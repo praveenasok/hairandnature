@@ -284,22 +284,22 @@ export default function AdminPage() {
   if (loading) return <div style={{ padding: '100px', textAlign: 'center' }}>Loading Admin Panel...</div>;
 
   return (
-    <div style={{ paddingTop: '120px', paddingBottom: '80px', minHeight: '100vh', background: '#f9f9f9' }}>
+    <div style={{ paddingTop: 'clamp(90px, 12vh, 120px)', paddingBottom: 'clamp(40px, 8vh, 80px)', minHeight: '100vh', background: '#f9f9f9' }}>
       <div className="container">
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '40px', color: 'var(--color-primary)' }}>Pricing Admin Panel</h1>
+        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', marginBottom: 'clamp(20px, 4vw, 40px)', color: 'var(--color-primary)', fontWeight: 600 }}>Pricing Admin Panel</h1>
         
-        <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '20px' }}>Bulk Assign & Adjust Prices</h2>
-          <p style={{ color: '#666', marginBottom: '30px' }}>Select multiple lengths, styles, and colors below. You can assign a flat price to all of them, or apply a percentage increase to their existing prices.</p>
+        <div style={{ background: 'white', padding: 'clamp(18px, 4vw, 30px)', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', marginBottom: '30px', border: '1px solid #eee' }}>
+          <h2 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 600 }}>Bulk Assign & Adjust Prices</h2>
+          <p style={{ color: '#666', marginBottom: '24px', lineHeight: 1.6, fontSize: '0.95rem' }}>Select multiple lengths, styles, and colors below. You can assign a flat price to all of them, or apply a percentage increase to their existing prices.</p>
           
           <div style={{ marginBottom: '25px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Product (Select One)</label>
-            <select value={product} onChange={e => setProduct(e.target.value)} style={{ width: '100%', maxWidth: '400px', padding: '10px', borderRadius: '6px', border: '1px solid #ddd' }}>
+            <select value={product} onChange={e => setProduct(e.target.value)} style={{ width: '100%', maxWidth: '400px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}>
               {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '30px', marginBottom: '30px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px', marginBottom: '25px' }}>
             
             {/* Lengths Multi-Select */}
             <div>
@@ -309,7 +309,7 @@ export default function AdminPage() {
                   {selectedLengths.length === LENGTHS.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px' }}>
+              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
                 {LENGTHS.map(l => (
                   <label key={l} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', cursor: 'pointer' }}>
                     <input type="checkbox" checked={selectedLengths.includes(l)} onChange={() => toggleSelection(l, selectedLengths, setSelectedLengths)} />
@@ -327,7 +327,7 @@ export default function AdminPage() {
                   {selectedStyles.length === STYLES.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px' }}>
+              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
                 {STYLES.map(s => (
                   <label key={s} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', cursor: 'pointer' }}>
                     <input type="checkbox" checked={selectedStyles.includes(s)} onChange={() => toggleSelection(s, selectedStyles, setSelectedStyles)} />
@@ -345,7 +345,7 @@ export default function AdminPage() {
                   {selectedColors.length === COLORS.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px' }}>
+              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
                 {COLORS.map(c => (
                   <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 0', cursor: 'pointer' }}>
                     <input type="checkbox" checked={selectedColors.includes(c)} onChange={() => toggleSelection(c, selectedColors, setSelectedColors)} />
@@ -357,10 +357,10 @@ export default function AdminPage() {
 
           </div>
 
-          <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-end', borderTop: '1px solid #eee', paddingTop: '25px', flexWrap: 'wrap' }}>
-            <div style={{ minWidth: '200px' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-end', borderTop: '1px solid #eee', paddingTop: '20px', flexWrap: 'wrap' }}>
+            <div style={{ flex: '1 1 200px', minWidth: 'min(100%, 200px)' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Action</label>
-              <select value={actionType} onChange={e => setActionType(e.target.value as any)} style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '1.05rem' }}>
+              <select value={actionType} onChange={e => setActionType(e.target.value as any)} style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}>
                 <option value="exact">Set Exact Price ($)</option>
                 <option value="percentage">Apply % increase over base price</option>
                 <option value="delete">Delete these combinations</option>
@@ -368,14 +368,14 @@ export default function AdminPage() {
             </div>
             
             {actionType !== "delete" && (
-              <div style={{ flex: 1, minWidth: '200px' }}>
+              <div style={{ flex: '1 1 200px', minWidth: 'min(100%, 200px)' }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>{actionType === "exact" ? 'Price ($)' : 'Percentage (%)'}</label>
                 <input 
                   type="number" 
                   value={inputValue} 
                   onChange={e => setInputValue(e.target.value)} 
                   placeholder={actionType === "exact" ? "e.g. 150" : "e.g. 15"}
-                  style={{ width: '100%', padding: '12px', borderRadius: '6px', border: '1px solid #ddd', fontSize: '1.1rem' }}
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
                 />
               </div>
             )}
@@ -384,28 +384,28 @@ export default function AdminPage() {
               onClick={handleSave}
               disabled={saving}
               className={actionType === "delete" ? "btn-dark" : "btn-gold"}
-              style={{ padding: '12px 30px', border: 'none', cursor: 'pointer', height: '49px', minWidth: '160px', marginLeft: actionType === "delete" ? 'auto' : '0' }}
+              style={{ padding: '12px 24px', border: 'none', cursor: 'pointer', minHeight: '48px', flex: '1 1 180px', width: '100%', justifyContent: 'center' }}
             >
               {saving ? 'Processing...' : actionType === "delete" ? 'Delete Selection' : 'Apply Update'}
             </button>
           </div>
         </div>
 
-        <div style={{ background: 'white', padding: '30px', borderRadius: '12px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)' }}>
+        <div style={{ background: 'white', padding: 'clamp(18px, 4vw, 30px)', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
-            <h2 style={{ fontSize: '1.5rem', margin: 0 }}>Current Defined Prices</h2>
-            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 600 }}>Current Defined Prices</h2>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%', maxWidth: '600px', justifyContent: 'flex-start' }}>
               <input 
                 type="text" 
                 placeholder="Search products, lengths, colors..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ padding: '8px 15px', borderRadius: '6px', border: '1px solid #ddd', minWidth: '250px' }}
+                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #ddd', flex: '1 1 200px', minWidth: 'min(100%, 200px)', fontSize: '0.95rem' }}
               />
               {selectedRows.length > 0 && (
                 <button 
                   onClick={handleDeleteSelected}
-                  style={{ background: '#555', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
+                  style={{ background: '#555', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
                 >
                   Delete Selected ({selectedRows.length})
                 </button>
@@ -413,7 +413,7 @@ export default function AdminPage() {
               {Object.keys(prices).length > 0 && (
                 <button 
                   onClick={handleClearAll}
-                  style={{ background: '#ff4d4f', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer', fontWeight: 600 }}
+                  style={{ background: '#ff4d4f', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem' }}
                 >
                   Clear All Prices
                 </button>
@@ -426,8 +426,8 @@ export default function AdminPage() {
           ) : processedPrices.length === 0 ? (
             <p style={{ color: '#666' }}>No prices match your search query.</p>
           ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+            <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '650px' }}>
                 <thead>
                   <tr style={{ borderBottom: '2px solid #eee' }}>
                     <th style={{ padding: '12px', width: '40px' }}>

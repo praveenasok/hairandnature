@@ -59,38 +59,38 @@ export default function ProductDetail() {
   return (
     <motion.div 
       initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-      style={{ padding: '50px 0', backgroundColor: 'var(--color-white)', minHeight: '80vh' }}
+      style={{ paddingTop: 'clamp(90px, 12vh, 120px)', paddingBottom: 'clamp(40px, 8vh, 80px)', backgroundColor: 'var(--color-white)', minHeight: '80vh' }}
     >
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <div className="container">
         <div className="flex-row-mobile-stack">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
-            style={{ flex: '1 1 400px' }}
+            style={{ flex: '1 1 320px', minWidth: 0, width: '100%' }}
           >
             <img 
               src={product.image} 
               alt={product.name} 
-              style={{ width: '100%', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} 
+              style={{ width: '100%', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', objectFit: 'cover' }} 
             />
           </motion.div>
           <motion.div 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-            style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+            style={{ flex: '1 1 320px', minWidth: 0, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
           >
-            <h1 style={{ fontSize: '2.5rem', color: 'var(--color-primary)', marginBottom: '10px' }}>{product.name}</h1>
-            <p style={{ fontSize: '2rem', fontWeight: 600, marginBottom: '20px' }}>₹{product.price}</p>
-            <p style={{ fontSize: '1.2rem', opacity: 0.8, lineHeight: 1.6, marginBottom: '40px' }}>{product.description}</p>
+            <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', color: 'var(--color-primary)', marginBottom: '10px', lineHeight: 1.15 }}>{product.name}</h1>
+            <p style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 600, marginBottom: '15px' }}>₹{product.price}</p>
+            <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', opacity: 0.8, lineHeight: 1.6, marginBottom: 'clamp(24px, 4vw, 36px)' }}>{product.description}</p>
             
             <button 
               onClick={handlePayment} 
               disabled={isProcessing}
               className="btn" 
-              style={{ fontSize: '1.2rem', padding: '15px 30px', width: '100%', maxWidth: '100%' }}
+              style={{ fontSize: 'clamp(1rem, 3vw, 1.15rem)', padding: '14px 28px', width: '100%' }}
             >
               {isProcessing ? 'Processing...' : 'Buy Now'}
             </button>
-            <p style={{ fontSize: '0.9rem', opacity: 0.6, marginTop: '15px', textAlign: 'center' }}>Secure checkout via Razorpay</p>
+            <p style={{ fontSize: '0.85rem', opacity: 0.6, marginTop: '12px', textAlign: 'center' }}>Secure checkout via Razorpay</p>
           </motion.div>
         </div>
       </div>

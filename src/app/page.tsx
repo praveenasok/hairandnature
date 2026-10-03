@@ -53,14 +53,14 @@ export default function Home() {
     },
     { 
       img: "/images/k_tips_light.jpg", 
-      align: "flex-end", 
-      textAlign: "right" as const,
+      align: "flex-start", 
+      textAlign: "left" as const,
       title: "K Tips",
       subtitle: "Premium keratin-tipped extensions for individual strand-by-strand application and natural movement.",
       link: "/k-tips",
       buttonText: "View Product",
       titleNowrap: true,
-      thumbs: ["/images/products/KTip.webp", "/images/products/KTip.jpg", "/images/products/KTip2.png"]
+      thumbs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"]
     },
     { 
       img: "/images/butterfly_wefts.jpg", 
@@ -101,9 +101,7 @@ export default function Home() {
           height: calc(100vh - 80px);
           margin-top: 80px;
           position: relative;
-          display: flex;
-          align-items: center;
-          padding: 0 8%;
+          overflow: hidden;
           color: white;
           background: #111;
         }
@@ -120,28 +118,40 @@ export default function Home() {
         }
         
         .hero-content {
-          position: relative;
-          z-index: 2;
-          padding: 30px 40px;
-          background: rgba(0, 0, 0, 0.45);
-          backdrop-filter: blur(15px);
-          -webkit-backdrop-filter: blur(15px);
+          position: absolute;
+          z-index: 10;
+          padding: 24px 28px;
+          background: rgba(15, 15, 15, 0.52);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.16);
           border-radius: 24px;
+          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+          max-width: clamp(320px, 26vw, 420px);
+          top: clamp(24px, 5.5vh, 55px);
         }
 
         .hero-title {
-          font-size: 3rem;
-          margin-bottom: 20px;
-          line-height: 1.2;
+          font-size: clamp(1.8rem, 2.3vw, 2.3rem);
+          margin-bottom: 10px;
+          line-height: 1.15;
+          font-weight: 500;
+          letter-spacing: -0.5px;
         }
 
         .hero-subtitle {
-          font-size: 1.2rem;
+          font-size: clamp(0.85rem, 0.95vw, 0.95rem);
           font-family: var(--font-sans);
           opacity: 0.9;
-          margin-bottom: 40px;
-          line-height: 1.6;
+          margin-bottom: 20px;
+          line-height: 1.5;
           font-weight: 300;
+        }
+
+        .hero-content .btn-gold {
+          padding: 10px 24px;
+          font-size: 0.85rem;
+          letter-spacing: 0.8px;
         }
 
         .section-title {
@@ -217,18 +227,19 @@ export default function Home() {
 
         .hero-product-cards-wrapper {
           position: absolute;
-          bottom: 40px;
+          bottom: 22px;
           left: 50%;
           transform: translateX(-50%);
           z-index: 10;
-          width: 90%;
-          max-width: 1200px;
+          width: calc(100% - 48px);
+          max-width: 1280px;
+          padding: 0 8px 8px 0;
         }
 
         .hero-product-cards {
-          display: flex;
-          gap: 20px;
-          justify-content: center;
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 16px;
           width: 100%;
         }
 
@@ -238,57 +249,69 @@ export default function Home() {
 
         .hero-card-container {
           position: relative;
-          flex: 1;
-          max-width: 280px;
           text-decoration: none;
           display: flex;
           flex-direction: column;
-          transition: transform 0.3s ease;
+          transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+          min-width: 0;
         }
 
         .hero-card-container:hover {
-          transform: translateY(-5px);
+          transform: translateY(-4px);
         }
 
         .hero-card {
           flex-grow: 1;
-          background: rgba(0, 0, 0, 0.45);
-          backdrop-filter: blur(15px);
-          -webkit-backdrop-filter: blur(15px);
-          border-radius: 24px;
-          padding: 20px 10px;
+          background: rgba(18, 18, 18, 0.58);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 16px;
+          padding: 10px 14px;
           text-align: center;
           color: white;
-          min-height: 120px;
+          min-height: 68px;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          -webkit-mask-image: radial-gradient(circle at calc(100% - 15px) calc(100% - 15px), transparent 30px, black 31px);
-          mask-image: radial-gradient(circle at calc(100% - 15px) calc(100% - 15px), transparent 30px, black 31px);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+          -webkit-mask-image: radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), transparent 25px, black 26px);
+          mask-image: radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), transparent 25px, black 26px);
         }
 
         .hero-card .eyebrow {
-          font-size: 0.75rem;
-          font-weight: 600;
-          text-transform: capitalize;
-          opacity: 0.9;
-          margin-bottom: 6px;
+          font-size: clamp(0.78rem, 0.9vw, 0.86rem);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.6px;
+          opacity: 0.92;
+          margin-bottom: 3px;
+          line-height: 1.15;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
         }
 
         .hero-card h3 {
-          font-size: 1.15rem;
+          font-size: clamp(1.14rem, 1.35vw, 1.32rem);
           font-weight: 700;
           margin: 0;
           line-height: 1.2;
+          letter-spacing: -0.2px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
         }
 
         .arrow-btn {
           position: absolute;
-          bottom: -10px;
-          right: -10px;
-          width: 50px;
-          height: 50px;
+          bottom: -5px;
+          right: -5px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
           background: #fff;
           display: flex;
@@ -296,13 +319,13 @@ export default function Home() {
           justify-content: center;
           overflow: hidden;
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          border: 3px solid #c43b40;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          border: 2.5px solid #e45258;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
         }
         
         .hero-card-container:hover .arrow-btn {
-          transform: scale(1.1);
-          box-shadow: 0 6px 15px rgba(196, 59, 64, 0.5);
+          transform: scale(1.12);
+          box-shadow: 0 6px 16px rgba(228, 82, 88, 0.55);
           border-color: white;
         }
 
@@ -314,16 +337,17 @@ export default function Home() {
         }
 
         .hero-slider-thumb {
-          width: 120px;
-          height: 120px;
+          width: 90px;
+          height: 90px;
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 992px) {
           .hero-product-cards-wrapper {
-            bottom: 30px;
+            bottom: 18px;
             width: 100%;
             left: 0;
             transform: none;
+            padding: 0 0 10px 0;
             overflow: hidden;
             -ms-overflow-style: none;
             scrollbar-width: none;
@@ -332,42 +356,125 @@ export default function Home() {
             display: none;
           }
           .hero-product-cards {
+            display: flex;
+            grid-template-columns: none;
             justify-content: flex-start;
             width: max-content;
+            gap: 12px;
             animation: marquee 25s linear infinite;
-            padding-bottom: 20px;
+            padding: 0 16px 10px 16px;
+          }
+          .hero-card-container {
+            width: 185px;
+            flex-shrink: 0;
+          }
+          .hero-card {
+            min-height: 64px;
+            padding: 8px 12px;
+          }
+          .hero-card .eyebrow {
+            font-size: 0.74rem;
+          }
+          .hero-card h3 {
+            font-size: 1.05rem;
           }
           .mobile-clone {
             display: flex !important;
           }
           @keyframes marquee {
             0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-50% - 10px)); }
-          }
-          .hero-card {
-            min-width: 180px;
+            100% { transform: translateX(calc(-50% - 7px)); }
           }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
+          .hero-section {
+            height: calc(100vh - 70px);
+            min-height: 540px;
+            margin-top: 70px;
+          }
+          .hero-bg {
+            object-position: center 6% !important;
+          }
           .hero-content {
-            left: 5% !important;
-            right: 5% !important;
-            max-width: 90% !important;
-            flex-direction: column !important;
-            text-align: center !important;
-            padding: 15px 15px !important;
-            gap: 10px !important;
+            left: 14px !important;
+            right: 14px !important;
+            margin: 0 auto !important;
+            max-width: min(440px, calc(100% - 28px)) !important;
             top: auto !important;
-            bottom: 200px !important;
+            bottom: 110px !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            padding: 8px 12px 8px 10px !important;
+            gap: 10px !important;
+            border-radius: 18px !important;
+            min-height: 52px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+          }
+          .hero-thumb-wrapper {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
           }
           .hero-slider-thumb {
-            width: 70px !important;
-            height: 70px !important;
+            width: 38px !important;
+            height: 38px !important;
           }
-          .hero-title { font-size: 1.5rem !important; margin-bottom: 5px !important; }
-          .hero-subtitle { display: none !important; }
-          .section-title { font-size: 2.2rem; }
+          .hero-text-content {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            gap: 10px !important;
+            flex: 1 !important;
+            min-width: 0 !important;
+            text-align: left !important;
+          }
+          .hero-title-group {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+          }
+          .hero-title { 
+            font-size: 0.98rem !important; 
+            margin-bottom: 1px !important; 
+            line-height: 1.15 !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600 !important;
+          }
+          .hero-subtitle { 
+            font-size: 0.72rem !important; 
+            margin-bottom: 0 !important; 
+            line-height: 1.25 !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.82;
+          }
+          .hero-cta-btn {
+            flex-shrink: 0 !important;
+            padding: 6px 14px !important;
+            font-size: 0.74rem !important;
+            letter-spacing: 0.4px !important;
+            border-radius: 20px !important;
+            white-space: nowrap !important;
+            height: 32px !important;
+          }
+          .hero-product-cards-wrapper {
+            bottom: 12px !important;
+          }
+          .section-title { font-size: clamp(1.75rem, 5vw, 2.2rem) !important; }
+        }
+
+        @media (max-width: 640px) {
+          .product-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
       `}</style>
       
@@ -389,39 +496,38 @@ export default function Home() {
           <motion.div 
             key={currentSlide}
             className="hero-content"
-            initial={{ opacity: 0, x: heroSlides[currentSlide].align === 'flex-start' ? -30 : 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: heroSlides[currentSlide].align === 'flex-start' ? -30 : 30 }}
-            transition={{ duration: 0.8 }}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.6 }}
             style={{ 
-              zIndex: 10, 
               textAlign: heroSlides[currentSlide].textAlign, 
-              maxWidth: '680px',
-              position: 'absolute',
-              left: heroSlides[currentSlide].align === 'flex-start' ? '8%' : 'auto',
-              right: heroSlides[currentSlide].align === 'flex-end' ? '8%' : 'auto',
+              left: heroSlides[currentSlide].align === 'flex-start' ? 'clamp(20px, 5vw, 60px)' : 'auto',
+              right: heroSlides[currentSlide].align === 'flex-end' ? 'clamp(20px, 5vw, 60px)' : 'auto',
               display: 'flex',
               flexDirection: heroSlides[currentSlide].align === 'flex-start' ? 'row' : 'row-reverse',
               alignItems: 'center',
-              gap: '35px'
+              gap: '24px'
             }}
           >
             {heroSlides[currentSlide].thumbs && (
-              <div style={{ flexShrink: 0 }}>
+              <div className="hero-thumb-wrapper" style={{ flexShrink: 0 }}>
                 <MiniImageSlider 
                   images={heroSlides[currentSlide].thumbs!} 
                   className="hero-slider-thumb"
-                  style={{ borderRadius: '50%', border: '4px solid rgba(255,255,255,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
+                  style={{ borderRadius: '50%', border: '2px solid rgba(255,255,255,0.35)', boxShadow: '0 8px 25px rgba(0,0,0,0.35)' }}
                 />
               </div>
             )}
-            <div>
-              <h1 className="hero-title" style={{ margin: '0 0 15px 0' }}>
-                {heroSlides[currentSlide].title}
-              </h1>
-              <p className="hero-subtitle" style={{ margin: '0 0 25px 0' }}>{heroSlides[currentSlide].subtitle}</p>
+            <div className="hero-text-content">
+              <div className="hero-title-group">
+                <h1 className="hero-title">
+                  {heroSlides[currentSlide].title}
+                </h1>
+                <p className="hero-subtitle">{heroSlides[currentSlide].subtitle}</p>
+              </div>
               {heroSlides[currentSlide].buttonText && heroSlides[currentSlide].link && (
-                <a href={heroSlides[currentSlide].link} className="btn-gold">{heroSlides[currentSlide].buttonText}</a>
+                <a href={heroSlides[currentSlide].link} className="btn-gold hero-cta-btn">{heroSlides[currentSlide].buttonText}</a>
               )}
             </div>
           </motion.div>
@@ -433,7 +539,7 @@ export default function Home() {
               { title: "ClipOn Extensions", link: "/seamless-clipon-extensions", eyebrow: "Instantly Add Volume", iconImgs: ["/images/products/clipon.webp", "/images/products/clipon2.jpeg", "/images/products/clipon3.jpeg"] },
               { title: "Genius Wefts", link: "/genius-wefts", eyebrow: "Ultra-Thin & Flexible", iconImgs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"] },
               { title: "Tape Extensions", link: "/tape-extensions", eyebrow: "Lightweight & Discreet", iconImgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
-              { title: "K Tips", link: "/k-tips", eyebrow: "Premium Keratin", iconImgs: ["/images/products/KTip.webp", "/images/products/KTip.jpg", "/images/products/KTip2.png"] },
+              { title: "K Tips", link: "/k-tips", eyebrow: "Premium Keratin", iconImgs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"] },
               { title: "Butterfly Wefts", link: "/butterfly-wefts", eyebrow: "Maximum Volume", iconImgs: ["/images/products/butterflyweft.jpg", "/images/products/butterflyweft2.jpg", "/images/products/butterflyweft3.webp"] }
             ].map(prod => (
               <a href={prod.link} className="hero-card-container" key={prod.title}>
@@ -451,7 +557,7 @@ export default function Home() {
               { title: "ClipOn Extensions", link: "/seamless-clipon-extensions", eyebrow: "Instantly Add Volume", iconImgs: ["/images/products/clipon.webp", "/images/products/clipon2.jpeg", "/images/products/clipon3.jpeg"] },
               { title: "Genius Wefts", link: "/genius-wefts", eyebrow: "Ultra-Thin & Flexible", iconImgs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"] },
               { title: "Tape Extensions", link: "/tape-extensions", eyebrow: "Lightweight & Discreet", iconImgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
-              { title: "K Tips", link: "/k-tips", eyebrow: "Premium Keratin", iconImgs: ["/images/products/KTip.webp", "/images/products/KTip.jpg", "/images/products/KTip2.png"] },
+              { title: "K Tips", link: "/k-tips", eyebrow: "Premium Keratin", iconImgs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"] },
               { title: "Butterfly Wefts", link: "/butterfly-wefts", eyebrow: "Maximum Volume", iconImgs: ["/images/products/butterflyweft.jpg", "/images/products/butterflyweft2.jpg", "/images/products/butterflyweft3.webp"] }
             ].map(prod => (
               <a href={prod.link} className="hero-card-container mobile-clone" key={prod.title + "-clone"}>
@@ -510,27 +616,27 @@ export default function Home() {
 
       <section id="about-section" className="section" style={{ background: 'white' }}>
         <div className="container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: 'clamp(30px, 5vw, 60px)', alignItems: 'center' }}>
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <img src="/images/hair_bun.png" alt="About us" style={{ width: '100%', borderRadius: '10px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
+              <img src="/images/caucasian_models_hair.jpg" alt="Our Hair Extensions Collection - Three Models" style={{ width: '100%', borderRadius: '16px', boxShadow: '0 20px 40px rgba(0,0,0,0.12)', objectFit: 'cover' }} />
             </motion.div>
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="section-title" style={{ textAlign: 'left' }}>Our Heritage & Commitment</h2>
-              <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: '20px' }}>
+              <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '16px' }}>Our Heritage & Commitment</h2>
+              <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.1rem)', lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: '16px' }}>
                 At hair&nature®, we pride ourselves on delivering the finest, ethically sourced Remy human hair directly from the temples of India to you.
               </p>
-              <p style={{ fontSize: '1.1rem', lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: '30px' }}>
+              <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.1rem)', lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: '26px' }}>
                 With decades of expertise as a manufacturer and exporter, we ensure every strand undergoes rigorous quality checks. Our extensions remain chemical-free, retaining their natural strength, bounce, and luster for unparalleled longevity.
               </p>
-              <a href="#contact-section" className="btn-gold">Get in Touch</a>
+              <a href="/#contact-section" className="btn-gold">Get in Touch</a>
             </motion.div>
           </div>
         </div>

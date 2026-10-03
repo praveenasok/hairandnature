@@ -8,7 +8,7 @@ import MiniImageSlider from "./MiniImageSlider";
 
 const PRODUCTS = [
   { name: "Tape Extensions", href: "/tape-extensions", imgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
-  { name: "K Tips", href: "/k-tips", imgs: ["/images/products/KTip.webp", "/images/products/KTip.jpg", "/images/products/KTip2.png"] },
+  { name: "K Tips", href: "/k-tips", imgs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"] },
   { name: "Genius Wefts", href: "/genius-wefts", imgs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"] },
   { name: "Butterfly Wefts", href: "/butterfly-wefts", imgs: ["/images/products/butterflyweft.jpg", "/images/products/butterflyweft2.jpg", "/images/products/butterflyweft3.webp"] },
   { name: "ClipOn Extensions", href: "/seamless-clipon-extensions", imgs: ["/images/products/clipon.webp", "/images/products/clipon2.jpeg", "/images/products/clipon3.jpeg"] },
@@ -34,7 +34,7 @@ export default function Navigation() {
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '15px' }} onClick={() => setIsOpen(false)}>
             {/* If you have a specific logo, replace this text with it */}
-            <h1 className="brand-name" style={{ margin: 0, fontWeight: 500 }}>hair&nature®</h1>
+            <h1 className="brand-name" style={{ margin: 0, fontWeight: 500, fontSize: 'clamp(1.4rem, 4.5vw, 1.8rem)' }}>hair&nature®</h1>
           </Link>
           
           {/* Desktop Nav */}
@@ -107,6 +107,90 @@ export default function Navigation() {
                           {product.name}
                         </Link>
                       ))}
+
+                      {/* Bottom-Right Slot: Logo & Authentic Rubber Stamp */}
+                      <div 
+                        style={{ 
+                          padding: '18px 24px', 
+                          borderRadius: '16px', 
+                          background: 'rgba(235, 225, 216, 0.35)', 
+                          border: '1px solid rgba(228, 82, 88, 0.15)', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'space-between',
+                          gap: '16px',
+                          position: 'relative',
+                          overflow: 'hidden',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(228, 82, 88, 0.05)';
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.backgroundColor = 'rgba(235, 225, 216, 0.35)';
+                          e.currentTarget.style.transform = 'translateY(0)';
+                        }}
+                      >
+                        {/* Brand Logo */}
+                        <span style={{ 
+                          fontFamily: 'var(--font-serif)', 
+                          fontSize: '1.65rem', 
+                          fontWeight: 600, 
+                          color: 'var(--color-primary)', 
+                          lineHeight: 1.1,
+                          letterSpacing: '-0.4px'
+                        }}>
+                          hair&nature®
+                        </span>
+
+                        {/* Authentic Rubber Stamp Seal */}
+                        <svg 
+                          xmlns="http://www.w3.org/2000/svg" 
+                          viewBox="0 0 120 120" 
+                          width="90" 
+                          height="90" 
+                          style={{ 
+                            transform: 'rotate(-9deg)', 
+                            flexShrink: 0,
+                            opacity: 0.9,
+                            transition: 'transform 0.3s ease'
+                          }}
+                          aria-label="Made with 100% Natural Human Hair Stamp"
+                        >
+                          <defs>
+                            <filter id="megaMenuRubberStamp" x="-10%" y="-10%" width="120%" height="120%">
+                              <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" result="noise" />
+                              <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1" xChannelSelector="R" yChannelSelector="G" />
+                            </filter>
+                            <path id="megaMenuUpperArc" d="M 18,60 A 42,42 0 0,1 102,60" fill="none" />
+                            <path id="megaMenuLowerArc" d="M 18,60 A 42,42 0 0,0 102,60" fill="none" />
+                          </defs>
+                          <g filter="url(#megaMenuRubberStamp)" stroke="#b82e35" fill="#b82e35">
+                            {/* Outer Distressed Stamp Rings */}
+                            <circle cx="60" cy="60" r="56" fill="none" strokeWidth="2.6" />
+                            <circle cx="60" cy="60" r="51.5" fill="none" strokeWidth="1.2" strokeDasharray="3,1.5" />
+
+                            {/* Inner Stamp Rings */}
+                            <circle cx="60" cy="60" r="32" fill="none" strokeWidth="1.6" />
+                            <circle cx="60" cy="60" r="29" fill="none" strokeWidth="0.8" />
+
+                            {/* Top Curved Text */}
+                            <text fontSize="8.5" fontWeight="900" fontFamily="'Quicksand', Arial, sans-serif" letterSpacing="2" stroke="none">
+                              <textPath href="#megaMenuUpperArc" startOffset="50%" textAnchor="middle">★ MADE WITH ★</textPath>
+                            </text>
+
+                            {/* Bottom Curved Text */}
+                            <text fontSize="8.5" fontWeight="900" fontFamily="'Quicksand', Arial, sans-serif" letterSpacing="2" stroke="none">
+                              <textPath href="#megaMenuLowerArc" startOffset="50%" textAnchor="middle">★ HUMAN HAIR ★</textPath>
+                            </text>
+
+                            {/* Center Stamp Typography */}
+                            <text x="60" y="55" textAnchor="middle" fontSize="15" fontWeight="900" fontFamily="'Quicksand', Arial Black, sans-serif" letterSpacing="0.5" stroke="none">100%</text>
+                            <text x="60" y="66" textAnchor="middle" fontSize="7" fontWeight="900" fontFamily="'Quicksand', Arial, sans-serif" letterSpacing="2" stroke="none">NATURAL</text>
+                          </g>
+                        </svg>
+                      </div>
                     </div>
                   </motion.div>
                 )}
@@ -123,7 +207,7 @@ export default function Navigation() {
           {/* Mobile Nav Toggle */}
           <button 
             className="mobile-menu-btn" 
-            style={{ color: scrolled ? 'var(--color-text)' : 'white' }} 
+            style={{ color: 'var(--color-text)' }} 
             onClick={() => setIsOpen(!isOpen)} 
             aria-label="Toggle menu"
           >
@@ -147,16 +231,16 @@ export default function Navigation() {
               
               <div style={{ padding: '15px 0', borderBottom: '1px solid #eee' }}>
                 <span style={{ color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '10px' }}>Products</span>
-                <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '15px', gap: '15px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '10px', gap: '14px' }}>
                   {PRODUCTS.map(product => (
                     <Link 
                       key={product.href} 
                       href={product.href} 
-                      style={{ color: '#555', fontWeight: 500, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '12px' }} 
+                      style={{ color: '#444', fontWeight: 500, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '14px', padding: '4px 0' }} 
                       onClick={() => setIsOpen(false)}
                     >
-                      <MiniImageSlider images={product.imgs} style={{ width: '56px', height: '56px', borderRadius: '50%', border: '1px solid #eee', flexShrink: 0 }} />
-                      {product.name}
+                      <MiniImageSlider images={product.imgs} style={{ width: '50px', height: '50px', borderRadius: '50%', border: '1px solid #eee', flexShrink: 0 }} />
+                      <span>{product.name}</span>
                     </Link>
                   ))}
                 </div>
@@ -164,6 +248,19 @@ export default function Navigation() {
 
               <Link href="/#about-section" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>About Us</Link>
               <Link href="/#contact-section" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>Contact</Link>
+              
+              <div style={{ paddingTop: '20px', paddingBottom: '10px' }}>
+                <a 
+                  href="https://wa.me/919871171978" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="btn-gold" 
+                  style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem' }}
+                  onClick={() => setIsOpen(false)}
+                >
+                  Inquire Now on WhatsApp
+                </a>
+              </div>
             </nav>
           </motion.div>
         )}
