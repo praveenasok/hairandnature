@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
+const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
 const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
 const COLORS = [
   { name: '#1 Jet Black', hex: '#0e0d12' },
@@ -18,8 +19,10 @@ const COLORS = [
 export default function ProductPage({ title, desc, img, specs = [] }: { title: string, desc: string, img: string, specs?: {label: string, value: string}[] }) {
   const { formatPrice, currency } = useCurrency();
   const [length, setLength] = useState(LENGTHS[0]);
+  const [weight, setWeight] = useState(WEIGHTS[1]);
   const [style, setStyle] = useState(STYLES[0]);
   const [color, setColor] = useState(COLORS[0].name);
+  const [description, setDescription] = useState(desc);
   
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [unit, setUnit] = useState<string>('unit');
@@ -38,14 +41,35 @@ export default function ProductPage({ title, desc, img, specs = [] }: { title: s
         }
       })
       .catch(err => console.error("Could not load units", err));
+
+    fetch('/api/descriptions')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data[title]) {
+          setDescription(data[title]);
+        }
+      })
+      .catch(err => console.error("Could not load descriptions", err));
   }, [title]);
 
-  const currentKey = `${title}|${length}|${style}|${color}`;
-  const currentPrice = prices[currentKey];
+  const keyWithWeight = `${title}|${length}|${style}|${color}|${weight}`;
+  const keyLegacy = `${title}|${length}|${style}|${color}`;
+
+  let currentPrice = prices[keyWithWeight];
+  if (currentPrice === undefined && prices[keyLegacy] !== undefined) {
+    const base = prices[keyLegacy];
+    const mults: Record<string, number> = {
+      '50 Grams': 0.55,
+      '100 Grams': 1.0,
+      '150 Grams': 1.48,
+      '200 Grams': 1.95
+    };
+    currentPrice = Math.round(base * (mults[weight] || 1.0));
+  }
 
   const formattedPriceWithUnit = currentPrice !== undefined ? formatPrice(currentPrice, unit) : '';
   const priceText = currentPrice !== undefined ? ` - ${formattedPriceWithUnit}` : '';
-  const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: ${formattedPriceWithUnit} (${currency})` : ''}`;
+  const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nWeight: ${weight}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: ${formattedPriceWithUnit} (${currency})` : ''}`;
   const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -89,12 +113,12 @@ export default function ProductPage({ title, desc, img, specs = [] }: { title: s
               </div>
             )}
           </div>
-          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: 1.7, marginBottom: '24px', color: '#555' }}>{desc}</p>
+          <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: 1.7, marginBottom: '24px', color: '#555' }}>{description}</p>
           
           <hr style={{ border: 'none', borderTop: '1px solid #eaeaea', margin: '24px 0' }} />
 
           {/* Length Options */}
-          <div style={{ marginBottom: '25px' }}>
+          <div style={{ marginBottom: '22px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Length</span>
               <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{length}</span>
@@ -123,10 +147,40 @@ export default function ProductPage({ title, desc, img, specs = [] }: { title: s
             </div>
           </div>
 
-          {/* Style Options */}
-          <div style={{ marginBottom: '25px' }}>
+          {/* Weight Options */}
+          <div style={{ marginBottom: '22px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Style/Texture</span>
+              <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Weight</span>
+              <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{weight}</span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {WEIGHTS.map(w => (
+                <button 
+                  key={w} 
+                  onClick={() => setWeight(w)}
+                  style={{ 
+                    padding: '8px 16px', 
+                    borderRadius: '8px', 
+                    border: w === weight ? '2px solid var(--color-primary)' : '1px solid #ddd', 
+                    background: w === weight ? 'rgba(228, 82, 88, 0.05)' : 'white',
+                    color: w === weight ? 'var(--color-primary)' : '#444',
+                    fontWeight: w === weight ? 600 : 400,
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s ease',
+                    minHeight: '40px'
+                  }}
+                >
+                  {w}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Style Options */}
+          <div style={{ marginBottom: '22px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Style / Texture</span>
               <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{style}</span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
@@ -187,7 +241,9 @@ export default function ProductPage({ title, desc, img, specs = [] }: { title: s
                 {specs.map((spec, i) => (
                   <div key={i} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: i === specs.length - 1 ? 'none' : '1px solid #f0f0f0', gap: '10px' }}>
                     <span style={{ color: '#666', fontSize: '0.92rem' }}>{spec.label}</span>
-                    <span style={{ color: '#222', fontWeight: 500, fontSize: '0.92rem', textAlign: 'right' }}>{spec.value}</span>
+                    <span style={{ color: '#222', fontWeight: 500, fontSize: '0.92rem', textAlign: 'right' }}>
+                      {spec.label.toLowerCase().includes('weight') ? weight : spec.value}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -197,7 +253,7 @@ export default function ProductPage({ title, desc, img, specs = [] }: { title: s
           {/* Order Summary Box */}
           <div style={{ background: '#f8f8f8', padding: 'clamp(18px, 4vw, 25px)', borderRadius: '16px', border: '1px solid #e0e0e0' }}>
             <div style={{ marginBottom: '20px', fontSize: '1rem', lineHeight: 1.6, color: '#444' }}>
-              Summary: Premium <strong>{title}</strong> in length <strong>{length}</strong>, style <strong>{style}</strong>, and color <strong>{color}</strong>{priceText}.
+              Summary: Premium <strong>{title}</strong> in length <strong>{length}</strong>, weight <strong>{weight}</strong>, style <strong>{style}</strong>, and color <strong>{color}</strong>{priceText}.
             </div>
             <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-gold" style={{ width: '100%', padding: '16px 20px', fontSize: 'clamp(1rem, 3.5vw, 1.15rem)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
               <span>Inquire & Order on WhatsApp</span>

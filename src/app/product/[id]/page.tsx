@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { products } from '../../../data/products';
 import Script from 'next/script';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useCurrency } from '@/context/CurrencyContext';
 
@@ -11,7 +11,31 @@ export default function ProductDetail() {
   const { id } = useParams();
   const product = products.find(p => p.id === id);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [description, setDescription] = useState(product?.description || "");
+  const [unit, setUnit] = useState(product?.unit || "piece");
   const { formatPrice, currency } = useCurrency();
+
+  useEffect(() => {
+    if (product) {
+      fetch('/api/descriptions')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data[product.name]) {
+            setDescription(data[product.name]);
+          }
+        })
+        .catch(err => console.error("Error loading descriptions", err));
+
+      fetch('/api/units')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data[product.name]) {
+            setUnit(data[product.name]);
+          }
+        })
+        .catch(err => console.error("Error loading units", err));
+    }
+  }, [product]);
 
   if (!product) {
     return <div className="container" style={{ padding: '100px 0', textAlign: 'center' }}><h2>Product not found.</h2></div>;
@@ -82,9 +106,9 @@ export default function ProductDetail() {
           >
             <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', color: 'var(--color-primary)', marginBottom: '10px', lineHeight: 1.15 }}>{product.name}</h1>
             <p style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 700, marginBottom: '15px', color: 'var(--color-primary)' }}>
-              {formatPrice(product.price, product.unit || 'unit')}
+              {formatPrice(product.price, unit)}
             </p>
-            <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', opacity: 0.8, lineHeight: 1.6, marginBottom: 'clamp(24px, 4vw, 36px)' }}>{product.description}</p>
+            <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', opacity: 0.8, lineHeight: 1.6, marginBottom: 'clamp(24px, 4vw, 36px)' }}>{description}</p>
             
             <button 
               onClick={handlePayment} 

@@ -12,25 +12,32 @@ const defaultUnits: Record<string, string> = {
   "ClipOn Extensions": "set"
 };
 
+let memoryUnits: Record<string, string> = { ...defaultUnits };
+
 export async function GET() {
   try {
-    if (!fs.existsSync(unitsFilePath)) {
-      return NextResponse.json(defaultUnits);
+    if (fs.existsSync(unitsFilePath)) {
+      const fileContent = fs.readFileSync(unitsFilePath, 'utf8');
+      const units = JSON.parse(fileContent);
+      memoryUnits = { ...defaultUnits, ...units };
     }
-    const fileContent = fs.readFileSync(unitsFilePath, 'utf8');
-    const units = JSON.parse(fileContent);
-    return NextResponse.json({ ...defaultUnits, ...units });
+    return NextResponse.json(memoryUnits);
   } catch (error) {
     console.error('Error reading units:', error);
-    return NextResponse.json(defaultUnits);
+    return NextResponse.json(memoryUnits);
   }
 }
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    fs.writeFileSync(unitsFilePath, JSON.stringify(data, null, 2), 'utf8');
-    return NextResponse.json({ success: true, units: data });
+    memoryUnits = { ...memoryUnits, ...data };
+    try {
+      fs.writeFileSync(unitsFilePath, JSON.stringify(memoryUnits, null, 2), 'utf8');
+    } catch (fsErr) {
+      console.warn('Filesystem write warning in serverless environment:', fsErr);
+    }
+    return NextResponse.json({ success: true, units: memoryUnits });
   } catch (error) {
     console.error('Error saving units:', error);
     return NextResponse.json({ error: 'Failed to save units' }, { status: 500 });
