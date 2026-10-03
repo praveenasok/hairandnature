@@ -1,6 +1,7 @@
 "use client";
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { useCurrency } from '@/context/CurrencyContext';
 
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
@@ -15,24 +16,36 @@ const COLORS = [
 ];
 
 export default function ProductPage({ title, desc, img, specs = [] }: { title: string, desc: string, img: string, specs?: {label: string, value: string}[] }) {
+  const { formatPrice, currency } = useCurrency();
   const [length, setLength] = useState(LENGTHS[0]);
   const [style, setStyle] = useState(STYLES[0]);
   const [color, setColor] = useState(COLORS[0].name);
   
   const [prices, setPrices] = useState<Record<string, number>>({});
+  const [unit, setUnit] = useState<string>('unit');
   
   useEffect(() => {
     fetch('/api/prices')
       .then(res => res.json())
       .then(data => setPrices(data || {}))
       .catch(err => console.error("Could not load prices", err));
-  }, []);
+
+    fetch('/api/units')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data[title]) {
+          setUnit(data[title]);
+        }
+      })
+      .catch(err => console.error("Could not load units", err));
+  }, [title]);
 
   const currentKey = `${title}|${length}|${style}|${color}`;
   const currentPrice = prices[currentKey];
 
-  const priceText = currentPrice !== undefined ? ` - $${Math.round(currentPrice)}` : '';
-  const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: $${Math.round(currentPrice)}` : ''}`;
+  const formattedPriceWithUnit = currentPrice !== undefined ? formatPrice(currentPrice, unit) : '';
+  const priceText = currentPrice !== undefined ? ` - ${formattedPriceWithUnit}` : '';
+  const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: ${formattedPriceWithUnit} (${currency})` : ''}`;
   const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -71,7 +84,9 @@ export default function ProductPage({ title, desc, img, specs = [] }: { title: s
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '15px' }}>
             <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)', color: 'var(--color-primary)', fontWeight: 700, lineHeight: 1.15, margin: 0 }}>{title}</h1>
             {currentPrice !== undefined && (
-              <div style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 'bold', color: '#333' }}>${Math.round(currentPrice)}</div>
+              <div style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
+                {formattedPriceWithUnit}
+              </div>
             )}
           </div>
           <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: 1.7, marginBottom: '24px', color: '#555' }}>{desc}</p>

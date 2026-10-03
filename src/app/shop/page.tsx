@@ -1,7 +1,12 @@
+"use client";
+
 import Link from 'next/link';
 import { products } from '../../data/products';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function Shop() {
+  const { formatPrice } = useCurrency();
+
   return (
     <div className="animate-fade-in" style={{ paddingTop: 'clamp(90px, 12vh, 120px)', paddingBottom: 'clamp(40px, 8vh, 80px)', backgroundColor: 'var(--color-white)', minHeight: '80vh' }}>
       <div className="container">
@@ -17,7 +22,9 @@ export default function Shop() {
                 </div>
                 <div style={{ padding: 'clamp(18px, 3vw, 24px)' }}>
                   <h3 style={{ fontSize: '1.25rem', marginBottom: '8px', color: '#222' }}>{product.name}</h3>
-                  <p style={{ color: 'var(--color-primary)', fontWeight: 600, fontSize: '1.2rem', marginBottom: '18px' }}>₹{product.price}</p>
+                  <p style={{ color: 'var(--color-primary)', fontWeight: 700, fontSize: '1.2rem', marginBottom: '18px' }}>
+                    {formatPrice(product.price, product.unit || 'unit')}
+                  </p>
                   <span className="btn" style={{ width: '100%', padding: '12px 20px', fontSize: '0.95rem' }}>View Details</span>
                 </div>
               </Link>

@@ -7,13 +7,15 @@ const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches'
 const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
 const COLORS = ['#1 Jet Black', '#1b Off Black', '#2 Darkest Brown', '#4 Medium Brown', '#8 Light Ash Brown', '#22 Light Blonde', '#613 Bleach Blonde'];
 
-type SortKey = 'product' | 'length' | 'style' | 'color' | 'price';
+type SortKey = 'product' | 'length' | 'style' | 'color' | 'price' | 'unit';
 type SortDirection = 'asc' | 'desc';
 
 export default function AdminPage() {
   const [prices, setPrices] = useState<Record<string, number>>({});
+  const [units, setUnits] = useState<Record<string, string>>({});
   
   const [product, setProduct] = useState(PRODUCTS[0]);
+  const [selectedUnit, setSelectedUnit] = useState<string>("pack");
   const [selectedLengths, setSelectedLengths] = useState<string[]>([LENGTHS[0]]);
   const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
   const [selectedColors, setSelectedColors] = useState<string[]>([COLORS[0]]);
@@ -32,17 +34,46 @@ export default function AdminPage() {
   const [sortConfig, setSortConfig] = useState<{ key: SortKey, direction: SortDirection } | null>(null);
 
   useEffect(() => {
-    fetch('/api/prices')
-      .then(res => res.json())
-      .then(data => {
-        setPrices(data || {});
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    Promise.all([
+      fetch('/api/prices').then(res => res.json()).catch(() => ({})),
+      fetch('/api/units').then(res => res.json()).catch(() => ({}))
+    ]).then(([priceData, unitData]) => {
+      setPrices(priceData || {});
+      const loadedUnits = unitData || {};
+      setUnits(loadedUnits);
+      setSelectedUnit(loadedUnits[PRODUCTS[0]] || "pack");
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
   }, []);
+
+  const handleProductChange = (newProduct: string) => {
+    setProduct(newProduct);
+    setSelectedUnit(units[newProduct] || "pack");
+  };
+
+  const handleSaveUnit = async (prodName: string, unitVal: string) => {
+    const cleaned = unitVal.trim() || 'unit';
+    const updatedUnits = { ...units, [prodName]: cleaned };
+    try {
+      const res = await fetch('/api/units', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedUnits)
+      });
+      if (res.ok) {
+        setUnits(updatedUnits);
+        alert(`Unit for "${prodName}" saved as "${cleaned}"!`);
+      } else {
+        alert("Failed to save unit.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error saving unit.");
+    }
+  };
 
   const toggleSelection = (item: string, currentList: string[], setList: (v: string[]) => void) => {
     if (currentList.includes(item)) {
@@ -224,8 +255,9 @@ export default function AdminPage() {
   // Process data for rendering (searching and sorting)
   const processedPrices = useMemo(() => {
     let result = Object.entries(prices).map(([key, price]) => {
-      const [product, length, style, color] = key.split('|');
-      return { key, product, length, style, color, price };
+      const [prodName, length, style, color] = key.split('|');
+      const unit = units[prodName] || 'unit';
+      return { key, product: prodName, length, style, color, price, unit };
     });
 
     if (searchQuery) {
@@ -234,7 +266,8 @@ export default function AdminPage() {
         item.product.toLowerCase().includes(q) ||
         item.length.toLowerCase().includes(q) ||
         item.style.toLowerCase().includes(q) ||
-        item.color.toLowerCase().includes(q)
+        item.color.toLowerCase().includes(q) ||
+        item.unit.toLowerCase().includes(q)
       );
     }
 
@@ -258,7 +291,7 @@ export default function AdminPage() {
     }
 
     return result;
-  }, [prices, searchQuery, sortConfig]);
+  }, [prices, units, searchQuery, sortConfig]);
 
   const toggleAllRows = () => {
     if (selectedRows.length === processedPrices.length && processedPrices.length > 0) {
@@ -286,17 +319,72 @@ export default function AdminPage() {
   return (
     <div style={{ paddingTop: 'clamp(90px, 12vh, 120px)', paddingBottom: 'clamp(40px, 8vh, 80px)', minHeight: '100vh', background: '#f9f9f9' }}>
       <div className="container">
-        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', marginBottom: 'clamp(20px, 4vw, 40px)', color: 'var(--color-primary)', fontWeight: 600 }}>Pricing Admin Panel</h1>
+        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', marginBottom: 'clamp(20px, 4vw, 40px)', color: 'var(--color-primary)', fontWeight: 600 }}>Pricing & Product Admin Panel</h1>
         
         <div style={{ background: 'white', padding: 'clamp(18px, 4vw, 30px)', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', marginBottom: '30px', border: '1px solid #eee' }}>
-          <h2 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 600 }}>Bulk Assign & Adjust Prices</h2>
-          <p style={{ color: '#666', marginBottom: '24px', lineHeight: 1.6, fontSize: '0.95rem' }}>Select multiple lengths, styles, and colors below. You can assign a flat price to all of them, or apply a percentage increase to their existing prices.</p>
+          <h2 style={{ fontSize: '1.4rem', marginBottom: '14px', fontWeight: 600 }}>Bulk Assign Prices & Manage Units</h2>
+          <p style={{ color: '#666', marginBottom: '24px', lineHeight: 1.6, fontSize: '0.95rem' }}>Select a product and configure its selling unit (e.g. pack, bundle, weft, unit). Choose multiple lengths, styles, and colors to assign exact prices or percentage increases.</p>
           
-          <div style={{ marginBottom: '25px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Product (Select One)</label>
-            <select value={product} onChange={e => setProduct(e.target.value)} style={{ width: '100%', maxWidth: '400px', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}>
-              {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
-            </select>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))', gap: '20px', marginBottom: '25px' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Product (Select One)</label>
+              <select 
+                value={product} 
+                onChange={e => handleProductChange(e.target.value)} 
+                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
+              >
+                {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ fontWeight: 600 }}>Product Unit of Sale</label>
+                <span style={{ fontSize: '0.8rem', color: '#666' }}>Active: <strong style={{ color: 'var(--color-primary)' }}>{units[product] || 'unit'}</strong></span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input 
+                  type="text" 
+                  value={selectedUnit} 
+                  onChange={e => setSelectedUnit(e.target.value)} 
+                  placeholder="e.g. pack, bundle, weft, unit"
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
+                />
+                <button 
+                  onClick={() => handleSaveUnit(product, selectedUnit)}
+                  type="button"
+                  className="btn-gold"
+                  style={{ padding: '10px 16px', fontSize: '0.85rem', whiteSpace: 'nowrap', border: 'none', cursor: 'pointer', borderRadius: '8px' }}
+                >
+                  Save Unit
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.78rem', color: '#888' }}>Quick select:</span>
+                {['pack', 'bundle', 'weft', 'piece', 'set', 'unit'].map(u => (
+                  <button
+                    key={u}
+                    type="button"
+                    onClick={() => {
+                      setSelectedUnit(u);
+                      handleSaveUnit(product, u);
+                    }}
+                    style={{
+                      background: selectedUnit === u ? 'var(--color-primary)' : '#f0f0f0',
+                      color: selectedUnit === u ? 'white' : '#444',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '2px 8px',
+                      fontSize: '0.75rem',
+                      cursor: 'pointer',
+                      fontWeight: selectedUnit === u ? 600 : 400
+                    }}
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: '20px', marginBottom: '25px' }}>
@@ -450,8 +538,11 @@ export default function AdminPage() {
                     <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('color')}>
                       Color {getSortIcon('color')}
                     </th>
+                    <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('unit')}>
+                      Unit {getSortIcon('unit')}
+                    </th>
                     <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('price')}>
-                      Price {getSortIcon('price')}
+                      Price (USD) {getSortIcon('price')}
                     </th>
                     <th style={{ padding: '12px' }}>Action</th>
                   </tr>
@@ -473,7 +564,12 @@ export default function AdminPage() {
                         <td style={{ padding: '12px' }}>{item.length}</td>
                         <td style={{ padding: '12px' }}>{item.style}</td>
                         <td style={{ padding: '12px' }}>{item.color}</td>
-                        <td style={{ padding: '12px', fontWeight: 'bold' }}>${Math.round(item.price)}</td>
+                        <td style={{ padding: '12px' }}>
+                          <span style={{ background: '#f0f0f0', padding: '3px 8px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#555' }}>
+                            {item.unit}
+                          </span>
+                        </td>
+                        <td style={{ padding: '12px', fontWeight: 'bold' }}>${Math.round(item.price)}/{item.unit}</td>
                         <td style={{ padding: '12px' }}>
                           <button onClick={() => handleDelete(item.key)} style={{ background: '#ff4d4f', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer' }}>Delete</button>
                         </td>

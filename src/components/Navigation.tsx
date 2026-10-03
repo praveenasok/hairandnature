@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MiniImageSlider from "./MiniImageSlider";
+import CurrencySelector from "./CurrencySelector";
 
 const PRODUCTS = [
   { name: "Tape Extensions", href: "/tape-extensions", imgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
@@ -199,20 +200,26 @@ export default function Navigation() {
 
             <Link href="/#about-section" className="nav-link">About Us</Link>
             <Link href="/#contact-section" className="nav-link">Contact</Link>
+            <div style={{ marginLeft: '4px', marginRight: '4px' }}>
+              <CurrencySelector />
+            </div>
             <a href="https://wa.me/919871171978" target="_blank" rel="noreferrer" className="btn-gold" style={{ padding: '10px 20px', fontSize: '0.85rem' }}>
                Inquire Now
             </a>
           </nav>
 
-          {/* Mobile Nav Toggle */}
-          <button 
-            className="mobile-menu-btn" 
-            style={{ color: 'var(--color-text)' }} 
-            onClick={() => setIsOpen(!isOpen)} 
-            aria-label="Toggle menu"
-          >
-            {isOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          {/* Mobile Right Controls */}
+          <div className="mobile-header-actions" style={{ display: 'none', alignItems: 'center', gap: '8px' }}>
+            <CurrencySelector compact />
+            <button 
+              className="mobile-menu-btn" 
+              style={{ color: 'var(--color-text)' }} 
+              onClick={() => setIsOpen(!isOpen)} 
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -227,6 +234,10 @@ export default function Navigation() {
             style={{ overflow: 'hidden' }}
           >
             <nav style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid #eee' }}>
+                <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Currency</span>
+                <CurrencySelector />
+              </div>
               <Link href="/" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>Home</Link>
               
               <div style={{ padding: '15px 0', borderBottom: '1px solid #eee' }}>

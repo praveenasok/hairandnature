@@ -204,7 +204,8 @@ button {
   display: none;
 }
 
-.mobile-menu-btn {
+.mobile-menu-btn,
+.mobile-header-actions {
   display: none;
 }
 
@@ -214,6 +215,11 @@ button {
   }
   .desktop-nav {
     display: none !important;
+  }
+  .mobile-header-actions {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
   }
   .mobile-menu-btn {
     display: flex;
