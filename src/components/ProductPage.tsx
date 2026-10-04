@@ -169,269 +169,27 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
     currentPrice = Math.round(base * (mults[weight] || 1.0));
   }
 
-  // Minimum base starting price for this product
-  const startingPriceUSD = useMemo(() => {
-    const matches = Object.entries(prices)
-      .filter(([k]) => k.startsWith(`${title}|`))
-      .map(([, v]) => v);
-    if (matches.length > 0) return Math.min(...matches);
-    return currentPrice || 45;
-  }, [prices, title, currentPrice]);
-
   const formattedPriceWithUnit = currentPrice !== undefined ? formatPrice(currentPrice, unit) : '';
   const priceText = currentPrice !== undefined ? ` - ${formattedPriceWithUnit}` : '';
   const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nWeight: ${weight}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: ${formattedPriceWithUnit} (${currency})` : ''}`;
   const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(whatsappMessage)}`;
 
-  const scrollToBuilder = () => {
-    const el = document.getElementById('builder-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   return (
-    <div style={{ background: 'var(--color-background)', minHeight: '100vh' }}>
-      
-      {/* 1. HERO SECTION WITH PRODUCT IMAGE SLIDER */}
-      <section 
-        onMouseEnter={() => setIsPaused(true)}
-        onMouseLeave={() => setIsPaused(false)}
-        style={{
-          position: 'relative',
-          height: 'clamp(490px, 66vh, 660px)',
-          width: '100%',
-          overflow: 'hidden',
-          backgroundColor: '#111',
-          display: 'flex',
-          alignItems: 'center'
-        }}
-      >
-        {/* Sliding Background Images */}
-        <AnimatePresence initial={false} mode="popLayout">
-          <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.9, ease: [0.25, 0.1, 0.25, 1.0] }}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              zIndex: 0
-            }}
-          >
-            <img
-              src={slideImages[currentSlide]}
-              alt={`${title} hero view ${currentSlide + 1}`}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: PRODUCT_IMAGE_CONFIG[slideImages[currentSlide]]?.position || 'center 20%',
-                transform: PRODUCT_IMAGE_CONFIG[slideImages[currentSlide]]?.transform || 'none'
-              }}
-            />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Sophisticated Dark Gradient Overlays for Readability */}
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          background: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 45%, rgba(0,0,0,0.75) 100%)',
-          zIndex: 1,
-          pointerEvents: 'none'
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, bottom: 0,
-          width: 'clamp(320px, 58vw, 820px)',
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0) 100%)',
-          zIndex: 1,
-          pointerEvents: 'none'
-        }} />
-
-        {/* Slider Navigation Arrows (Left / Right) */}
-        {slideImages.length > 1 && (
-          <>
-            <button
-              onClick={handlePrevSlide}
-              aria-label="Previous slide"
-              style={{
-                position: 'absolute',
-                left: 'clamp(12px, 2.5vw, 32px)',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 'clamp(42px, 5vw, 52px)',
-                height: 'clamp(42px, 5vw, 52px)',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.18)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.35)',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 4,
-                transition: 'all 0.25s ease'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.35)';
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.18)';
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-              }}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-
-            <button
-              onClick={handleNextSlide}
-              aria-label="Next slide"
-              style={{
-                position: 'absolute',
-                right: 'clamp(12px, 2.5vw, 32px)',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 'clamp(42px, 5vw, 52px)',
-                height: 'clamp(42px, 5vw, 52px)',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.18)',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.35)',
-                color: '#fff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 4,
-                transition: 'all 0.25s ease'
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.35)';
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1.08)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.18)';
-                e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-              }}
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-          </>
-        )}
-
-        {/* Hero Content Overlay */}
-        <div className="container" style={{ position: 'relative', zIndex: 2, width: '100%', paddingTop: 'clamp(60px, 8vh, 80px)' }}>
-          <motion.div 
-            initial={{ opacity: 0, y: 25 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 0.7 }}
-            style={{ maxWidth: '640px' }}
-          >
-            {/* Breadcrumb */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: 'rgba(255,255,255,0.75)', marginBottom: '14px' }}>
-              <a href="/" style={{ color: 'rgba(255,255,255,0.75)' }}>Home</a>
-              <span>/</span>
-              <a href="/shop" style={{ color: 'rgba(255,255,255,0.75)' }}>Products</a>
-              <span>/</span>
-              <span style={{ color: '#fff', fontWeight: 600 }}>{title}</span>
-            </div>
-
-            {/* Pill Badge */}
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(228, 82, 88, 0.25)', border: '1px solid rgba(228, 82, 88, 0.5)', color: '#ffb3b8', padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem', fontWeight: 600, marginBottom: '16px', backdropFilter: 'blur(6px)' }}>
-              <span>✨ 100% Remy Human Hair • Factory Direct</span>
-            </div>
-
-            {/* Hero Title */}
-            <h1 style={{ fontSize: 'clamp(2.2rem, 5.5vw, 3.8rem)', color: '#ffffff', fontWeight: 700, lineHeight: 1.1, marginBottom: '16px', letterSpacing: '-0.5px' }}>
-              {title}
-            </h1>
-
-            {/* Subtitle / Excerpt */}
-            <p style={{ fontSize: 'clamp(0.95rem, 2vw, 1.15rem)', lineHeight: 1.6, color: 'rgba(255,255,255,0.88)', marginBottom: '22px', maxWidth: '560px' }}>
-              {description}
-            </p>
-
-            {/* Price & Action Row */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: '20px' }}>
-              <div style={{ background: 'rgba(0,0,0,0.45)', border: '1px solid rgba(255,255,255,0.22)', padding: '10px 18px', borderRadius: '12px', backdropFilter: 'blur(8px)' }}>
-                <span style={{ display: 'block', fontSize: '0.75rem', color: 'rgba(255,255,255,0.65)', textTransform: 'uppercase', letterSpacing: '1px' }}>Starting From</span>
-                <span style={{ fontSize: 'clamp(1.4rem, 3vw, 1.8rem)', fontWeight: 700, color: 'var(--color-primary-light, #ff8b94)' }}>
-                  {formatPrice(startingPriceUSD, unit)}
-                </span>
-              </div>
-
-              <button 
-                onClick={scrollToBuilder}
-                className="btn-gold"
-                style={{ padding: '14px 24px', fontSize: 'clamp(0.92rem, 2vw, 1.05rem)', display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', borderRadius: '10px', border: 'none' }}
-              >
-                <span>Customize Length & Weight</span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
-              </button>
-            </div>
-
-          </motion.div>
+    <div style={{ paddingTop: 'clamp(90px, 12vh, 130px)', paddingBottom: 'clamp(50px, 8vh, 80px)', background: 'var(--color-background)', minHeight: '100vh' }}>
+      <div className="container">
+        
+        {/* Clean Breadcrumb */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#777', marginBottom: '24px' }}>
+          <a href="/" style={{ color: '#777' }}>Home</a>
+          <span>/</span>
+          <a href="/#products-section" style={{ color: '#777' }}>Products</a>
+          <span>/</span>
+          <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{title}</span>
         </div>
 
-        {/* Bottom Hero Thumbnails Strip */}
-        {slideImages.length > 1 && (
-          <div style={{
-            position: 'absolute',
-            bottom: '18px',
-            left: 0,
-            right: 0,
-            zIndex: 3,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '0 20px'
-          }}>
-            {slideImages.map((sImg, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentSlide(idx)}
-                aria-label={`Go to slide ${idx + 1}`}
-                style={{
-                  width: idx === currentSlide ? '52px' : '40px',
-                  height: '36px',
-                  borderRadius: '8px',
-                  overflow: 'hidden',
-                  border: idx === currentSlide ? '2px solid var(--color-primary)' : '1px solid rgba(255,255,255,0.4)',
-                  padding: 0,
-                  background: 'rgba(0,0,0,0.5)',
-                  cursor: 'pointer',
-                  transition: 'all 0.25s ease',
-                  opacity: idx === currentSlide ? 1 : 0.65,
-                  boxShadow: idx === currentSlide ? '0 0 12px rgba(228, 82, 88, 0.6)' : 'none'
-                }}
-              >
-                <img src={sImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              </button>
-            ))}
-            <span style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.8rem', fontWeight: 600, marginLeft: '6px', background: 'rgba(0,0,0,0.45)', padding: '4px 10px', borderRadius: '12px' }}>
-              {String(currentSlide + 1).padStart(2, '0')} / {String(slideImages.length).padStart(2, '0')}
-            </span>
-          </div>
-        )}
-      </section>
-
-      {/* 2. PRODUCT DETAILS & CONFIGURATOR SECTION */}
-      <div id="builder-section" style={{ paddingTop: 'clamp(40px, 6vh, 60px)', paddingBottom: 'clamp(50px, 8vh, 80px)' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 'clamp(30px, 5vw, 60px)', alignItems: 'flex-start' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 'clamp(30px, 5vw, 60px)', alignItems: 'flex-start' }}>
           
-          {/* Left Column: Interactive Product Gallery */}
+          {/* Left Column: Product Hero Image with Slider */}
           <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
             
             {/* Main Interactive Product Image Frame */}
@@ -526,7 +284,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
           {/* Right Column: Product Details & Builder */}
           <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '15px' }}>
-              <h2 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', color: 'var(--color-primary)', fontWeight: 700, lineHeight: 1.15, margin: 0 }}>{title}</h2>
+              <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', color: 'var(--color-primary)', fontWeight: 700, lineHeight: 1.15, margin: 0 }}>{title}</h1>
               {currentPrice !== undefined && (
                 <div style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
                   {formattedPriceWithUnit}
