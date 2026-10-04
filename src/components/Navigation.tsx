@@ -283,45 +283,40 @@ export default function Navigation() {
               <CurrencySelector />
             </div>
             
-            {/* Global Enquiry Button */}
+            {/* Unified Luxury Inquire Now CTA */}
             <button
               onClick={() => setEnquiryOpen(true)}
+              className="btn-gold"
               style={{
-                background: totalCount > 0 ? 'rgba(228,82,88,0.08)' : '#ffffff',
-                border: totalCount > 0 ? '1.5px solid var(--color-primary)' : '1px solid #d5ceca',
-                color: totalCount > 0 ? 'var(--color-primary)' : '#444',
-                padding: '8px 16px',
-                borderRadius: '24px',
-                fontSize: '0.84rem',
-                fontWeight: 700,
+                padding: '10px 22px',
+                fontSize: '0.88rem',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                boxShadow: totalCount > 0 ? '0 3px 12px rgba(228,82,88,0.15)' : 'none'
+                border: 'none',
+                boxShadow: totalCount > 0 
+                  ? '0 6px 20px rgba(228, 82, 88, 0.4)' 
+                  : '0 4px 14px rgba(228, 82, 88, 0.25)',
+                position: 'relative'
               }}
-              title="Show Global Enquiries"
+              title="Open Wholesale Enquiry Concierge"
             >
-              <span style={{ fontSize: '1rem' }}>📋</span>
-              <span>Global Enquiry</span>
+              <span>Inquire Now</span>
               {totalCount > 0 && (
                 <span style={{
-                  background: 'var(--color-primary)',
-                  color: '#ffffff',
+                  background: '#ffffff',
+                  color: 'var(--color-primary)',
                   borderRadius: '12px',
-                  padding: '2px 7px',
-                  fontSize: '0.72rem',
-                  fontWeight: 800
+                  padding: '2px 8px',
+                  fontSize: '0.74rem',
+                  fontWeight: 800,
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
                 }}>
                   {totalCount}
                 </span>
               )}
             </button>
-
-            <a href="https://wa.me/919871171978" target="_blank" rel="noreferrer" className="btn-gold" style={{ padding: '10px 20px', fontSize: '0.85rem' }}>
-               Inquire Now
-            </a>
           </nav>
 
           {/* Mobile Right Controls */}
@@ -329,21 +324,26 @@ export default function Navigation() {
             <button
               onClick={() => setEnquiryOpen(true)}
               style={{
-                background: totalCount > 0 ? 'rgba(228,82,88,0.1)' : '#f5f5f5',
-                border: totalCount > 0 ? '1px solid var(--color-primary)' : '1px solid #ddd',
-                color: totalCount > 0 ? 'var(--color-primary)' : '#444',
-                padding: '6px 10px',
-                borderRadius: '16px',
+                background: totalCount > 0 ? 'var(--color-primary)' : '#f5f0ea',
+                border: totalCount > 0 ? '1px solid var(--color-primary)' : '1px solid #d9d0c7',
+                color: totalCount > 0 ? '#ffffff' : '#444',
+                padding: '6px 12px',
+                borderRadius: '20px',
                 fontSize: '0.78rem',
                 fontWeight: 700,
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '6px',
                 cursor: 'pointer'
               }}
             >
               <span>📋</span>
-              {totalCount > 0 && <span>{totalCount}</span>}
+              <span>Inquire</span>
+              {totalCount > 0 && (
+                <span style={{ background: '#ffffff', color: 'var(--color-primary)', padding: '1px 6px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 800 }}>
+                  {totalCount}
+                </span>
+              )}
             </button>
             <CurrencySelector compact />
             <button 
@@ -396,16 +396,16 @@ export default function Navigation() {
               <Link href="/#contact-section" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>Contact</Link>
               
               <div style={{ paddingTop: '20px', paddingBottom: '10px' }}>
-                <a 
-                  href="https://wa.me/919871171978" 
-                  target="_blank" 
-                  rel="noreferrer" 
+                <button 
                   className="btn-gold" 
-                  style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem' }}
-                  onClick={() => setIsOpen(false)}
+                  style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  onClick={() => {
+                    setIsOpen(false);
+                    setEnquiryOpen(true);
+                  }}
                 >
-                  Inquire Now on WhatsApp
-                </a>
+                  <span>{totalCount > 0 ? `Review Enquiry Portfolio (${totalCount})` : 'Wholesale Enquiry Concierge'}</span>
+                </button>
               </div>
             </nav>
           </motion.div>

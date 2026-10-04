@@ -859,63 +859,113 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
             )}
 
-            {/* Order Summary & WhatsApp Action Card */}
+            {/* Luxury Order Summary & Wholesale Enquiry Action Card */}
             <div style={{ 
-              background: '#1a1a1a', 
-              color: '#ffffff', 
-              padding: 'clamp(20px, 3vw, 24px)', 
-              borderRadius: '16px', 
-              boxShadow: '0 10px 25px rgba(0,0,0,0.12)' 
+              background: 'linear-gradient(135deg, #fffdfa 0%, #fbf5ed 60%, #f6ebdc 100%)', 
+              border: '1.5px solid rgba(197, 148, 58, 0.35)', 
+              borderRadius: '20px', 
+              padding: 'clamp(20px, 3.5vw, 26px)', 
+              boxShadow: '0 10px 32px rgba(197, 148, 58, 0.09), inset 0 1px 0 rgba(255,255,255,0.95)',
+              position: 'relative',
+              overflow: 'hidden'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#aaa', fontWeight: 600 }}>
-                  Order Summary
+              {/* Header Badge */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                <span style={{ 
+                  fontSize: '0.74rem', 
+                  textTransform: 'uppercase', 
+                  letterSpacing: '1.2px', 
+                  color: '#8c7662', 
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#c5943a' }}></span>
+                  Wholesale Summary
                 </span>
-                <span style={{ fontSize: '0.82rem', color: '#4ade80', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></span>
+                <span style={{ 
+                  fontSize: '0.74rem', 
+                  background: '#dcfce7', 
+                  color: '#15803d', 
+                  padding: '2px 8px', 
+                  borderRadius: '12px', 
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}>
+                  <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#16a34a' }}></span>
                   Factory In-Stock
                 </span>
               </div>
 
-              <div style={{ fontSize: '0.92rem', lineHeight: 1.5, color: '#ddd', marginBottom: '16px' }}>
-                <strong style={{ color: '#fff' }}>{title}</strong> • {length} • {weight} • {style} • {color}
+              {/* Active Selection Ribbon */}
+              <div style={{ 
+                background: '#ffffff', 
+                border: '1px solid #ebdcd0', 
+                borderRadius: '12px', 
+                padding: '12px 14px', 
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.02)'
+              }}>
+                <div style={{ width: '38px', height: '38px', borderRadius: '50%', overflow: 'hidden', border: '1.5px solid var(--color-primary)', flexShrink: 0 }}>
+                  <img src={selectedColorObj.image} alt={selectedColorObj.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1a1a1a', lineHeight: 1.2 }}>
+                    {title}
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#666', marginTop: '3px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    <span>{length}</span>
+                    <span>•</span>
+                    <span>{weight}</span>
+                    <span>•</span>
+                    <span>{style}</span>
+                    <span>•</span>
+                    <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{color}</span>
+                  </div>
+                </div>
               </div>
 
               {/* Quantity Stepper Row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                <span style={{ fontSize: '0.86rem', color: '#bbb' }}>Quantity ({unit}s):</span>
-                <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(197, 148, 58, 0.2)' }}>
+                <span style={{ fontSize: '0.86rem', color: '#555', fontWeight: 600 }}>Order Quantity ({unit}s):</span>
+                <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', borderRadius: '8px', border: '1px solid #d9d0c7', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
                   <button 
                     type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    style={{ border: 'none', background: 'transparent', color: '#fff', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
+                    style={{ border: 'none', background: 'transparent', color: '#444', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
                   >
                     -
                   </button>
-                  <span style={{ padding: '0 12px', fontSize: '0.92rem', fontWeight: 700, color: '#fff' }}>
+                  <span style={{ padding: '0 12px', fontSize: '0.92rem', fontWeight: 800, color: '#1a1a1a' }}>
                     {quantity}
                   </span>
                   <button 
                     type="button"
                     onClick={() => setQuantity(quantity + 1)}
-                    style={{ border: 'none', background: 'transparent', color: '#fff', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
+                    style={{ border: 'none', background: 'transparent', color: '#444', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
                   >
                     +
                   </button>
                 </div>
               </div>
 
-              {/* Price Row */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+              {/* Price Calculation Row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(197, 148, 58, 0.2)' }}>
                 <div>
-                  <span style={{ fontSize: '0.88rem', color: '#bbb' }}>Estimated Total:</span>
+                  <span style={{ fontSize: '0.86rem', color: '#666', fontWeight: 600 }}>Estimated Rate:</span>
                   {quantity > 1 && (
                     <span style={{ display: 'block', fontSize: '0.74rem', color: '#888' }}>
                       ({quantity} x {formattedPriceWithUnit})
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-primary)' }}>
+                <span style={{ fontSize: '1.45rem', fontWeight: 800, color: '#b83238' }}>
                   {currentPrice !== undefined ? formatPrice(currentPrice * quantity) : 'Wholesale Quote'}
                 </span>
               </div>
@@ -923,9 +973,9 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               {/* Toast Feedback */}
               {addedToast && (
                 <div style={{
-                  background: 'rgba(74, 222, 128, 0.15)',
-                  border: '1px solid #4ade80',
-                  color: '#4ade80',
+                  background: '#dcfce7',
+                  border: '1px solid #86efac',
+                  color: '#15803d',
                   padding: '10px 14px',
                   borderRadius: '10px',
                   fontSize: '0.84rem',
@@ -936,20 +986,20 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   justifyContent: 'space-between',
                   gap: '8px'
                 }}>
-                  <span>✓ Added to Global Enquiry ({totalCount} in bag)</span>
+                  <span>✓ Added to Wholesale Enquiry ({totalCount} in portfolio)</span>
                   <button
                     type="button"
                     onClick={() => openGlobalEnquiry(true)}
-                    style={{ background: '#4ade80', color: '#000', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+                    style={{ background: '#16a34a', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
                   >
-                    Review All →
+                    Review Portfolio →
                   </button>
                 </div>
               )}
 
-              {/* Two Main Enquiry Actions */}
+              {/* Main Enquiry Actions */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {/* 1. Add to Global Enquiry (Primary) */}
+                {/* 1. Add to Wholesale Enquiry List (Primary) */}
                 <button 
                   type="button"
                   onClick={handleAddToGlobalEnquiry}
@@ -964,12 +1014,12 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                     justifyContent: 'center', 
                     gap: '10px',
                     borderRadius: '12px',
-                    boxShadow: '0 4px 15px rgba(228, 82, 88, 0.35)',
+                    boxShadow: '0 6px 20px rgba(228, 82, 88, 0.35)',
                     border: 'none',
                     cursor: 'pointer'
                   }}
                 >
-                  <span>➕ Add to Global Enquiry</span>
+                  <span>➕ Add to Wholesale Enquiry List</span>
                   {totalCount > 0 && (
                     <span style={{ background: '#ffffff', color: 'var(--color-primary)', borderRadius: '12px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: 800 }}>
                       {totalCount} in List
@@ -977,7 +1027,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   )}
                 </button>
 
-                {/* 2. Show Global Enquiries Drawer */}
+                {/* 2. Review Enquiry Portfolio & Send Combined Message */}
                 <button
                   type="button"
                   onClick={() => openGlobalEnquiry(true)}
@@ -991,31 +1041,40 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                     justifyContent: 'center',
                     gap: '8px',
                     borderRadius: '12px',
-                    background: 'rgba(255,255,255,0.08)',
-                    border: '1px solid rgba(255,255,255,0.2)',
-                    color: '#ffffff',
+                    background: '#ffffff',
+                    border: '1.5px solid rgba(197, 148, 58, 0.45)',
+                    color: '#6e4c19',
                     cursor: 'pointer',
-                    transition: 'background 0.2s'
+                    boxShadow: '0 2px 8px rgba(197, 148, 58, 0.08)',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(197, 148, 58, 0.8)';
+                    e.currentTarget.style.background = '#fefcf8';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(197, 148, 58, 0.45)';
+                    e.currentTarget.style.background = '#ffffff';
                   }}
                 >
-                  <span>📋 Show Global Enquiries ({totalCount}) • Send 1 Message</span>
+                  <span>📋 Review Enquiry Portfolio ({totalCount}) • Send 1 Message</span>
                 </button>
               </div>
 
               {/* Secondary single-item quick WhatsApp link */}
-              <div style={{ textAlign: 'center', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <div style={{ textAlign: 'center', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(197, 148, 58, 0.18)' }}>
                 <a 
                   href={whatsappUrl} 
                   target="_blank" 
                   rel="noreferrer" 
-                  style={{ fontSize: '0.8rem', color: '#bbb', textDecoration: 'underline', transition: 'color 0.2s' }}
+                  style={{ fontSize: '0.8rem', color: '#7a6654', textDecoration: 'underline', fontWeight: 500, transition: 'color 0.2s' }}
                 >
-                  ⚡ Or send instant WhatsApp inquiry for this single item only
+                  ⚡ Direct WhatsApp quote for this single configuration only
                 </a>
               </div>
 
-              <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '0.74rem', color: '#888' }}>
-                🌍 Combine multiple lengths & styles across products into 1 single wholesale message
+              <div style={{ textAlign: 'center', marginTop: '8px', fontSize: '0.74rem', color: '#998473' }}>
+                🌍 Direct Factory Floor • Express Worldwide Dispatch via DHL / FedEx Priority
               </div>
             </div>
 

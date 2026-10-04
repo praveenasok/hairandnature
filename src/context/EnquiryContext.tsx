@@ -67,7 +67,7 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
   const [customerDetails, setCustomerDetails] = useState<CustomerDetails>({});
   const { currency, formatPrice, convertPrice } = useCurrency();
 
-  // Load from localStorage on mount
+  // Load items and customer profile from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -76,6 +76,10 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
         if (Array.isArray(parsed)) {
           setItems(parsed);
         }
+      }
+      const storedProfile = localStorage.getItem('hairandnature_customer_profile');
+      if (storedProfile) {
+        setCustomerDetails(JSON.parse(storedProfile));
       }
     } catch (e) {
       console.error('Failed to load enquiries from localStorage:', e);
@@ -90,6 +94,18 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
     } catch (e) {
       console.error('Failed to save enquiries to localStorage:', e);
     }
+  };
+
+  const updateCustomerDetails: React.Dispatch<React.SetStateAction<CustomerDetails>> = (detailsOrFn) => {
+    setCustomerDetails(prev => {
+      const next = typeof detailsOrFn === 'function' ? detailsOrFn(prev) : detailsOrFn;
+      try {
+        localStorage.setItem('hairandnature_customer_profile', JSON.stringify(next));
+      } catch (e) {
+        console.error('Failed to save customer profile:', e);
+      }
+      return next;
+    });
   };
 
   const addItem = (itemData: Omit<EnquiryItem, 'id' | 'addedAt'>) => {
@@ -150,45 +166,48 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
     const cust = { ...customerDetails, ...details };
     const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
-    let msg = `🌟 *hair&nature® Global Wholesale Enquiry* 🌟\n`;
+    let msg = `✨ *hair&nature® Factory Wholesale Enquiry Manifest* ✨\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     msg += `📅 *Date:* ${dateStr}\n`;
+    msg += `🏭 *Dispatch Origin:* Direct Factory Export Hub (New Delhi, India)\n`;
     
     if (cust.name || cust.salonName || cust.country) {
-      msg += `\n👤 *Client / Salon Profile:*\n`;
+      msg += `\n👤 *Salon / Master Stylist Profile:*\n`;
       if (cust.name) msg += `• Contact Person: ${cust.name}\n`;
       if (cust.salonName) msg += `• Salon / Studio: ${cust.salonName}\n`;
       if (cust.city || cust.country) msg += `• Location: ${[cust.city, cust.country].filter(Boolean).join(', ')}\n`;
-      if (cust.notes) msg += `• Notes: ${cust.notes}\n`;
+      if (cust.notes) msg += `• Special Notes: ${cust.notes}\n`;
     }
 
-    msg += `\n📦 *Enquired Products (${items.length} types, ${totalCount} total units):*\n`;
+    msg += `\n📦 *Order Manifest (${items.length} Product Types • ${totalCount} Total Units):*\n`;
     msg += `────────────────────────────\n`;
 
     let totalEst = 0;
     items.forEach((item, index) => {
-      const singlePriceStr = item.basePriceUsd !== undefined ? formatPrice(item.basePriceUsd, item.unit) : 'Factory Direct Tier';
+      const singlePriceStr = item.basePriceUsd !== undefined ? formatPrice(item.basePriceUsd, item.unit) : 'Direct Factory Rate';
       let subtotalStr = '';
       if (item.basePriceUsd !== undefined) {
         const itemConverted = convertPrice(item.basePriceUsd);
         const subtotalConverted = itemConverted * item.quantity;
         totalEst += subtotalConverted;
-        subtotalStr = ` ≈ ${formatPrice(item.basePriceUsd * item.quantity)}`;
+        subtotalStr = ` (Subtotal: ${formatPrice(item.basePriceUsd * item.quantity)})`;
       }
 
-      msg += `\n*${index + 1}. ${item.title}* (${item.quantity} ${item.unit || 'unit'}${item.quantity > 1 ? 's' : ''})\n`;
+      msg += `\n*${index + 1}. ${item.title}* [${item.quantity} ${item.unit || 'pack'}${item.quantity > 1 ? 's' : ''}]\n`;
       msg += `   • Length: ${item.length}\n`;
       msg += `   • Weight: ${item.weight}\n`;
-      msg += `   • Style: ${item.style}\n`;
-      msg += `   • Color: ${item.color}\n`;
-      msg += `   • Est. Rate: ${singlePriceStr}${subtotalStr ? ` (Subtotal:${subtotalStr})` : ''}\n`;
+      msg += `   • Texture: ${item.style}\n`;
+      msg += `   • Shade: ${item.color}\n`;
+      msg += `   • Rate: ${singlePriceStr}${subtotalStr}\n`;
     });
 
     msg += `\n────────────────────────────\n`;
     if (totalEst > 0) {
-      msg += `💰 *Estimated Total Value:* ${formatPrice(items.reduce((acc, it) => acc + (it.basePriceUsd || 0) * it.quantity, 0))} (${currency})\n`;
+      msg += `💰 *Estimated Portfolio Total:* ${formatPrice(items.reduce((acc, it) => acc + (it.basePriceUsd || 0) * it.quantity, 0))} (${currency})\n`;
     }
-    msg += `✈️ *Dispatch:* Express Worldwide from New Delhi Factory\n\n`;
-    msg += `Please confirm stock availability, wholesale tiered discounts, and dispatch timeframe. Thank you!`;
+    msg += `💎 *Quality Standard:* 100% Pure Virgin Temple Remy Hair (Cuticle Aligned)\n`;
+    msg += `✈️ *Shipping:* Express International via DHL / FedEx Priority\n\n`;
+    msg += `Please verify current factory inventory, tiered wholesale discounts, and express dispatch lead time. Thank you!`;
 
     return msg;
   };
@@ -245,7 +264,7 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
         totalCount,
         lastAddedItem,
         customerDetails,
-        setCustomerDetails,
+        setCustomerDetails: updateCustomerDetails,
         sendCombinedEnquiry,
         generateCombinedMessage,
       }}
