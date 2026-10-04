@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -17,10 +18,17 @@ const PRODUCTS = [
 ];
 
 export default function Navigation() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const { setIsOpen: setEnquiryOpen, totalCount, sendGeneralEnquiry } = useEnquiry();
+
+  // Close mega menu and mobile menu on any route change
+  useEffect(() => {
+    setProductsOpen(false);
+    setIsOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,7 +50,7 @@ export default function Navigation() {
           
           {/* Desktop Nav */}
           <nav className="desktop-nav" style={{ display: 'flex', gap: '40px', alignItems: 'center' }}>
-            <Link href="/" className="nav-link">Home</Link>
+            <Link href="/" className="nav-link" onClick={() => setProductsOpen(false)}>Home</Link>
             
             {/* Products Dropdown */}
             <div 
@@ -50,7 +58,12 @@ export default function Navigation() {
               onMouseEnter={() => setProductsOpen(true)} 
               onMouseLeave={() => setProductsOpen(false)}
             >
-              <Link href="/#products-section" className="nav-link" style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Link 
+                href="/#products-section" 
+                className="nav-link" 
+                style={{ display: 'flex', alignItems: 'center', gap: '5px' }}
+                onClick={() => setProductsOpen(false)}
+              >
                 Products <ChevronDown size={14} />
               </Link>
               
@@ -79,16 +92,20 @@ export default function Navigation() {
                     }}
                   >
                     {/* Featured Left Panel */}
-                    <div style={{ borderRadius: '12px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '20px', minHeight: '200px' }}>
+                    <Link
+                      href="/#products-section"
+                      onClick={() => setProductsOpen(false)}
+                      style={{ borderRadius: '12px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '20px', minHeight: '200px', textDecoration: 'none' }}
+                    >
                       <MiniImageSlider 
                         images={["/images/hero_general_1.jpg", "/images/genius_wefts_light.jpg", "/images/hero_general_2.jpg", "/images/k_tips_light.jpg"]} 
-                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', filter: 'brightness(0.6)' }} 
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', filter: 'brightness(0.6)', pointerEvents: 'none' }} 
                       />
                       <div style={{ position: 'relative', zIndex: 1, color: 'white' }}>
                         <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 600 }}>Premium Collection</h4>
                         <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.9, lineHeight: 1.5 }}>Discover ethically sourced, 100% natural Indian Remy human hair.</p>
                       </div>
-                    </div>
+                    </Link>
 
                     {/* Products Grid Right Panel */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -96,7 +113,10 @@ export default function Navigation() {
                         <Link 
                           key={product.href} 
                           href={product.href}
-                          style={{ padding: '20px', color: '#333', fontSize: '1.2rem', fontWeight: 600, transition: 'all 0.3s ease', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '20px', borderRadius: '16px' }}
+                          onClick={() => {
+                            setProductsOpen(false);
+                          }}
+                          style={{ padding: '20px', color: '#333', fontSize: '1.2rem', fontWeight: 600, transition: 'all 0.3s ease', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '20px', borderRadius: '16px', cursor: 'pointer' }}
                           onMouseOver={(e) => {
                             e.currentTarget.style.backgroundColor = 'rgba(228, 82, 88, 0.05)';
                             e.currentTarget.style.transform = 'translateY(-2px)';
@@ -106,13 +126,15 @@ export default function Navigation() {
                             e.currentTarget.style.transform = 'translateY(0)';
                           }}
                         >
-                          <MiniImageSlider images={product.imgs} style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid #eee', boxShadow: '0 6px 15px rgba(0,0,0,0.08)', flexShrink: 0 }} />
+                          <MiniImageSlider images={product.imgs} style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid #eee', boxShadow: '0 6px 15px rgba(0,0,0,0.08)', flexShrink: 0, pointerEvents: 'none' }} />
                           {product.name}
                         </Link>
                       ))}
 
                       {/* Bottom-Right Slot: Logo & Authentic Rubber Stamp */}
-                      <div 
+                      <Link 
+                        href="/#about-section"
+                        onClick={() => setProductsOpen(false)}
                         style={{ 
                           padding: '14px 20px', 
                           borderRadius: '16px', 
@@ -125,6 +147,8 @@ export default function Navigation() {
                           gap: '16px',
                           position: 'relative',
                           overflow: 'hidden',
+                          textDecoration: 'none',
+                          cursor: 'pointer',
                           transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => {
@@ -270,15 +294,15 @@ export default function Navigation() {
                             VIRGIN REMY
                           </text>
                         </svg>
-                      </div>
+                      </Link>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            <Link href="/#about-section" className="nav-link">About Us</Link>
-            <Link href="/#contact-section" className="nav-link">Contact</Link>
+            <Link href="/#about-section" className="nav-link" onClick={() => setProductsOpen(false)}>About Us</Link>
+            <Link href="/#contact-section" className="nav-link" onClick={() => setProductsOpen(false)}>Contact</Link>
             <div style={{ marginLeft: '4px', marginRight: '4px' }}>
               <CurrencySelector />
             </div>
