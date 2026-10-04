@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import MiniImageSlider from '../components/MiniImageSlider';
 import TestimonialsSection from '../components/TestimonialsSection';
 
@@ -194,13 +195,19 @@ export default function Home() {
         }
         
         .product-card:hover {
-          transform: translateY(-10px);
+          transform: translateY(-8px);
+          box-shadow: 0 16px 36px rgba(0,0,0,0.08);
         }
 
         .product-image {
           width: 100%;
           height: 350px;
           object-fit: cover;
+          transition: transform 0.4s ease;
+        }
+
+        .product-card:hover .product-image {
+          transform: scale(1.03);
         }
 
         .product-info {
@@ -587,13 +594,76 @@ export default function Home() {
           </motion.h2>
           <p className="section-subtitle">Discover our exclusive range of 100% natural human hair extensions, carefully crafted to blend seamlessly with your natural hair.</p>
           
-          <div className="product-grid">
+          <div className="product-grid" style={{ rowGap: '32px' }}>
             {[
-              { title: "ClipOn Extensions", desc: "Instantly add length and volume with our easy-to-use, damage-free clip-on extensions.", img: "/images/seamless_clipon.jpg" },
-              { title: "Genius Wefts", desc: "Ultra-thin and flexible wefts that lay perfectly flat against your scalp for seamless blending.", img: "/images/genius_wefts_light.jpg" },
-              { title: "Tape Extensions", desc: "Lightweight and discreet tape-ins that provide a natural, full-bodied look with long-lasting hold.", img: "/images/tape_extensions.jpg" },
-              { title: "K Tips", desc: "Premium keratin-tipped extensions for individual strand-by-strand application and natural movement.", img: "/images/k_tips_light.jpg" },
-              { title: "Butterfly Wefts", desc: "Innovative weft design providing maximum volume with incredible comfort and durability.", img: "/images/butterfly_wefts.jpg" }
+              // Row 1: Model Showcase
+              { 
+                title: "ClipOn Extensions", 
+                desc: "Instantly add length and volume with our easy-to-use, damage-free clip-on extensions.", 
+                img: "/images/seamless_clipon.jpg",
+                link: "/seamless-clipon-extensions"
+              },
+              { 
+                title: "Genius Wefts", 
+                desc: "Ultra-thin and flexible wefts that lay perfectly flat against your scalp for seamless blending.", 
+                img: "/images/genius_wefts_light.jpg",
+                link: "/genius-wefts"
+              },
+              { 
+                title: "Tape Extensions", 
+                desc: "Lightweight and discreet tape-ins that provide a natural, full-bodied look with long-lasting hold.", 
+                img: "/images/tape_extensions.jpg",
+                link: "/tape-extensions"
+              },
+              { 
+                title: "K Tips", 
+                desc: "Premium keratin-tipped extensions for individual strand-by-strand application and natural movement.", 
+                img: "/images/k_tips_light.jpg",
+                link: "/k-tips"
+              },
+              { 
+                title: "Butterfly Wefts", 
+                desc: "Innovative weft design providing maximum volume with incredible comfort and durability.", 
+                img: "/images/butterfly_wefts.jpg",
+                link: "/butterfly-wefts"
+              },
+
+              // Row 2: Physical Product Showcase
+              { 
+                title: "ClipOn Extensions", 
+                desc: "Instantly add length and volume with our easy-to-use, damage-free clip-on extensions.", 
+                img: "/images/products/clipon.webp",
+                link: "/seamless-clipon-extensions",
+                objectPosition: "center 22%"
+              },
+              { 
+                title: "Genius Wefts", 
+                desc: "Ultra-thin and flexible wefts that lay perfectly flat against your scalp for seamless blending.", 
+                img: "/images/products/geniusweft.jpg",
+                link: "/genius-wefts",
+                objectPosition: "center 42%"
+              },
+              { 
+                title: "Tape Extensions", 
+                desc: "Lightweight and discreet tape-ins that provide a natural, full-bodied look with long-lasting hold.", 
+                img: "/images/products/tapeextensions.webp",
+                link: "/tape-extensions",
+                objectPosition: "center 56%"
+              },
+              { 
+                title: "K Tips", 
+                desc: "Premium keratin-tipped extensions for individual strand-by-strand application and natural movement.", 
+                img: "/images/products/KTip2.png",
+                link: "/k-tips",
+                objectPosition: "center 25%"
+              },
+              { 
+                title: "Butterfly Wefts", 
+                desc: "Innovative weft design providing maximum volume with incredible comfort and durability.", 
+                img: "/images/products/butterflyweft.jpg",
+                link: "/butterfly-wefts",
+                objectPosition: "58% 36%"
+              }
             ].map((product, idx) => (
               <motion.div 
                 className="product-card" 
@@ -601,13 +671,33 @@ export default function Home() {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 + 0.1 }}
+                transition={{ delay: (idx % 5) * 0.08 + 0.1 }}
               >
-                <img src={product.img} alt={product.title} className="product-image" />
+                <Link href={product.link} style={{ display: 'block', overflow: 'hidden' }}>
+                  <img 
+                    src={product.img} 
+                    alt={product.title} 
+                    className="product-image" 
+                    style={{ 
+                      objectPosition: product.objectPosition || 'center',
+                      backgroundColor: '#fbf8f5'
+                    }} 
+                  />
+                </Link>
                 <div className="product-info">
-                  <h3>{product.title}</h3>
+                  <Link href={product.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <h3>{product.title}</h3>
+                  </Link>
                   <p>{product.desc}</p>
-                  <a href="https://wa.me/919871171978" target="_blank" rel="noreferrer" className="btn-outline" style={{ display: 'inline-block', fontSize: '0.85rem', padding: '10px 20px' }}>Inquire Now</a>
+                  <a 
+                    href={`https://wa.me/919871171978?text=${encodeURIComponent(`Hello hair&nature, I am inquiring about ${product.title}.`)}`} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="btn-outline" 
+                    style={{ display: 'inline-block', fontSize: '0.85rem', padding: '10px 20px' }}
+                  >
+                    Inquire Now
+                  </a>
                 </div>
               </motion.div>
             ))}
