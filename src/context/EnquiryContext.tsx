@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useCurrency } from './CurrencyContext';
+import { getProductThumbnail } from '../data/productImages';
 
 export interface EnquiryItem {
   id: string;
@@ -74,7 +75,15 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          setItems(parsed);
+          // Normalize any legacy stored model photos into physical product photos
+          const sanitized = parsed.map((item: EnquiryItem) => ({
+            ...item,
+            image: getProductThumbnail(item.title, item.image, item.productId)
+          }));
+          setItems(sanitized);
+          if (JSON.stringify(sanitized) !== stored) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(sanitized));
+          }
         }
       }
       const storedProfile = localStorage.getItem('hairandnature_customer_profile');
@@ -109,14 +118,20 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
   };
 
   const addItem = (itemData: Omit<EnquiryItem, 'id' | 'addedAt'>) => {
+    const safeProductImage = getProductThumbnail(itemData.title, itemData.image, itemData.productId);
+    const normalizedItemData = {
+      ...itemData,
+      image: safeProductImage
+    };
+
     // Check if duplicate config exists
     const existingIndex = items.findIndex(
       it =>
-        it.title === itemData.title &&
-        it.length === itemData.length &&
-        it.weight === itemData.weight &&
-        it.style === itemData.style &&
-        it.color === itemData.color
+        it.title === normalizedItemData.title &&
+        it.length === normalizedItemData.length &&
+        it.weight === normalizedItemData.weight &&
+        it.style === normalizedItemData.style &&
+        it.color === normalizedItemData.color
     );
 
     let updatedList: EnquiryItem[];
@@ -125,13 +140,14 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
     if (existingIndex > -1) {
       targetItem = {
         ...items[existingIndex],
-        quantity: items[existingIndex].quantity + itemData.quantity
+        image: safeProductImage,
+        quantity: items[existingIndex].quantity + normalizedItemData.quantity
       };
       updatedList = [...items];
       updatedList[existingIndex] = targetItem;
     } else {
       targetItem = {
-        ...itemData,
+        ...normalizedItemData,
         id: `${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
         addedAt: new Date().toISOString()
       };

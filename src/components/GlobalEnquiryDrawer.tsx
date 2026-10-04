@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Trash2, Plus, Minus, MessageCircle, Copy, Mail, Check, Globe, ShoppingBag, Sparkles, Building2, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { useEnquiry, EnquiryItem } from '../context/EnquiryContext';
 import { useCurrency } from '../context/CurrencyContext';
+import { getProductThumbnail, DRAWER_IMAGE_STYLE_CONFIG } from '../data/productImages';
 
 interface GlobalFeedItem {
   id: string;
@@ -481,22 +482,38 @@ export default function GlobalEnquiryDrawer() {
                             position: 'relative'
                           }}
                         >
-                          {/* Image */}
+                          {/* Physical Product Image */}
                           <div style={{
-                            width: '64px',
-                            height: '64px',
-                            borderRadius: '10px',
+                            width: '68px',
+                            height: '68px',
+                            borderRadius: '12px',
                             overflow: 'hidden',
                             flexShrink: 0,
-                            border: '1px solid #eee',
-                            background: '#f9f9f9',
-                            position: 'relative'
+                            border: '1px solid #ebd9c8',
+                            background: '#fcfaf7',
+                            position: 'relative',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.03)'
                           }}>
-                            <img
-                              src={item.image || '/images/tape_extensions.jpg'}
-                              alt={item.title}
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
+                            {(() => {
+                              const productImg = getProductThumbnail(item.title, item.image, item.productId);
+                              const styleConfig = DRAWER_IMAGE_STYLE_CONFIG[productImg];
+                              return (
+                                <img
+                                  src={productImg}
+                                  alt={item.title}
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    objectPosition: styleConfig?.position || 'center center',
+                                    transform: styleConfig?.transform || 'none'
+                                  }}
+                                />
+                              );
+                            })()}
                           </div>
 
                           {/* Info */}

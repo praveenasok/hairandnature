@@ -7,6 +7,7 @@ import { useEnquiry } from '@/context/EnquiryContext';
 
 import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor } from '@/data/colors';
 import { HAIR_STYLES, STYLE_NAMES, HairStyle } from '@/data/styles';
+import { getProductThumbnail } from '@/data/productImages';
 
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
@@ -198,10 +199,12 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(whatsappMessage)}`;
 
   const handleAddToGlobalEnquiry = () => {
+    // Select authentic physical product photo instead of model image
+    const productThumbnail = getProductThumbnail(title, slideImages[1] || slideImages[0]);
     addItem({
       productId: title.toLowerCase().replace(/\s+/g, '-'),
       title,
-      image: slideImages[0] || img,
+      image: productThumbnail,
       length,
       weight,
       style,
