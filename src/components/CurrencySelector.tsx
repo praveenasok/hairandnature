@@ -53,9 +53,11 @@ export default function CurrencySelector({ compact = false }: { compact?: boolea
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >
-        <span style={{ fontSize: '1rem', lineHeight: 1 }}>{currentConfig.flag}</span>
+        <span style={{ fontSize: compact ? '0.92rem' : '1rem', lineHeight: 1 }}>{currentConfig.flag}</span>
         <span>{currentConfig.code}</span>
-        <span style={{ color: '#888', fontWeight: 500, fontSize: '0.8rem' }}>({currentConfig.symbol.trim()})</span>
+        {!compact && (
+          <span style={{ color: '#888', fontWeight: 500, fontSize: '0.8rem' }}>({currentConfig.symbol.trim()})</span>
+        )}
         <svg
           width="12"
           height="12"

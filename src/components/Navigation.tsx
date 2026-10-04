@@ -30,6 +30,18 @@ export default function Navigation() {
     setIsOpen(false);
   }, [pathname]);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
@@ -43,9 +55,9 @@ export default function Navigation() {
     <>
       <header className={`site-header ${scrolled ? 'scrolled' : ''}`}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '15px' }} onClick={() => setIsOpen(false)}>
-            {/* If you have a specific logo, replace this text with it */}
-            <h1 className="brand-name" style={{ margin: 0, fontWeight: 500, fontSize: 'clamp(1.4rem, 4.5vw, 1.8rem)' }}>hair&nature®</h1>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexShrink: 1, minWidth: 0, textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
+            {/* Brand Logo */}
+            <h1 className="brand-name" style={{ margin: 0, fontWeight: 500, fontSize: 'clamp(1.25rem, 4.2vw, 1.8rem)', whiteSpace: 'nowrap' }}>hair&nature®</h1>
           </Link>
           
           {/* Desktop Nav */}
@@ -350,7 +362,7 @@ export default function Navigation() {
           </nav>
 
           {/* Mobile Right Controls */}
-          <div className="mobile-header-actions" style={{ display: 'none', alignItems: 'center', gap: '8px' }}>
+          <div className="mobile-header-actions">
             <button
               onClick={() => {
                 if (totalCount > 0) {
@@ -359,23 +371,11 @@ export default function Navigation() {
                   sendGeneralEnquiry();
                 }
               }}
-              style={{
-                background: totalCount > 0 ? 'var(--color-primary)' : '#f5f0ea',
-                border: totalCount > 0 ? '1px solid var(--color-primary)' : '1px solid #d9d0c7',
-                color: totalCount > 0 ? '#ffffff' : '#444',
-                padding: '6px 12px',
-                borderRadius: '20px',
-                fontSize: '0.78rem',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                cursor: 'pointer'
-              }}
+              className="mobile-inquire-btn"
               title={totalCount > 0 ? "Review Enquiry Portfolio" : "Send General Wholesale Enquiry"}
             >
               <span>📋</span>
-              <span>Inquire</span>
+              <span className="mobile-inquire-label">Inquire</span>
               {totalCount > 0 && (
                 <span style={{ background: '#ffffff', color: 'var(--color-primary)', padding: '1px 6px', borderRadius: '10px', fontSize: '0.7rem', fontWeight: 800 }}>
                   {totalCount}
@@ -385,11 +385,10 @@ export default function Navigation() {
             <CurrencySelector compact />
             <button 
               className="mobile-menu-btn" 
-              style={{ color: 'var(--color-text)' }} 
               onClick={() => setIsOpen(!isOpen)} 
-              aria-label="Toggle menu"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
+              {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -399,43 +398,43 @@ export default function Navigation() {
       <AnimatePresence>
         {isOpen && (
           <motion.div 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
             className="mobile-nav-overlay"
-            style={{ overflow: 'hidden' }}
           >
-            <nav style={{ display: 'flex', flexDirection: 'column', padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '14px', borderBottom: '1px solid #eee' }}>
+            <nav style={{ display: 'flex', flexDirection: 'column', padding: '24px 20px', minHeight: '100%' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid #f0e6dc' }}>
                 <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Currency</span>
                 <CurrencySelector />
               </div>
-              <Link href="/" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>Home</Link>
+              <Link href="/" style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc', color: '#1a1a1a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Home</Link>
               
-              <div style={{ padding: '15px 0', borderBottom: '1px solid #eee' }}>
-                <span style={{ color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '10px' }}>Products</span>
-                <div style={{ display: 'flex', flexDirection: 'column', paddingLeft: '10px', gap: '14px' }}>
+              <div style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc' }}>
+                <span style={{ color: '#1a1a1a', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '14px', fontSize: '0.9rem' }}>Our Products</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {PRODUCTS.map(product => (
                     <Link 
                       key={product.href} 
                       href={product.href} 
-                      style={{ color: '#444', fontWeight: 500, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '14px', padding: '4px 0' }} 
+                      style={{ color: '#2b231d', fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '14px', padding: '6px 0', textDecoration: 'none' }} 
                       onClick={() => setIsOpen(false)}
                     >
-                      <MiniImageSlider images={product.imgs} style={{ width: '50px', height: '50px', borderRadius: '50%', border: '1px solid #eee', flexShrink: 0 }} />
+                      <MiniImageSlider images={product.imgs} style={{ width: '46px', height: '46px', borderRadius: '50%', border: '1.5px solid #ebd9c8', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }} />
                       <span>{product.name}</span>
                     </Link>
                   ))}
                 </div>
               </div>
 
-              <Link href="/#about-section" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>About Us</Link>
-              <Link href="/#contact-section" style={{ padding: '15px 0', borderBottom: '1px solid #eee', color: '#1a1a1a', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '1px' }} onClick={() => setIsOpen(false)}>Contact</Link>
+              <Link href="/#about-section" style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc', color: '#1a1a1a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>About Us</Link>
+              <Link href="/#contact-section" style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc', color: '#1a1a1a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Contact</Link>
               
-              <div style={{ paddingTop: '20px', paddingBottom: '10px' }}>
+              <div style={{ paddingTop: '24px', paddingBottom: '20px' }}>
                 <button 
                   className="btn-gold" 
-                  style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+                  style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', borderRadius: '12px' }}
                   onClick={() => {
                     setIsOpen(false);
                     if (totalCount > 0) {
