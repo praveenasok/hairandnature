@@ -4,18 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 
+import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor } from '@/data/colors';
+
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
 const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
-const COLORS = [
-  { name: '#1 Jet Black', hex: '#0e0d12' },
-  { name: '#1b Off Black', hex: '#19171d' },
-  { name: '#2 Darkest Brown', hex: '#231812' },
-  { name: '#4 Medium Brown', hex: '#442f23' },
-  { name: '#8 Light Ash Brown', hex: '#5e5549' },
-  { name: '#22 Light Blonde', hex: '#f0e6c8' },
-  { name: '#613 Bleach Blonde', hex: '#fef5ce' }
-];
 
 const DEFAULT_PRODUCT_IMAGES: Record<string, string[]> = {
   "Tape Extensions": [
@@ -288,8 +281,18 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const [length, setLength] = useState(LENGTHS[0]);
   const [weight, setWeight] = useState(WEIGHTS[1]);
   const [style, setStyle] = useState(STYLES[0]);
-  const [color, setColor] = useState(COLORS[0].name);
+  const [color, setColor] = useState(SPECTRUM_COLORS[0].name);
+  const [colorCategory, setColorCategory] = useState<string>('All');
   const [description, setDescription] = useState(desc);
+
+  const filteredColors = useMemo(() => {
+    if (colorCategory === 'All') return SPECTRUM_COLORS;
+    return SPECTRUM_COLORS.filter(c => c.category === colorCategory);
+  }, [colorCategory]);
+
+  const selectedColorObj = useMemo(() => {
+    return SPECTRUM_COLORS.find(c => c.name === color) || SPECTRUM_COLORS[0];
+  }, [color]);
   
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [unit, setUnit] = useState<string>('unit');
@@ -576,29 +579,109 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
             </div>
 
-            {/* Color Options */}
-            <div style={{ marginBottom: '30px' }}>
+            {/* Color Options with Spectrum One Images & Names */}
+            <div style={{ marginBottom: '32px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Premium Color</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{color}</span>
+                <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Premium Shade / Color</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '3px 12px', borderRadius: '12px', fontSize: '0.88rem' }}>
+                  {selectedColorObj.name}
+                </span>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                {COLORS.map(c => (
-                  <button 
-                    key={c.name} 
-                    onClick={() => setColor(c.name)}
-                    title={c.name}
-                    aria-label={c.name}
-                    style={{ 
-                      width: '38px', height: '38px', borderRadius: '50%', 
-                      background: c.hex,
-                      border: c.name === color ? '3px solid white' : 'none', 
-                      boxShadow: c.name === color ? '0 0 0 2px var(--color-primary)' : '0 2px 5px rgba(0,0,0,0.2)',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease'
-                    }}
-                  />
-                ))}
+
+              {/* Selected Color Visual Preview Card */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '10px 14px', marginBottom: '16px' }}>
+                <div style={{ width: '52px', height: '64px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.1)', background: '#fff' }}>
+                  <img src={selectedColorObj.image} alt={selectedColorObj.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                    <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#111' }}>{selectedColorObj.name}</span>
+                    <span style={{ fontSize: '0.72rem', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>{selectedColorObj.category}</span>
+                  </div>
+                  <span style={{ fontSize: '0.82rem', color: '#666', display: 'block' }}>100% Remy Human Hair • Organic Tone Swatch</span>
+                </div>
+              </div>
+
+              {/* Category Filter Tabs */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
+                {COLOR_CATEGORIES.map(cat => {
+                  const count = cat === 'All' ? SPECTRUM_COLORS.length : SPECTRUM_COLORS.filter(c => c.category === cat).length;
+                  const isActive = colorCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setColorCategory(cat)}
+                      style={{
+                        padding: '5px 12px',
+                        borderRadius: '20px',
+                        border: isActive ? '1px solid var(--color-primary)' : '1px solid #e0e0e0',
+                        background: isActive ? 'rgba(228, 82, 88, 0.08)' : '#fff',
+                        color: isActive ? 'var(--color-primary)' : '#666',
+                        fontSize: '0.78rem',
+                        fontWeight: isActive ? 600 : 400,
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {cat} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Color Swatches Grid with Real Images */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', 
+                gap: '8px', 
+                maxHeight: '260px', 
+                overflowY: 'auto', 
+                padding: '8px',
+                border: '1px solid #eaeaea',
+                borderRadius: '12px',
+                background: '#fafafa'
+              }}>
+                {filteredColors.map(c => {
+                  const isSelected = c.name === color;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => setColor(c.name)}
+                      title={c.name}
+                      aria-label={c.name}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '6px 2px',
+                        borderRadius: '10px',
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e0e0e0',
+                        background: isSelected ? 'rgba(228, 82, 88, 0.06)' : '#fff',
+                        cursor: 'pointer',
+                        boxShadow: isSelected ? '0 0 0 1px var(--color-primary)' : '0 1px 2px rgba(0,0,0,0.04)',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', background: '#eee' }}>
+                        <img src={c.image} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      </div>
+                      <span style={{ 
+                        fontSize: '0.72rem', 
+                        fontWeight: isSelected ? 700 : 500, 
+                        color: isSelected ? 'var(--color-primary)' : '#444',
+                        textAlign: 'center',
+                        lineHeight: 1.2,
+                        maxWidth: '68px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap'
+                      }}>
+                        {c.name}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

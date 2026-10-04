@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { SPECTRUM_COLORS } from "@/data/colors";
 
 const PRODUCTS = [
   "Tape Extensions",
@@ -17,7 +18,7 @@ const PRODUCTS = [
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
 const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
-const COLORS = ['#1 Jet Black', '#1b Off Black', '#2 Darkest Brown', '#4 Medium Brown', '#8 Light Ash Brown', '#22 Light Blonde', '#613 Bleach Blonde'];
+const COLORS = SPECTRUM_COLORS.map(c => c.name);
 
 type SortKey = 'product' | 'length' | 'weight' | 'style' | 'color' | 'price' | 'unit';
 type SortDirection = 'asc' | 'desc';
@@ -574,11 +575,13 @@ export default function AdminPage() {
                   {selectedColors.length === COLORS.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {COLORS.map(c => (
-                  <label key={c} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.9rem' }}>
-                    <input type="checkbox" checked={selectedColors.includes(c)} onChange={() => toggleSelection(c, selectedColors, setSelectedColors)} />
-                    {c}
+              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
+                {SPECTRUM_COLORS.map(c => (
+                  <label key={c.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
+                    <input type="checkbox" checked={selectedColors.includes(c.name)} onChange={() => toggleSelection(c.name, selectedColors, setSelectedColors)} />
+                    <img src={c.image} alt={c.name} style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #ddd' }} />
+                    <span>{c.name}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#888', marginLeft: 'auto' }}>{c.category}</span>
                   </label>
                 ))}
               </div>
