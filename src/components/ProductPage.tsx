@@ -638,17 +638,70 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </span>
               </div>
 
-              {/* Active Color Preview Bar */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '10px', padding: '8px 12px', marginBottom: '12px' }}>
-                <div style={{ width: '42px', height: '42px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 6px rgba(0,0,0,0.1)', background: '#fff' }}>
-                  <img src={selectedColorObj.image} alt={selectedColorObj.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              {/* Active Color Preview Bar with HD Loupe */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '14px', 
+                background: 'linear-gradient(135deg, #ffffff 0%, #faf7f5 100%)', 
+                border: '1.5px solid rgba(228, 82, 88, 0.22)', 
+                borderRadius: '14px', 
+                padding: '10px 14px', 
+                marginBottom: '14px',
+                boxShadow: '0 4px 18px rgba(228, 82, 88, 0.06)'
+              }}>
+                <div style={{ 
+                  position: 'relative',
+                  width: '56px', 
+                  height: '56px', 
+                  borderRadius: '12px', 
+                  overflow: 'hidden', 
+                  flexShrink: 0, 
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5)', 
+                  border: '2px solid var(--color-primary)',
+                  background: '#f5f5f5' 
+                }}>
+                  <img 
+                    src={selectedColorObj.image} 
+                    alt={selectedColorObj.name} 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover',
+                      transform: 'scale(1.25)',
+                      transition: 'transform 0.3s ease'
+                    }} 
+                  />
+                  <div style={{ 
+                    position: 'absolute', 
+                    bottom: '2px', 
+                    right: '2px', 
+                    background: 'rgba(0,0,0,0.65)', 
+                    color: '#fff', 
+                    fontSize: '9px', 
+                    fontWeight: 800, 
+                    padding: '1px 4px', 
+                    borderRadius: '4px',
+                    backdropFilter: 'blur(2px)'
+                  }}>
+                    HD
+                  </div>
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#111' }}>{selectedColorObj.name}</span>
-                    <span style={{ fontSize: '0.7rem', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', padding: '1px 6px', borderRadius: '6px', fontWeight: 600 }}>{selectedColorObj.category}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 800, fontSize: '1rem', color: '#111' }}>{selectedColorObj.name}</span>
+                    <span style={{ fontSize: '0.72rem', background: 'rgba(228, 82, 88, 0.12)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
+                      {selectedColorObj.category}
+                    </span>
+                    <span style={{ fontSize: '0.68rem', background: '#f0ece7', color: '#6d5a49', padding: '2px 6px', borderRadius: '6px', fontWeight: 600 }}>
+                      Active Shade
+                    </span>
                   </div>
-                  <span style={{ fontSize: '0.76rem', color: '#777' }}>100% Remy Human Hair • Organic Tone Swatch</span>
+                  <div style={{ fontSize: '0.78rem', color: '#666', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>✨ 100% Remy Human Hair</span>
+                    <span>•</span>
+                    <span style={{ color: '#2b8a3e', fontWeight: 600 }}>In Stock (Factory Direct)</span>
+                  </div>
                 </div>
               </div>
 
@@ -679,14 +732,14 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 })}
               </div>
 
-              {/* Color Swatches Grid */}
+              {/* Color Swatches Grid with In-Place Zoom on Selected Swatch */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', 
-                gap: '6px', 
-                maxHeight: '230px', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', 
+                gap: '10px', 
+                maxHeight: '260px', 
                 overflowY: 'auto', 
-                padding: '8px',
+                padding: '14px 12px',
                 border: '1px solid #e5e5e5',
                 borderRadius: '12px',
                 background: '#fafafa'
@@ -705,27 +758,79 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         alignItems: 'center',
                         gap: '4px',
                         padding: '6px 2px',
-                        borderRadius: '8px',
+                        borderRadius: '10px',
                         border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
-                        background: isSelected ? 'rgba(228, 82, 88, 0.06)' : '#fff',
+                        background: isSelected ? '#ffffff' : '#fff',
                         cursor: 'pointer',
-                        boxShadow: isSelected ? '0 0 0 1px var(--color-primary)' : 'none',
-                        transition: 'all 0.15s ease'
+                        position: 'relative',
+                        zIndex: isSelected ? 20 : 1,
+                        transform: isSelected ? 'scale(1.24)' : 'scale(1)',
+                        transformOrigin: 'center center',
+                        boxShadow: isSelected 
+                          ? '0 12px 26px -2px rgba(228, 82, 88, 0.42), 0 0 0 2px var(--color-primary)' 
+                          : '0 1px 3px rgba(0,0,0,0.04)',
+                        transition: 'transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease'
                       }}
                     >
-                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', background: '#eee' }}>
-                        <img src={c.image} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      {/* Selected In-Place Checkmark Badge */}
+                      {isSelected && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '-5px',
+                          right: '-5px',
+                          width: '18px',
+                          height: '18px',
+                          borderRadius: '50%',
+                          background: 'var(--color-primary)',
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          fontWeight: 900,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                          zIndex: 25
+                        }}>
+                          ✓
+                        </div>
+                      )}
+
+                      {/* Swatch Hair Image with In-Place Zoom */}
+                      <div style={{ 
+                        width: '38px', 
+                        height: '38px', 
+                        borderRadius: '50%', 
+                        overflow: 'hidden', 
+                        border: isSelected ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.08)', 
+                        background: '#eee',
+                        boxShadow: isSelected ? '0 0 0 1.5px var(--color-primary)' : 'none',
+                        transition: 'all 0.2s ease'
+                      }}>
+                        <img 
+                          src={c.image} 
+                          alt={c.name} 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover',
+                            transform: isSelected ? 'scale(1.35)' : 'scale(1)',
+                            transition: 'transform 0.28s ease'
+                          }} 
+                        />
                       </div>
+
+                      {/* Swatch Label */}
                       <span style={{ 
-                        fontSize: '0.7rem', 
-                        fontWeight: isSelected ? 700 : 500, 
+                        fontSize: isSelected ? '0.73rem' : '0.68rem', 
+                        fontWeight: isSelected ? 800 : 500, 
                         color: isSelected ? 'var(--color-primary)' : '#444',
                         textAlign: 'center',
                         lineHeight: 1.2,
-                        maxWidth: '64px',
+                        maxWidth: '68px',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap'
+                        whiteSpace: 'nowrap',
+                        transition: 'all 0.2s ease'
                       }}>
                         {c.name}
                       </span>

@@ -114,10 +114,11 @@ export default function Navigation() {
                       {/* Bottom-Right Slot: Logo & Authentic Rubber Stamp */}
                       <div 
                         style={{ 
-                          padding: '18px 24px', 
+                          padding: '14px 20px', 
                           borderRadius: '16px', 
-                          background: 'rgba(235, 225, 216, 0.35)', 
-                          border: '1px solid rgba(228, 82, 88, 0.15)', 
+                          background: 'linear-gradient(135deg, #fffdfa 0%, #fbf5ed 60%, #f6ebdc 100%)', 
+                          border: '1px solid rgba(197, 148, 58, 0.35)', 
+                          boxShadow: '0 4px 20px rgba(197, 148, 58, 0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
                           display: 'flex', 
                           alignItems: 'center', 
                           justifyContent: 'space-between',
@@ -127,71 +128,147 @@ export default function Navigation() {
                           transition: 'all 0.3s ease'
                         }}
                         onMouseOver={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(228, 82, 88, 0.05)';
+                          e.currentTarget.style.borderColor = 'rgba(197, 148, 58, 0.55)';
+                          e.currentTarget.style.boxShadow = '0 6px 24px rgba(197, 148, 58, 0.16), inset 0 1px 0 rgba(255,255,255,0.9)';
                           e.currentTarget.style.transform = 'translateY(-2px)';
                         }}
                         onMouseOut={(e) => {
-                          e.currentTarget.style.backgroundColor = 'rgba(235, 225, 216, 0.35)';
+                          e.currentTarget.style.borderColor = 'rgba(197, 148, 58, 0.35)';
+                          e.currentTarget.style.boxShadow = '0 4px 20px rgba(197, 148, 58, 0.08), inset 0 1px 0 rgba(255,255,255,0.9)';
                           e.currentTarget.style.transform = 'translateY(0)';
                         }}
                       >
-                        {/* Brand Logo */}
-                        <span style={{ 
-                          fontFamily: 'var(--font-serif)', 
-                          fontSize: '1.65rem', 
-                          fontWeight: 600, 
-                          color: 'var(--color-primary)', 
-                          lineHeight: 1.1,
-                          letterSpacing: '-0.4px'
-                        }}>
-                          hair&nature®
-                        </span>
+                        {/* Brand Logo & Provenance Subtitle */}
+                        <div>
+                          <span style={{ 
+                            fontFamily: 'var(--font-serif)', 
+                            fontSize: '1.65rem', 
+                            fontWeight: 600, 
+                            color: '#b83238', 
+                            lineHeight: 1.1,
+                            letterSpacing: '-0.4px',
+                            display: 'block'
+                          }}>
+                            hair&nature®
+                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                            <span style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#c5943a', display: 'inline-block' }}></span>
+                            <span style={{ 
+                              fontSize: '0.68rem', 
+                              letterSpacing: '1px', 
+                              textTransform: 'uppercase', 
+                              color: '#8c7662', 
+                              fontWeight: 600 
+                            }}>
+                              100% Remy Hair Guarantee
+                            </span>
+                          </div>
+                        </div>
 
-                        {/* Authentic Rubber Stamp Seal */}
+                        {/* Luxury Certified Medallion Seal */}
                         <svg 
                           xmlns="http://www.w3.org/2000/svg" 
                           viewBox="0 0 120 120" 
-                          width="90" 
-                          height="90" 
+                          width="92" 
+                          height="92" 
                           style={{ 
-                            transform: 'rotate(-9deg)', 
                             flexShrink: 0,
-                            opacity: 0.9,
-                            transition: 'transform 0.3s ease'
+                            transition: 'transform 0.4s ease, filter 0.4s ease',
+                            filter: 'drop-shadow(0 3px 8px rgba(197, 148, 58, 0.18))'
                           }}
-                          aria-label="Made with 100% Natural Human Hair Stamp"
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05) rotate(2deg)';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'scale(1) rotate(0deg)';
+                          }}
+                          aria-label="Certified 100% Pure Natural Remy Human Hair Seal"
                         >
                           <defs>
-                            <filter id="megaMenuRubberStamp" x="-10%" y="-10%" width="120%" height="120%">
-                              <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" result="noise" />
-                              <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.1" xChannelSelector="R" yChannelSelector="G" />
-                            </filter>
-                            <path id="megaMenuUpperArc" d="M 18,60 A 42,42 0 0,1 102,60" fill="none" />
-                            <path id="megaMenuLowerArc" d="M 18,60 A 42,42 0 0,0 102,60" fill="none" />
+                            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#f7e5b2" />
+                              <stop offset="30%" stopColor="#dfb76c" />
+                              <stop offset="65%" stopColor="#c5943a" />
+                              <stop offset="100%" stopColor="#966d21" />
+                            </linearGradient>
+                            <radialGradient id="sealBackdrop" cx="50%" cy="50%" r="50%">
+                              <stop offset="0%" stopColor="#fffdf9" />
+                              <stop offset="70%" stopColor="#fbf3e6" />
+                              <stop offset="100%" stopColor="#f1e0ca" />
+                            </radialGradient>
+                            <linearGradient id="roseAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+                              <stop offset="0%" stopColor="#e45258" />
+                              <stop offset="100%" stopColor="#ad252b" />
+                            </linearGradient>
+                            {/* Clockwise Upper Arc for Top Text */}
+                            <path id="medallionUpperArc" d="M 21,60 A 39,39 0 0,1 99,60" fill="none" />
+                            {/* Clockwise Lower Arc for Bottom Text */}
+                            <path id="medallionLowerArc" d="M 99,60 A 39,39 0 0,1 21,60" fill="none" />
                           </defs>
-                          <g filter="url(#megaMenuRubberStamp)" stroke="#b82e35" fill="#b82e35">
-                            {/* Outer Distressed Stamp Rings */}
-                            <circle cx="60" cy="60" r="56" fill="none" strokeWidth="2.6" />
-                            <circle cx="60" cy="60" r="51.5" fill="none" strokeWidth="1.2" strokeDasharray="3,1.5" />
 
-                            {/* Inner Stamp Rings */}
-                            <circle cx="60" cy="60" r="32" fill="none" strokeWidth="1.6" />
-                            <circle cx="60" cy="60" r="29" fill="none" strokeWidth="0.8" />
+                          {/* Outer Medallion Body */}
+                          <circle cx="60" cy="60" r="57" fill="url(#sealBackdrop)" />
 
-                            {/* Top Curved Text */}
-                            <text fontSize="8.5" fontWeight="900" fontFamily="'Quicksand', Arial, sans-serif" letterSpacing="2" stroke="none">
-                              <textPath href="#megaMenuUpperArc" startOffset="50%" textAnchor="middle">★ MADE WITH ★</textPath>
-                            </text>
+                          {/* Outer Luxury Dual Rings & Notches */}
+                          <circle cx="60" cy="60" r="56" fill="none" stroke="url(#goldGradient)" strokeWidth="1.8" />
+                          <circle cx="60" cy="60" r="52.5" fill="none" stroke="url(#goldGradient)" strokeWidth="1" strokeDasharray="2, 2.5" />
+                          <circle cx="60" cy="60" r="48.5" fill="none" stroke="url(#goldGradient)" strokeWidth="0.8" />
 
-                            {/* Bottom Curved Text */}
-                            <text fontSize="8.5" fontWeight="900" fontFamily="'Quicksand', Arial, sans-serif" letterSpacing="2" stroke="none">
-                              <textPath href="#megaMenuLowerArc" startOffset="50%" textAnchor="middle">★ HUMAN HAIR ★</textPath>
-                            </text>
+                          {/* Curved Typography: Top Arc */}
+                          <text fontSize="7" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="1.8" fill="#7a5518">
+                            <textPath href="#medallionUpperArc" startOffset="50%" textAnchor="middle">★ 100% PURE NATURAL ★</textPath>
+                          </text>
 
-                            {/* Center Stamp Typography */}
-                            <text x="60" y="55" textAnchor="middle" fontSize="15" fontWeight="900" fontFamily="'Quicksand', Arial Black, sans-serif" letterSpacing="0.5" stroke="none">100%</text>
-                            <text x="60" y="66" textAnchor="middle" fontSize="7" fontWeight="900" fontFamily="'Quicksand', Arial, sans-serif" letterSpacing="2" stroke="none">NATURAL</text>
-                          </g>
+                          {/* Curved Typography: Bottom Arc */}
+                          <text fontSize="7" fontWeight="800" fontFamily="system-ui, -apple-system, sans-serif" letterSpacing="1.8" fill="#7a5518">
+                            <textPath href="#medallionLowerArc" startOffset="50%" textAnchor="middle">★ REMY HUMAN HAIR ★</textPath>
+                          </text>
+
+                          {/* Inner Medallion Separation Ring */}
+                          <circle cx="60" cy="60" r="30.5" fill="url(#sealBackdrop)" stroke="url(#goldGradient)" strokeWidth="1.4" />
+                          <circle cx="60" cy="60" r="28" fill="none" stroke="url(#goldGradient)" strokeWidth="0.6" strokeDasharray="1.5, 2" />
+
+                          {/* Center Medallion Elements */}
+                          <text x="60" y="45.5" textAnchor="middle" fontSize="6.5" fill="url(#goldGradient)" letterSpacing="2">★★★</text>
+
+                          <text 
+                            x="60" 
+                            y="59" 
+                            textAnchor="middle" 
+                            fontSize="15.5" 
+                            fontWeight="800" 
+                            fontFamily="var(--font-serif), Georgia, 'Playfair Display', serif" 
+                            fill="url(#roseAccent)" 
+                            letterSpacing="0.3"
+                          >
+                            100%
+                          </text>
+
+                          <text 
+                            x="60" 
+                            y="68" 
+                            textAnchor="middle" 
+                            fontSize="6.2" 
+                            fontWeight="800" 
+                            fontFamily="system-ui, -apple-system, sans-serif" 
+                            letterSpacing="2.2" 
+                            fill="#7a5518"
+                          >
+                            NATURAL
+                          </text>
+
+                          <text 
+                            x="60" 
+                            y="75" 
+                            textAnchor="middle" 
+                            fontSize="4.8" 
+                            fontWeight="700" 
+                            fontFamily="system-ui, -apple-system, sans-serif" 
+                            letterSpacing="1.4" 
+                            fill="#966d21"
+                          >
+                            VIRGIN REMY
+                          </text>
                         </svg>
                       </div>
                     </div>
