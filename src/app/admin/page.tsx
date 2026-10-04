@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { SPECTRUM_COLORS } from "@/data/colors";
+import { HAIR_STYLES, STYLE_NAMES } from "@/data/styles";
 
 const PRODUCTS = [
   "Tape Extensions",
@@ -17,7 +18,7 @@ const PRODUCTS = [
 ];
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
-const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
+const STYLES = STYLE_NAMES;
 const COLORS = SPECTRUM_COLORS.map(c => c.name);
 
 type SortKey = 'product' | 'length' | 'weight' | 'style' | 'color' | 'price' | 'unit';
@@ -557,11 +558,13 @@ export default function AdminPage() {
                   {selectedStyles.length === STYLES.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {STYLES.map(s => (
-                  <label key={s} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.9rem' }}>
-                    <input type="checkbox" checked={selectedStyles.includes(s)} onChange={() => toggleSelection(s, selectedStyles, setSelectedStyles)} />
-                    {s}
+              <div style={{ maxHeight: '190px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
+                {HAIR_STYLES.map(s => (
+                  <label key={s.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
+                    <input type="checkbox" checked={selectedStyles.includes(s.name)} onChange={() => toggleSelection(s.name, selectedStyles, setSelectedStyles)} />
+                    <img src={s.image} alt={s.name} style={{ width: '26px', height: '26px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #ddd' }} />
+                    <span style={{ fontWeight: 500 }}>{s.name}</span>
+                    <span style={{ fontSize: '0.72rem', color: '#888', marginLeft: 'auto' }}>{s.pattern}</span>
                   </label>
                 ))}
               </div>

@@ -5,10 +5,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 
 import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor } from '@/data/colors';
+import { HAIR_STYLES, STYLE_NAMES, HairStyle } from '@/data/styles';
 
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
-const STYLES = ['Natural Straight', 'Natural Wave', 'Body Wave', 'Deep Wave', 'Kinky Curls', 'Afro Curls'];
+const STYLES = STYLE_NAMES;
 
 const DEFAULT_PRODUCT_IMAGES: Record<string, string[]> = {
   "Tape Extensions": [
@@ -293,6 +294,10 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const selectedColorObj = useMemo(() => {
     return SPECTRUM_COLORS.find(c => c.name === color) || SPECTRUM_COLORS[0];
   }, [color]);
+
+  const selectedStyleObj = useMemo(() => {
+    return HAIR_STYLES.find(s => s.name === style) || HAIR_STYLES[0];
+  }, [style]);
   
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [unit, setUnit] = useState<string>('unit');
@@ -550,32 +555,116 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             </div>
 
             {/* Style Options */}
-            <div style={{ marginBottom: '22px' }}>
+            <div style={{ marginBottom: '26px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                 <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Style / Texture</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{style}</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '3px 12px', borderRadius: '12px', fontSize: '0.88rem' }}>
+                  {selectedStyleObj.name} • {selectedStyleObj.curlType}
+                </span>
               </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {STYLES.map(st => (
-                  <button 
-                    key={st} 
-                    onClick={() => setStyle(st)}
-                    style={{ 
-                      padding: '8px 14px', 
-                      borderRadius: '8px', 
-                      border: st === style ? '2px solid var(--color-primary)' : '1px solid #ddd', 
-                      background: st === style ? 'rgba(228, 82, 88, 0.05)' : 'white',
-                      color: st === style ? 'var(--color-primary)' : '#444',
-                      fontWeight: st === style ? 600 : 400,
-                      cursor: 'pointer',
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s ease',
-                      minHeight: '40px'
-                    }}
-                  >
-                    {st}
-                  </button>
-                ))}
+
+              {/* Selected Style Visual Preview Card */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '10px 14px', marginBottom: '14px' }}>
+                <div style={{ width: '56px', height: '56px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.1)', background: '#fff' }}>
+                  <img src={selectedStyleObj.image} alt={selectedStyleObj.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                    <span style={{ fontWeight: 700, fontSize: '1.02rem', color: '#111' }}>{selectedStyleObj.name}</span>
+                    <span style={{ fontSize: '0.72rem', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>{selectedStyleObj.pattern}</span>
+                  </div>
+                  <span style={{ fontSize: '0.8rem', color: '#666', display: 'block', lineHeight: 1.35 }}>{selectedStyleObj.description}</span>
+                </div>
+              </div>
+
+              {/* Style Cards Grid */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
+                gap: '10px' 
+              }}>
+                {HAIR_STYLES.map(st => {
+                  const isSelected = st.name === style;
+                  return (
+                    <button
+                      key={st.id}
+                      onClick={() => setStyle(st.name)}
+                      type="button"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        padding: '10px 8px 8px 8px',
+                        borderRadius: '12px',
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
+                        background: isSelected ? 'rgba(228, 82, 88, 0.04)' : '#ffffff',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        boxShadow: isSelected ? '0 4px 14px rgba(228, 82, 88, 0.16)' : '0 1px 3px rgba(0,0,0,0.02)',
+                        transform: isSelected ? 'translateY(-2px)' : 'none',
+                        position: 'relative'
+                      }}
+                    >
+                      <div style={{
+                        width: '100%',
+                        aspectRatio: '1 / 1',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        background: '#f8fafc',
+                        marginBottom: '8px',
+                        position: 'relative'
+                      }}>
+                        <img 
+                          src={st.image} 
+                          alt={st.name} 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover'
+                          }} 
+                        />
+                        {isSelected && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '6px',
+                            right: '6px',
+                            background: 'var(--color-primary)',
+                            color: '#fff',
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                          }}>
+                            ✓
+                          </div>
+                        )}
+                      </div>
+
+                      <span style={{ 
+                        fontWeight: isSelected ? 700 : 600, 
+                        fontSize: '0.85rem', 
+                        color: isSelected ? 'var(--color-primary)' : '#1e293b',
+                        lineHeight: 1.25,
+                        marginBottom: '3px'
+                      }}>
+                        {st.name}
+                      </span>
+                      <span style={{ 
+                        fontSize: '0.7rem', 
+                        color: '#64748b', 
+                        lineHeight: 1.2 
+                      }}>
+                        {st.pattern}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
