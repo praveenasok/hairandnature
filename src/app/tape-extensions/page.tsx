@@ -6,6 +6,11 @@ export default function TapeExtensions() {
       title="Tape Extensions"
       desc="Lightweight and discreet tape-ins that provide a natural, full-bodied look with long-lasting hold. Effortless to install and maintain, ensuring a flawlessly blended appearance."
       img="/images/tape_extensions.jpg"
+      images={[
+        "/images/tape_extensions.jpg",
+        "/images/products/tapeextensions.webp",
+        "/images/products/tapeextensions2.webp"
+      ]}
       specs={[
         { label: "Material", value: "100% Remy Human Hair" },
         { label: "Weight Per Pack", value: "50 to 100 Grams" },
