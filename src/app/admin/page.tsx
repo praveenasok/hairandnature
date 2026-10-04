@@ -51,9 +51,10 @@ export default function AdminPage() {
   const [unitSavedMsg, setUnitSavedMsg] = useState("");
   const [descSavedMsg, setDescSavedMsg] = useState("");
 
-  // Testimonials state
-  const [activeAdminTab, setActiveAdminTab] = useState<'products' | 'testimonials'>('products');
+  // Testimonials & Enquiries state
+  const [activeAdminTab, setActiveAdminTab] = useState<'products' | 'testimonials' | 'enquiries'>('products');
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [enquiries, setEnquiries] = useState<any[]>([]);
   const [savingTestimonials, setSavingTestimonials] = useState(false);
   const [testimonialSuccessMsg, setTestimonialSuccessMsg] = useState("");
   const [editingTestimonialId, setEditingTestimonialId] = useState<string | null>(null);
@@ -85,8 +86,9 @@ export default function AdminPage() {
       fetch('/api/prices').then(res => res.json()).catch(() => ({})),
       fetch('/api/units').then(res => res.json()).catch(() => ({})),
       fetch('/api/descriptions').then(res => res.json()).catch(() => ({})),
-      fetch('/api/testimonials').then(res => res.json()).catch(() => ([]))
-    ]).then(([priceData, unitData, descData, testimonialsData]) => {
+      fetch('/api/testimonials').then(res => res.json()).catch(() => ([])),
+      fetch('/api/enquiries').then(res => res.json()).catch(() => ([]))
+    ]).then(([priceData, unitData, descData, testimonialsData, enquiriesData]) => {
       setPrices(priceData || {});
       const loadedUnits = unitData || {};
       setUnits(loadedUnits);
@@ -98,6 +100,10 @@ export default function AdminPage() {
 
       if (Array.isArray(testimonialsData) && testimonialsData.length > 0) {
         setTestimonials(testimonialsData);
+      }
+
+      if (Array.isArray(enquiriesData)) {
+        setEnquiries(enquiriesData);
       }
       
       setLoading(false);
@@ -549,6 +555,27 @@ export default function AdminPage() {
             }}
           >
             <span>⭐</span> Home Page Testimonials ({testimonials.length})
+          </button>
+          <button 
+            type="button"
+            onClick={() => setActiveAdminTab('enquiries')} 
+            style={{ 
+              padding: '12px 24px', 
+              borderRadius: '12px', 
+              background: activeAdminTab === 'enquiries' ? 'var(--color-primary)' : '#ffffff',
+              color: activeAdminTab === 'enquiries' ? '#ffffff' : '#444444',
+              border: activeAdminTab === 'enquiries' ? '2px solid var(--color-primary)' : '1px solid #dddddd',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: activeAdminTab === 'enquiries' ? '0 4px 15px rgba(228,82,88,0.25)' : 'none',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span>📋</span> Global Enquiries ({enquiries.length})
           </button>
         </div>
 
@@ -1179,6 +1206,158 @@ export default function AdminPage() {
                             🗑️ Delete
                           </button>
                         </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {activeAdminTab === 'enquiries' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Summary Metrics */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '16px'
+            }}>
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                <span style={{ fontSize: '0.82rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Inquiries Logged</span>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--color-primary)', marginTop: '4px' }}>{enquiries.length}</div>
+              </div>
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                <span style={{ fontSize: '0.82rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Volume Requested</span>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#16a34a', marginTop: '4px' }}>
+                  {enquiries.reduce((acc, e) => acc + (e.totalItems || 0), 0)} packs
+                </div>
+              </div>
+              <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
+                <span style={{ fontSize: '0.82rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Estimated Pipeline Value</span>
+                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#2563eb', marginTop: '4px' }}>
+                  ${enquiries.reduce((acc, e) => acc + (e.estimatedTotal || 0), 0).toLocaleString()} CAD
+                </div>
+              </div>
+            </div>
+
+            {/* Inquiries List */}
+            <div style={{ background: '#fff', padding: 'clamp(20px, 4vw, 32px)', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', border: '1px solid #eee' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.3rem', fontWeight: 700, margin: 0 }}>
+                    Global Wholesale Inquiries ({enquiries.length})
+                  </h3>
+                  <span style={{ fontSize: '0.85rem', color: '#666' }}>
+                    Multi-product orders submitted from product pages via WhatsApp
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    fetch('/api/enquiries')
+                      .then(res => res.json())
+                      .then(data => setEnquiries(data))
+                      .catch(err => console.error(err));
+                  }}
+                  style={{ padding: '8px 16px', background: '#f3f4f6', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
+                >
+                  🔄 Refresh List
+                </button>
+              </div>
+
+              {enquiries.length === 0 ? (
+                <div style={{ padding: '40px', textAlign: 'center', color: '#888' }}>
+                  No global enquiries recorded yet.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {enquiries.map((enq) => (
+                    <div
+                      key={enq.id}
+                      style={{
+                        background: '#fafafa',
+                        border: '1px solid #e5e5e5',
+                        borderRadius: '14px',
+                        padding: '20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '12px'
+                      }}
+                    >
+                      {/* Top Header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                        <div>
+                          <strong style={{ fontSize: '1.05rem', color: '#111', display: 'block' }}>
+                            {enq.salonName || 'Salon Partner'}
+                          </strong>
+                          <span style={{ fontSize: '0.82rem', color: '#666' }}>
+                            Contact: {enq.clientName} • 📍 {enq.location}
+                          </span>
+                          <span style={{ fontSize: '0.78rem', color: '#999', display: 'block', marginTop: '2px' }}>
+                            📅 {new Date(enq.date).toLocaleString()}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                          <span style={{ background: '#dbeafe', color: '#1e40af', padding: '4px 10px', borderRadius: '12px', fontSize: '0.76rem', fontWeight: 700 }}>
+                            {enq.status || 'Received'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (!confirm('Are you sure you want to delete this enquiry record?')) return;
+                              const updated = enquiries.filter(e => e.id !== enq.id);
+                              setEnquiries(updated);
+                              try {
+                                await fetch('/api/enquiries', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify(updated)
+                                });
+                              } catch (e) {
+                                console.error(e);
+                              }
+                            }}
+                            style={{ background: '#fee2e2', border: '1px solid #fca5a5', color: '#b91c1c', padding: '4px 10px', borderRadius: '6px', fontSize: '0.76rem', cursor: 'pointer', fontWeight: 600 }}
+                          >
+                            🗑️ Delete
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Items Grid */}
+                      <div style={{ background: '#ffffff', borderRadius: '10px', padding: '12px 16px', border: '1px solid #ebebeb' }}>
+                        <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#333', marginBottom: '8px' }}>
+                          Enquired Items ({enq.totalItems} total {enq.items?.[0]?.unit || 'pack'}s):
+                        </div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+                          {enq.items?.map((it: any, iIdx: number) => (
+                            <div key={iIdx} style={{ background: '#f8f8f8', padding: '8px 12px', borderRadius: '8px', border: '1px solid #eee' }}>
+                              <strong style={{ display: 'block', fontSize: '0.88rem', color: 'var(--color-primary)' }}>
+                                {it.title}
+                              </strong>
+                              <span style={{ fontSize: '0.78rem', color: '#555' }}>
+                                {it.quantity}x • {it.length} • {it.weight}
+                              </span>
+                              <span style={{ display: 'block', fontSize: '0.75rem', color: '#777' }}>
+                                Style: {it.style} | Color: {it.color}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Notes & Estimated Value */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', paddingTop: '8px' }}>
+                        {enq.notes ? (
+                          <div style={{ fontSize: '0.82rem', color: '#666', fontStyle: 'italic', flex: 1 }}>
+                            Note: "{enq.notes}"
+                          </div>
+                        ) : <div />}
+                        {enq.estimatedTotal > 0 && (
+                          <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1a1a1a' }}>
+                            Est. Value: ${enq.estimatedTotal.toLocaleString()} {enq.currency || 'CAD'}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

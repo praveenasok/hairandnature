@@ -3,6 +3,9 @@ import { Quicksand } from "next/font/google";
 import "./globals.css";
 import Navigation from "../components/Navigation";
 import { CurrencyProvider } from "../context/CurrencyContext";
+import { EnquiryProvider } from "../context/EnquiryContext";
+import GlobalEnquiryDrawer from "../components/GlobalEnquiryDrawer";
+import GlobalEnquiryFloatingButton from "../components/GlobalEnquiryFloatingButton";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -32,8 +35,9 @@ export default function RootLayout({
     <html lang="en" className={`${quicksand.variable}`}>
       <body>
         <CurrencyProvider>
-          <Navigation />
-          <main>{children}</main>
+          <EnquiryProvider>
+            <Navigation />
+            <main>{children}</main>
           <footer id="contact-section" style={{ backgroundColor: '#111', color: 'white', padding: 'clamp(50px, 8vh, 80px) 0 30px' }}>
             <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: 'clamp(25px, 4vw, 40px)', marginBottom: '30px' }}>
               <div>
@@ -65,6 +69,9 @@ export default function RootLayout({
               <p>© 2026 hair&nature®. All rights reserved.</p>
             </div>
           </footer>
+            <GlobalEnquiryDrawer />
+            <GlobalEnquiryFloatingButton />
+          </EnquiryProvider>
         </CurrencyProvider>
       </body>
     </html>

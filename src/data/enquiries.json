@@ -1,0 +1,135 @@
+[
+  {
+    "id": "enq_1791102890005",
+    "date": "2026-10-04T08:34:50.005Z",
+    "clientName": "Test Salon",
+    "salonName": "Hair Studio Milano",
+    "location": "Milan, Italy",
+    "items": [
+      {
+        "title": "Tape Extensions",
+        "length": "20 Inch",
+        "weight": "100 Grams",
+        "style": "Natural Straight",
+        "color": "Natural Black (#1B)",
+        "quantity": 2,
+        "unit": "pack"
+      }
+    ],
+    "totalItems": 2,
+    "currency": "CAD",
+    "estimatedTotal": 320,
+    "status": "New Inquiry",
+    "notes": "Test multi-item inquiry"
+  },
+  {
+    "id": "enq_172800101",
+    "date": "2026-10-04T07:15:00Z",
+    "clientName": "Elena Rostova",
+    "salonName": "Luxe Locks Studio",
+    "location": "Mayfair, London, UK",
+    "items": [
+      {
+        "title": "Tape Extensions",
+        "length": "20 Inch",
+        "weight": "100 Grams",
+        "style": "Natural Straight",
+        "color": "Frost & Polar Ash (#60/18)",
+        "quantity": 6,
+        "unit": "pack"
+      },
+      {
+        "title": "Genius Wefts",
+        "length": "22 Inch",
+        "weight": "150 Grams",
+        "style": "Body Wave",
+        "color": "Honey & Champagne Melt (#18/22)",
+        "quantity": 4,
+        "unit": "weft"
+      }
+    ],
+    "totalItems": 10,
+    "currency": "CAD",
+    "estimatedTotal": 1640,
+    "status": "In Discussion",
+    "notes": "Need priority DHL express dispatch for VIP bridal installations next week."
+  },
+  {
+    "id": "enq_172800102",
+    "date": "2026-10-04T05:40:00Z",
+    "clientName": "Julian Mercier",
+    "salonName": "Atelier Hair Couture",
+    "location": "Paris, France",
+    "items": [
+      {
+        "title": "Genius Wefts",
+        "length": "24 Inch",
+        "weight": "100 Grams",
+        "style": "Natural Wave",
+        "color": "Dark Chocolate (#2)",
+        "quantity": 8,
+        "unit": "weft"
+      }
+    ],
+    "totalItems": 8,
+    "currency": "CAD",
+    "estimatedTotal": 1440,
+    "status": "Quote Sent",
+    "notes": "Sample order for French salon chain testing zero-mustache PU seams."
+  },
+  {
+    "id": "enq_172800103",
+    "date": "2026-10-03T21:12:00Z",
+    "clientName": "Amanda Sterling",
+    "salonName": "Fifth Avenue Hair Lounge",
+    "location": "New York, USA",
+    "items": [
+      {
+        "title": "K Tips",
+        "length": "22 Inch",
+        "weight": "100 Grams",
+        "style": "Natural Straight",
+        "color": "Natural Black (#1B)",
+        "quantity": 12,
+        "unit": "pack"
+      },
+      {
+        "title": "Butterfly Wefts",
+        "length": "20 Inch",
+        "weight": "100 Grams",
+        "style": "Natural Wave",
+        "color": "Icy Platinum Blonde (#60)",
+        "quantity": 5,
+        "unit": "weft"
+      }
+    ],
+    "totalItems": 17,
+    "currency": "CAD",
+    "estimatedTotal": 2980,
+    "status": "Confirmed",
+    "notes": "Custom Italian keratin bonds for Manhattan celebrity clients."
+  },
+  {
+    "id": "enq_172800104",
+    "date": "2026-10-03T14:30:00Z",
+    "clientName": "Chloe Campbell",
+    "salonName": "Sydney Extension Bar",
+    "location": "Sydney, Australia",
+    "items": [
+      {
+        "title": "Seamless ClipOn Extensions",
+        "length": "18 Inch",
+        "weight": "150 Grams",
+        "style": "Body Wave",
+        "color": "Chestnut Brown (#4)",
+        "quantity": 5,
+        "unit": "set"
+      }
+    ],
+    "totalItems": 5,
+    "currency": "CAD",
+    "estimatedTotal": 890,
+    "status": "Dispatched",
+    "notes": "Wholesale clip-in packs for Australian retail counter."
+  }
+]

@@ -6,6 +6,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import MiniImageSlider from "./MiniImageSlider";
 import CurrencySelector from "./CurrencySelector";
+import { useEnquiry } from "../context/EnquiryContext";
 
 const PRODUCTS = [
   { name: "Tape Extensions", href: "/tape-extensions", imgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
@@ -19,6 +20,7 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
+  const { setIsOpen: setEnquiryOpen, totalCount } = useEnquiry();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -203,6 +205,43 @@ export default function Navigation() {
             <div style={{ marginLeft: '4px', marginRight: '4px' }}>
               <CurrencySelector />
             </div>
+            
+            {/* Global Enquiry Button */}
+            <button
+              onClick={() => setEnquiryOpen(true)}
+              style={{
+                background: totalCount > 0 ? 'rgba(228,82,88,0.08)' : '#ffffff',
+                border: totalCount > 0 ? '1.5px solid var(--color-primary)' : '1px solid #d5ceca',
+                color: totalCount > 0 ? 'var(--color-primary)' : '#444',
+                padding: '8px 16px',
+                borderRadius: '24px',
+                fontSize: '0.84rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: totalCount > 0 ? '0 3px 12px rgba(228,82,88,0.15)' : 'none'
+              }}
+              title="Show Global Enquiries"
+            >
+              <span style={{ fontSize: '1rem' }}>📋</span>
+              <span>Global Enquiry</span>
+              {totalCount > 0 && (
+                <span style={{
+                  background: 'var(--color-primary)',
+                  color: '#ffffff',
+                  borderRadius: '12px',
+                  padding: '2px 7px',
+                  fontSize: '0.72rem',
+                  fontWeight: 800
+                }}>
+                  {totalCount}
+                </span>
+              )}
+            </button>
+
             <a href="https://wa.me/919871171978" target="_blank" rel="noreferrer" className="btn-gold" style={{ padding: '10px 20px', fontSize: '0.85rem' }}>
                Inquire Now
             </a>
@@ -210,6 +249,25 @@ export default function Navigation() {
 
           {/* Mobile Right Controls */}
           <div className="mobile-header-actions" style={{ display: 'none', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setEnquiryOpen(true)}
+              style={{
+                background: totalCount > 0 ? 'rgba(228,82,88,0.1)' : '#f5f5f5',
+                border: totalCount > 0 ? '1px solid var(--color-primary)' : '1px solid #ddd',
+                color: totalCount > 0 ? 'var(--color-primary)' : '#444',
+                padding: '6px 10px',
+                borderRadius: '16px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              <span>📋</span>
+              {totalCount > 0 && <span>{totalCount}</span>}
+            </button>
             <CurrencySelector compact />
             <button 
               className="mobile-menu-btn" 

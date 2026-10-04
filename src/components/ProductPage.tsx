@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useMemo } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
+import { useEnquiry } from '@/context/EnquiryContext';
 
 import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor } from '@/data/colors';
 import { HAIR_STYLES, STYLE_NAMES, HairStyle } from '@/data/styles';
@@ -100,6 +101,9 @@ interface ProductPageProps {
 
 export default function ProductPage({ title, desc, img, images = [], specs = [] }: ProductPageProps) {
   const { formatPrice, currency } = useCurrency();
+  const { addItem, totalCount, setIsOpen: openGlobalEnquiry } = useEnquiry();
+  const [quantity, setQuantity] = useState<number>(1);
+  const [addedToast, setAddedToast] = useState<boolean>(false);
   const [length, setLength] = useState(LENGTHS[0]);
   const [weight, setWeight] = useState(WEIGHTS[1]);
   const [style, setStyle] = useState(STYLES[0]);
@@ -193,6 +197,23 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const priceText = currentPrice !== undefined ? ` - ${formattedPriceWithUnit}` : '';
   const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nWeight: ${weight}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: ${formattedPriceWithUnit} (${currency})` : ''}`;
   const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(whatsappMessage)}`;
+
+  const handleAddToGlobalEnquiry = () => {
+    addItem({
+      productId: title.toLowerCase().replace(/\s+/g, '-'),
+      title,
+      image: slideImages[0] || img,
+      length,
+      weight,
+      style,
+      color,
+      unit,
+      quantity,
+      basePriceUsd: currentPrice
+    });
+    setAddedToast(true);
+    setTimeout(() => setAddedToast(false), 4500);
+  };
 
   return (
     <div style={{ paddingTop: 'clamp(90px, 12vh, 130px)', paddingBottom: 'clamp(50px, 8vh, 80px)', background: 'var(--color-background)', minHeight: '100vh' }}>
@@ -755,37 +776,141 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 <strong style={{ color: '#fff' }}>{title}</strong> • {length} • {weight} • {style} • {color}
               </div>
 
+              {/* Quantity Stepper Row */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <span style={{ fontSize: '0.86rem', color: '#bbb' }}>Quantity ({unit}s):</span>
+                <div style={{ display: 'inline-flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.2)', overflow: 'hidden' }}>
+                  <button 
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    style={{ border: 'none', background: 'transparent', color: '#fff', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
+                  >
+                    -
+                  </button>
+                  <span style={{ padding: '0 12px', fontSize: '0.92rem', fontWeight: 700, color: '#fff' }}>
+                    {quantity}
+                  </span>
+                  <button 
+                    type="button"
+                    onClick={() => setQuantity(quantity + 1)}
+                    style={{ border: 'none', background: 'transparent', color: '#fff', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Price Row */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
-                <span style={{ fontSize: '0.88rem', color: '#bbb' }}>Estimated Total:</span>
+                <div>
+                  <span style={{ fontSize: '0.88rem', color: '#bbb' }}>Estimated Total:</span>
+                  {quantity > 1 && (
+                    <span style={{ display: 'block', fontSize: '0.74rem', color: '#888' }}>
+                      ({quantity} x {formattedPriceWithUnit})
+                    </span>
+                  )}
+                </div>
                 <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-primary)' }}>
-                  {formattedPriceWithUnit || 'Wholesale Quote'}
+                  {currentPrice !== undefined ? formatPrice(currentPrice * quantity) : 'Wholesale Quote'}
                 </span>
               </div>
 
-              <a 
-                href={whatsappUrl} 
-                target="_blank" 
-                rel="noreferrer" 
-                className="btn-gold" 
-                style={{ 
-                  width: '100%', 
-                  padding: '16px 20px', 
-                  fontSize: '1.05rem', 
-                  fontWeight: 700,
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  gap: '10px',
-                  borderRadius: '12px',
-                  boxShadow: '0 4px 15px rgba(228, 82, 88, 0.35)'
-                }}
-              >
-                <span>Inquire & Order on WhatsApp</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.91A9.816 9.816 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01m-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18l-3.12.82l.83-3.04l-.2-.31a8.1 8.1 0 0 1-1.24-4.38c0-4.49 3.66-8.15 8.15-8.15c2.18 0 4.22.85 5.76 2.38a8.09 8.09 0 0 1 2.38 5.77c0 4.49-3.66 8.15-8.15 8.15m4.47-6.09c-.24-.12-1.45-.72-1.68-.8c-.23-.08-.39-.12-.56.12c-.17.25-.66.8-.81.98c-.15.17-.3.2-.54.08c-.24-.12-1.01-.37-1.92-1.18c-.71-.63-1.19-1.42-1.33-1.66c-.14-.24-.02-.37.1-.49c.11-.12.24-.29.37-.43c.12-.14.17-.24.25-.41c.08-.17.04-.31-.02-.43c-.06-.12-.56-1.35-.77-1.85c-.2-.5-.4-.43-.56-.43c-.14 0-.31-.02-.47-.02c-.17 0-.44.06-.67.31c-.23.25-.88.86-.88 2.1c0 1.24.9 2.44 1.02 2.6c.12.17 1.77 2.7 4.29 3.79c.6.26 1.07.41 1.43.53c.6.19 1.15.16 1.58.1c.48-.07 1.45-.6 1.65-1.17c.2-.57.2-1.07.14-1.17c-.06-.1-.22-.18-.46-.3M12 4a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8"/></svg>
-              </a>
+              {/* Toast Feedback */}
+              {addedToast && (
+                <div style={{
+                  background: 'rgba(74, 222, 128, 0.15)',
+                  border: '1px solid #4ade80',
+                  color: '#4ade80',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  marginBottom: '14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '8px'
+                }}>
+                  <span>✓ Added to Global Enquiry ({totalCount} in bag)</span>
+                  <button
+                    type="button"
+                    onClick={() => openGlobalEnquiry(true)}
+                    style={{ background: '#4ade80', color: '#000', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Review All →
+                  </button>
+                </div>
+              )}
 
-              <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.78rem', color: '#999' }}>
-                ⚡ Instant direct response from our master technicians • Custom bundles welcome
+              {/* Two Main Enquiry Actions */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {/* 1. Add to Global Enquiry (Primary) */}
+                <button 
+                  type="button"
+                  onClick={handleAddToGlobalEnquiry}
+                  className="btn-gold" 
+                  style={{ 
+                    width: '100%', 
+                    padding: '15px 20px', 
+                    fontSize: '1rem', 
+                    fontWeight: 700,
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'center', 
+                    gap: '10px',
+                    borderRadius: '12px',
+                    boxShadow: '0 4px 15px rgba(228, 82, 88, 0.35)',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <span>➕ Add to Global Enquiry</span>
+                  {totalCount > 0 && (
+                    <span style={{ background: '#ffffff', color: 'var(--color-primary)', borderRadius: '12px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: 800 }}>
+                      {totalCount} in List
+                    </span>
+                  )}
+                </button>
+
+                {/* 2. Show Global Enquiries Drawer */}
+                <button
+                  type="button"
+                  onClick={() => openGlobalEnquiry(true)}
+                  style={{
+                    width: '100%',
+                    padding: '12px 18px',
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    borderRadius: '12px',
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                >
+                  <span>📋 Show Global Enquiries ({totalCount}) • Send 1 Message</span>
+                </button>
+              </div>
+
+              {/* Secondary single-item quick WhatsApp link */}
+              <div style={{ textAlign: 'center', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+                <a 
+                  href={whatsappUrl} 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  style={{ fontSize: '0.8rem', color: '#bbb', textDecoration: 'underline', transition: 'color 0.2s' }}
+                >
+                  ⚡ Or send instant WhatsApp inquiry for this single item only
+                </a>
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '10px', fontSize: '0.74rem', color: '#888' }}>
+                🌍 Combine multiple lengths & styles across products into 1 single wholesale message
               </div>
             </div>
 
