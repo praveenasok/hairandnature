@@ -22,7 +22,13 @@ export const metadata: Metadata = {
   title: "hair&nature® - Natural Human Hair Extension Manufacturer & Exporter",
   description: "Ethically sourced, high-quality, chemical-free extensions known for strength, luster, and durability. Experience premium hair extensions.",
   icons: {
-    icon: '/favicon.svg',
+    icon: [
+      { url: '/icon.png', type: 'image/png' },
+      { url: '/favicon.ico' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
 };
 
