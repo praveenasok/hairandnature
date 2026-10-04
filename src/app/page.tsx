@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import MiniImageSlider from '../components/MiniImageSlider';
+import TestimonialsSection from '../components/TestimonialsSection';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -613,6 +614,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      <TestimonialsSection />
 
       <section id="about-section" className="section" style={{ background: 'white' }}>
         <div className="container">

@@ -376,32 +376,52 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   return (
     <div style={{ paddingTop: 'clamp(90px, 12vh, 130px)', paddingBottom: 'clamp(50px, 8vh, 80px)', background: 'var(--color-background)', minHeight: '100vh' }}>
       <div className="container">
-        
-        {/* Clean Breadcrumb */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.88rem', color: '#777', marginBottom: '24px' }}>
-          <a href="/" style={{ color: '#777' }}>Home</a>
-          <span>/</span>
-          <a href="/#products-section" style={{ color: '#777' }}>Products</a>
-          <span>/</span>
-          <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{title}</span>
+             {/* Clean Breadcrumb & Trust Banner */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '28px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#666' }}>
+            <a href="/" style={{ color: '#666', transition: 'color 0.2s' }}>Home</a>
+            <span style={{ color: '#bbb' }}>/</span>
+            <a href="/#products-section" style={{ color: '#666', transition: 'color 0.2s' }}>Products</a>
+            <span style={{ color: '#bbb' }}>/</span>
+            <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{title}</span>
+          </div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(228, 82, 88, 0.08)', color: 'var(--color-primary)', padding: '5px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
+            <span>✨</span> 100% Virgin Temple Remy Hair • Direct Factory Floor
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 340px), 1fr))', gap: 'clamp(30px, 5vw, 60px)', alignItems: 'flex-start' }}>
+        {/* Main 2-Column Luxury Showcase Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))', gap: 'clamp(32px, 5vw, 64px)', alignItems: 'start' }}>
           
-          {/* Left Column: Product Hero Image with Slider */}
-          <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+          {/* Left Column: Sticky Luxury Product Gallery */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.6 }}
+            style={{ position: 'sticky', top: '100px' }}
+          >
             
             {/* Main Interactive Product Image Frame */}
-            <div style={{ position: 'relative', width: '100%', aspectRatio: '4/5', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', marginBottom: '16px', background: '#f5f5f5' }}>
+            <div style={{ 
+              position: 'relative', 
+              width: '100%', 
+              aspectRatio: '4 / 4.8', 
+              borderRadius: '20px', 
+              overflow: 'hidden', 
+              boxShadow: '0 20px 45px rgba(0,0,0,0.08)', 
+              marginBottom: '16px', 
+              background: '#f8f6f4',
+              border: '1px solid rgba(0,0,0,0.04)'
+            }}>
               <AnimatePresence initial={false} mode="wait">
                 <motion.img 
                   key={currentSlide}
                   src={slideImages[currentSlide]} 
-                  alt={`${title} detail`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  alt={`${title} detail view`}
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.35 }}
+                  transition={{ duration: 0.3 }}
                   style={{ 
                     width: '100%', 
                     height: '100%', 
@@ -411,20 +431,85 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 />
               </AnimatePresence>
 
+              {/* Floating Quality Tag */}
+              <div style={{
+                position: 'absolute',
+                top: '16px',
+                left: '16px',
+                background: 'rgba(255, 255, 255, 0.9)',
+                backdropFilter: 'blur(8px)',
+                padding: '6px 14px',
+                borderRadius: '30px',
+                fontSize: '0.78rem',
+                fontWeight: 700,
+                color: '#222',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--color-primary)' }}></span>
+                Factory Direct • Export Grade
+              </div>
+
+              {/* Slide Counter Indicator */}
+              {slideImages.length > 1 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '16px',
+                  right: '16px',
+                  background: 'rgba(0, 0, 0, 0.55)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#fff',
+                  padding: '4px 10px',
+                  borderRadius: '20px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600
+                }}>
+                  {currentSlide + 1} / {slideImages.length}
+                </div>
+              )}
+
               {/* Gallery Overlay Prev / Next Buttons */}
               {slideImages.length > 1 && (
-                <div style={{ position: 'absolute', bottom: '14px', right: '14px', display: 'flex', gap: '8px', zIndex: 2 }}>
+                <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 2 }}>
                   <button 
                     onClick={handlePrevSlide}
                     aria-label="Previous image"
-                    style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(0,0,0,0.55)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      borderRadius: '50%', 
+                      background: 'rgba(255,255,255,0.9)', 
+                      color: '#222', 
+                      backdropFilter: 'blur(8px)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   </button>
                   <button 
                     onClick={handleNextSlide}
                     aria-label="Next image"
-                    style={{ width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(0,0,0,0.55)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                    style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      borderRadius: '50%', 
+                      background: 'rgba(255,255,255,0.9)', 
+                      color: '#222', 
+                      backdropFilter: 'blur(8px)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      transition: 'all 0.2s ease'
+                    }}
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </button>
@@ -432,23 +517,25 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               )}
             </div>
 
-            {/* Gallery Thumbnails Row */}
+            {/* Gallery Thumbnails Strip */}
             {slideImages.length > 1 && (
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${slideImages.length}, 1fr)`, gap: '8px', marginBottom: 'clamp(24px, 4vw, 36px)' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${slideImages.length}, 1fr)`, gap: '10px', marginBottom: '22px' }}>
                 {slideImages.map((sImg, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentSlide(idx)}
                     style={{
-                      height: '70px',
-                      borderRadius: '10px',
+                      height: '74px',
+                      borderRadius: '12px',
                       overflow: 'hidden',
-                      border: idx === currentSlide ? '2px solid var(--color-primary)' : '1px solid #ddd',
+                      border: idx === currentSlide ? '2px solid var(--color-primary)' : '1px solid rgba(0,0,0,0.08)',
                       padding: 0,
                       cursor: 'pointer',
                       background: '#fff',
-                      opacity: idx === currentSlide ? 1 : 0.7,
-                      transition: 'all 0.2s ease'
+                      opacity: idx === currentSlide ? 1 : 0.65,
+                      transform: idx === currentSlide ? 'scale(1.02)' : 'none',
+                      transition: 'all 0.2s ease',
+                      boxShadow: idx === currentSlide ? '0 4px 12px rgba(228, 82, 88, 0.18)' : 'none'
                     }}
                   >
                     <img src={sImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -456,132 +543,168 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 ))}
               </div>
             )}
-            
-            <h2 style={{ fontSize: 'clamp(1.4rem, 3.5vw, 2rem)', marginBottom: '20px', color: 'var(--color-primary)', fontWeight: 700 }}>The {title} Experience</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.15rem', marginBottom: '6px', color: '#222' }}>Premium Quality</h3>
-                  <p style={{ color: '#666', lineHeight: 1.6, fontSize: '0.92rem' }}>Sourced directly from Indian temples, ensuring 100% natural, healthy, and lustrous hair.</p>
-                </div>
+
+            {/* Luxury Trust & Craftsmanship Highlights */}
+            <div style={{ 
+              background: '#ffffff', 
+              borderRadius: '16px', 
+              padding: '16px 20px', 
+              border: '1px solid rgba(0,0,0,0.06)', 
+              boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '12px',
+              textAlign: 'center'
+            }}>
+              <div>
+                <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>💎</div>
+                <strong style={{ display: 'block', fontSize: '0.82rem', color: '#1a1a1a', fontWeight: 700 }}>100% Remy Hair</strong>
+                <span style={{ fontSize: '0.72rem', color: '#777' }}>Cuticle Aligned Flow</span>
               </div>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"/><line x1="16" y1="8" x2="2" y2="22"/><line x1="17.5" y1="15" x2="9" y2="6.5"/></svg>
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.15rem', marginBottom: '6px', color: '#222' }}>Seamless Blend</h3>
-                  <p style={{ color: '#666', lineHeight: 1.6, fontSize: '0.92rem' }}>Designed for maximum comfort and a flawless finish that mimics your natural hair growth.</p>
-                </div>
+              <div style={{ borderLeft: '1px solid #f0f0f0', borderRight: '1px solid #f0f0f0' }}>
+                <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>⚡</div>
+                <strong style={{ display: 'block', fontSize: '0.82rem', color: '#1a1a1a', fontWeight: 700 }}>Heat & Color Safe</strong>
+                <span style={{ fontSize: '0.72rem', color: '#777' }}>Up to 200°C Styling</span>
+              </div>
+              <div>
+                <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>🌍</div>
+                <strong style={{ display: 'block', fontSize: '0.82rem', color: '#1a1a1a', fontWeight: 700 }}>Worldwide Direct</strong>
+                <span style={{ fontSize: '0.72rem', color: '#777' }}>Express DHL / FedEx</span>
               </div>
             </div>
+
           </motion.div>
           
-          {/* Right Column: Product Details & Builder */}
-          <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '15px' }}>
-              <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', color: 'var(--color-primary)', fontWeight: 700, lineHeight: 1.15, margin: 0 }}>{title}</h1>
+          {/* Right Column: Luxury Product Details & Configurator Card */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ duration: 0.6, delay: 0.15 }}
+            style={{ 
+              background: '#ffffff', 
+              borderRadius: '24px', 
+              padding: 'clamp(24px, 4vw, 36px)', 
+              border: '1px solid rgba(0,0,0,0.06)', 
+              boxShadow: '0 12px 35px rgba(0,0,0,0.03)' 
+            }}
+          >
+            {/* Pre-header Tag */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+              <span style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700, color: 'var(--color-primary)' }}>
+                Professional Salon Grade
+              </span>
+              <span style={{ color: '#ccc' }}>•</span>
+              <span style={{ fontSize: '0.78rem', color: '#888' }}>
+                ★★★★★ (5.0) Verified Reviews
+              </span>
+            </div>
+
+            {/* Title & Live Pricing Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
+              <h1 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', color: '#1a1a1a', fontWeight: 700, lineHeight: 1.15, margin: 0, flex: 1, minWidth: '220px' }}>
+                {title}
+              </h1>
               {currentPrice !== undefined && (
-                <div style={{ fontSize: 'clamp(1.5rem, 3.5vw, 2rem)', fontWeight: 'bold', color: 'var(--color-primary)' }}>
-                  {formattedPriceWithUnit}
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.1rem)', fontWeight: 800, color: 'var(--color-primary)', lineHeight: 1 }}>
+                    {formattedPriceWithUnit}
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: '#888', display: 'block', marginTop: '4px' }}>
+                    Direct Wholesale Price ({currency})
+                  </span>
                 </div>
               )}
             </div>
-            <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', lineHeight: 1.7, marginBottom: '24px', color: '#555' }}>{description}</p>
+
+            <p style={{ fontSize: '0.98rem', lineHeight: 1.65, marginBottom: '22px', color: '#555' }}>
+              {description}
+            </p>
             
-            <hr style={{ border: 'none', borderTop: '1px solid #eaeaea', margin: '24px 0' }} />
+            <div style={{ height: '1px', background: '#f0edea', margin: '20px 0' }} />
 
-            {/* Length Options */}
+            {/* 1. Length Options */}
             <div style={{ marginBottom: '22px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Length</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{length}</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>1. Select Length</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                  {length}
+                </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {LENGTHS.map(len => (
-                  <button 
-                    key={len} 
-                    onClick={() => setLength(len)}
-                    style={{ 
-                      padding: '8px 14px', 
-                      borderRadius: '8px', 
-                      border: len === length ? '2px solid var(--color-primary)' : '1px solid #ddd', 
-                      background: len === length ? 'rgba(228, 82, 88, 0.05)' : 'white',
-                      color: len === length ? 'var(--color-primary)' : '#444',
-                      fontWeight: len === length ? 600 : 400,
-                      cursor: 'pointer',
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s ease',
-                      minHeight: '40px'
-                    }}
-                  >
-                    {len}
-                  </button>
-                ))}
+                {LENGTHS.map(len => {
+                  const isSelected = len === length;
+                  return (
+                    <button 
+                      key={len} 
+                      onClick={() => setLength(len)}
+                      style={{ 
+                        padding: '8px 14px', 
+                        borderRadius: '8px', 
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0', 
+                        background: isSelected ? 'rgba(228, 82, 88, 0.05)' : '#ffffff',
+                        color: isSelected ? 'var(--color-primary)' : '#334155',
+                        fontWeight: isSelected ? 700 : 500,
+                        cursor: 'pointer',
+                        fontSize: '0.88rem',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {len}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Weight Options */}
-            <div style={{ marginBottom: '22px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Weight</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.85rem' }}>{weight}</span>
+            {/* 2. Weight Options */}
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>2. Select Weight / Density</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                  {weight}
+                </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {WEIGHTS.map(w => (
-                  <button 
-                    key={w} 
-                    onClick={() => setWeight(w)}
-                    style={{ 
-                      padding: '8px 16px', 
-                      borderRadius: '8px', 
-                      border: w === weight ? '2px solid var(--color-primary)' : '1px solid #ddd', 
-                      background: w === weight ? 'rgba(228, 82, 88, 0.05)' : 'white',
-                      color: w === weight ? 'var(--color-primary)' : '#444',
-                      fontWeight: w === weight ? 600 : 400,
-                      cursor: 'pointer',
-                      fontSize: '0.9rem',
-                      transition: 'all 0.2s ease',
-                      minHeight: '40px'
-                    }}
-                  >
-                    {w}
-                  </button>
-                ))}
+                {WEIGHTS.map(w => {
+                  const isSelected = w === weight;
+                  return (
+                    <button 
+                      key={w} 
+                      onClick={() => setWeight(w)}
+                      style={{ 
+                        padding: '8px 14px', 
+                        borderRadius: '8px', 
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0', 
+                        background: isSelected ? 'rgba(228, 82, 88, 0.05)' : '#ffffff',
+                        color: isSelected ? 'var(--color-primary)' : '#334155',
+                        fontWeight: isSelected ? 700 : 500,
+                        cursor: 'pointer',
+                        fontSize: '0.88rem',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {w}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Style Options */}
-            <div style={{ marginBottom: '26px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Style / Texture</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '3px 12px', borderRadius: '12px', fontSize: '0.88rem' }}>
-                  {selectedStyleObj.name} • {selectedStyleObj.curlType}
+            {/* 3. Style / Texture Options */}
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>3. Select Style & Texture</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                  {selectedStyleObj.name} ({selectedStyleObj.curlType})
                 </span>
               </div>
 
-              {/* Selected Style Visual Preview Card */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '10px 14px', marginBottom: '14px' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '10px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.1)', background: '#fff' }}>
-                  <img src={selectedStyleObj.image} alt={selectedStyleObj.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 700, fontSize: '1.02rem', color: '#111' }}>{selectedStyleObj.name}</span>
-                    <span style={{ fontSize: '0.72rem', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>{selectedStyleObj.pattern}</span>
-                  </div>
-                  <span style={{ fontSize: '0.8rem', color: '#666', display: 'block', lineHeight: 1.35 }}>{selectedStyleObj.description}</span>
-                </div>
-              </div>
-
-              {/* Style Cards Grid */}
+              {/* Style Cards Compact Grid */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', 
-                gap: '10px' 
+                gridTemplateColumns: 'repeat(3, 1fr)', 
+                gap: '8px',
+                marginBottom: '10px'
               }}>
                 {HAIR_STYLES.map(st => {
                   const isSelected = st.name === style;
@@ -595,24 +718,23 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         flexDirection: 'column',
                         alignItems: 'center',
                         textAlign: 'center',
-                        padding: '10px 8px 8px 8px',
-                        borderRadius: '12px',
+                        padding: '8px 6px',
+                        borderRadius: '10px',
                         border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
                         background: isSelected ? 'rgba(228, 82, 88, 0.04)' : '#ffffff',
                         cursor: 'pointer',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        boxShadow: isSelected ? '0 4px 14px rgba(228, 82, 88, 0.16)' : '0 1px 3px rgba(0,0,0,0.02)',
-                        transform: isSelected ? 'translateY(-2px)' : 'none',
+                        transition: 'all 0.15s ease',
+                        boxShadow: isSelected ? '0 3px 10px rgba(228, 82, 88, 0.12)' : 'none',
                         position: 'relative'
                       }}
                     >
                       <div style={{
                         width: '100%',
                         aspectRatio: '1 / 1',
-                        borderRadius: '8px',
+                        borderRadius: '6px',
                         overflow: 'hidden',
                         background: '#f8fafc',
-                        marginBottom: '8px',
+                        marginBottom: '6px',
                         position: 'relative'
                       }}>
                         <img 
@@ -627,19 +749,18 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         {isSelected && (
                           <div style={{
                             position: 'absolute',
-                            top: '6px',
-                            right: '6px',
+                            top: '4px',
+                            right: '4px',
                             background: 'var(--color-primary)',
                             color: '#fff',
-                            width: '20px',
-                            height: '20px',
+                            width: '18px',
+                            height: '18px',
                             borderRadius: '50%',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                            fontSize: '10px',
+                            fontWeight: 700
                           }}>
                             ✓
                           </div>
@@ -648,51 +769,49 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
 
                       <span style={{ 
                         fontWeight: isSelected ? 700 : 600, 
-                        fontSize: '0.85rem', 
+                        fontSize: '0.8rem', 
                         color: isSelected ? 'var(--color-primary)' : '#1e293b',
-                        lineHeight: 1.25,
-                        marginBottom: '3px'
+                        lineHeight: 1.2
                       }}>
                         {st.name}
-                      </span>
-                      <span style={{ 
-                        fontSize: '0.7rem', 
-                        color: '#64748b', 
-                        lineHeight: 1.2 
-                      }}>
-                        {st.pattern}
                       </span>
                     </button>
                   );
                 })}
               </div>
+
+              {/* Texture Detail Note */}
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>•</span>
+                <span><strong>{selectedStyleObj.name}:</strong> {selectedStyleObj.description}</span>
+              </div>
             </div>
 
-            {/* Color Options with Spectrum One Images & Names */}
-            <div style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <span style={{ fontWeight: 600, fontSize: '1.05rem', color: '#333' }}>Select Premium Shade / Color</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.1)', padding: '3px 12px', borderRadius: '12px', fontSize: '0.88rem' }}>
+            {/* 4. Color Options */}
+            <div style={{ marginBottom: '26px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>4. Select Premium Shade</span>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
                   {selectedColorObj.name}
                 </span>
               </div>
 
-              {/* Selected Color Visual Preview Card */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '12px', padding: '10px 14px', marginBottom: '16px' }}>
-                <div style={{ width: '52px', height: '64px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 4px 10px rgba(0,0,0,0.1)', background: '#fff' }}>
+              {/* Active Color Preview Bar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#fafafa', border: '1px solid #e5e5e5', borderRadius: '10px', padding: '8px 12px', marginBottom: '12px' }}>
+                <div style={{ width: '42px', height: '42px', borderRadius: '8px', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 6px rgba(0,0,0,0.1)', background: '#fff' }}>
                   <img src={selectedColorObj.image} alt={selectedColorObj.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                    <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#111' }}>{selectedColorObj.name}</span>
-                    <span style={{ fontSize: '0.72rem', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>{selectedColorObj.category}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#111' }}>{selectedColorObj.name}</span>
+                    <span style={{ fontSize: '0.7rem', background: 'rgba(228, 82, 88, 0.1)', color: 'var(--color-primary)', padding: '1px 6px', borderRadius: '6px', fontWeight: 600 }}>{selectedColorObj.category}</span>
                   </div>
-                  <span style={{ fontSize: '0.82rem', color: '#666', display: 'block' }}>100% Remy Human Hair • Organic Tone Swatch</span>
+                  <span style={{ fontSize: '0.76rem', color: '#777' }}>100% Remy Human Hair • Organic Tone Swatch</span>
                 </div>
               </div>
 
               {/* Category Filter Tabs */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
                 {COLOR_CATEGORIES.map(cat => {
                   const count = cat === 'All' ? SPECTRUM_COLORS.length : SPECTRUM_COLORS.filter(c => c.category === cat).length;
                   const isActive = colorCategory === cat;
@@ -701,13 +820,13 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                       key={cat}
                       onClick={() => setColorCategory(cat)}
                       style={{
-                        padding: '5px 12px',
+                        padding: '4px 10px',
                         borderRadius: '20px',
-                        border: isActive ? '1px solid var(--color-primary)' : '1px solid #e0e0e0',
+                        border: isActive ? '1px solid var(--color-primary)' : '1px solid #e2e8f0',
                         background: isActive ? 'rgba(228, 82, 88, 0.08)' : '#fff',
-                        color: isActive ? 'var(--color-primary)' : '#666',
-                        fontSize: '0.78rem',
-                        fontWeight: isActive ? 600 : 400,
+                        color: isActive ? 'var(--color-primary)' : '#64748b',
+                        fontSize: '0.75rem',
+                        fontWeight: isActive ? 700 : 500,
                         cursor: 'pointer',
                         transition: 'all 0.15s ease'
                       }}
@@ -718,15 +837,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 })}
               </div>
 
-              {/* Color Swatches Grid with Real Images */}
+              {/* Color Swatches Grid */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', 
-                gap: '8px', 
-                maxHeight: '260px', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))', 
+                gap: '6px', 
+                maxHeight: '230px', 
                 overflowY: 'auto', 
                 padding: '8px',
-                border: '1px solid #eaeaea',
+                border: '1px solid #e5e5e5',
                 borderRadius: '12px',
                 background: '#fafafa'
               }}>
@@ -744,24 +863,24 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         alignItems: 'center',
                         gap: '4px',
                         padding: '6px 2px',
-                        borderRadius: '10px',
-                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e0e0e0',
+                        borderRadius: '8px',
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
                         background: isSelected ? 'rgba(228, 82, 88, 0.06)' : '#fff',
                         cursor: 'pointer',
-                        boxShadow: isSelected ? '0 0 0 1px var(--color-primary)' : '0 1px 2px rgba(0,0,0,0.04)',
+                        boxShadow: isSelected ? '0 0 0 1px var(--color-primary)' : 'none',
                         transition: 'all 0.15s ease'
                       }}
                     >
-                      <div style={{ width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', background: '#eee' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.08)', background: '#eee' }}>
                         <img src={c.image} alt={c.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       </div>
                       <span style={{ 
-                        fontSize: '0.72rem', 
+                        fontSize: '0.7rem', 
                         fontWeight: isSelected ? 700 : 500, 
                         color: isSelected ? 'var(--color-primary)' : '#444',
                         textAlign: 'center',
                         lineHeight: 1.2,
-                        maxWidth: '68px',
+                        maxWidth: '64px',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap'
@@ -774,15 +893,17 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
             </div>
 
-            {/* Specs Table */}
+            {/* Product Specifications Box */}
             {specs.length > 0 && (
-              <div style={{ marginBottom: '30px', background: 'white', borderRadius: '12px', padding: ' clamp(16px, 3vw, 20px)', border: '1px solid #eaeaea' }}>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '15px', color: '#333' }}>Product Specifications</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ marginBottom: '24px', background: '#faf8f6', borderRadius: '12px', padding: '16px', border: '1px solid #ebe5df' }}>
+                <div style={{ fontSize: '0.88rem', fontWeight: 700, color: '#333', marginBottom: '10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Technical Specifications
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px' }}>
                   {specs.map((spec, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: i === specs.length - 1 ? 'none' : '1px solid #f0f0f0', gap: '10px' }}>
-                      <span style={{ color: '#666', fontSize: '0.92rem' }}>{spec.label}</span>
-                      <span style={{ color: '#222', fontWeight: 500, fontSize: '0.92rem', textAlign: 'right' }}>
+                    <div key={i} style={{ fontSize: '0.82rem', display: 'flex', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px dashed #e5dfd8' }}>
+                      <span style={{ color: '#777' }}>{spec.label}:</span>
+                      <span style={{ color: '#222', fontWeight: 600 }}>
                         {spec.label.toLowerCase().includes('weight') ? weight : spec.value}
                       </span>
                     </div>
@@ -791,15 +912,60 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
             )}
 
-            {/* Order Summary Box */}
-            <div style={{ background: '#f8f8f8', padding: 'clamp(18px, 4vw, 25px)', borderRadius: '16px', border: '1px solid #e0e0e0' }}>
-              <div style={{ marginBottom: '20px', fontSize: '1rem', lineHeight: 1.6, color: '#444' }}>
-                Summary: Premium <strong>{title}</strong> in length <strong>{length}</strong>, weight <strong>{weight}</strong>, style <strong>{style}</strong>, and color <strong>{color}</strong>{priceText}.
+            {/* Order Summary & WhatsApp Action Card */}
+            <div style={{ 
+              background: '#1a1a1a', 
+              color: '#ffffff', 
+              padding: 'clamp(20px, 3vw, 24px)', 
+              borderRadius: '16px', 
+              boxShadow: '0 10px 25px rgba(0,0,0,0.12)' 
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <span style={{ fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '1px', color: '#aaa', fontWeight: 600 }}>
+                  Order Summary
+                </span>
+                <span style={{ fontSize: '0.82rem', color: '#4ade80', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80' }}></span>
+                  Factory In-Stock
+                </span>
               </div>
-              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="btn-gold" style={{ width: '100%', padding: '16px 20px', fontSize: 'clamp(1rem, 3.5vw, 1.15rem)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+
+              <div style={{ fontSize: '0.92rem', lineHeight: 1.5, color: '#ddd', marginBottom: '16px' }}>
+                <strong style={{ color: '#fff' }}>{title}</strong> • {length} • {weight} • {style} • {color}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+                <span style={{ fontSize: '0.88rem', color: '#bbb' }}>Estimated Total:</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--color-primary)' }}>
+                  {formattedPriceWithUnit || 'Wholesale Quote'}
+                </span>
+              </div>
+
+              <a 
+                href={whatsappUrl} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="btn-gold" 
+                style={{ 
+                  width: '100%', 
+                  padding: '16px 20px', 
+                  fontSize: '1.05rem', 
+                  fontWeight: 700,
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '10px',
+                  borderRadius: '12px',
+                  boxShadow: '0 4px 15px rgba(228, 82, 88, 0.35)'
+                }}
+              >
                 <span>Inquire & Order on WhatsApp</span>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.91A9.816 9.816 0 0 0 12.04 2c-5.46 0-9.91 4.45-9.91 9.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91c0-2.65-1.03-5.14-2.9-7.01m-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18l-3.12.82l.83-3.04l-.2-.31a8.1 8.1 0 0 1-1.24-4.38c0-4.49 3.66-8.15 8.15-8.15c2.18 0 4.22.85 5.76 2.38a8.09 8.09 0 0 1 2.38 5.77c0 4.49-3.66 8.15-8.15 8.15m4.47-6.09c-.24-.12-1.45-.72-1.68-.8c-.23-.08-.39-.12-.56.12c-.17.25-.66.8-.81.98c-.15.17-.3.2-.54.08c-.24-.12-1.01-.37-1.92-1.18c-.71-.63-1.19-1.42-1.33-1.66c-.14-.24-.02-.37.1-.49c.11-.12.24-.29.37-.43c.12-.14.17-.24.25-.41c.08-.17.04-.31-.02-.43c-.06-.12-.56-1.35-.77-1.85c-.2-.5-.4-.43-.56-.43c-.14 0-.31-.02-.47-.02c-.17 0-.44.06-.67.31c-.23.25-.88.86-.88 2.1c0 1.24.9 2.44 1.02 2.6c.12.17 1.77 2.7 4.29 3.79c.6.26 1.07.41 1.43.53c.6.19 1.15.16 1.58.1c.48-.07 1.45-.6 1.65-1.17c.2-.57.2-1.07.14-1.17c-.06-.1-.22-.18-.46-.3M12 4a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8"/></svg>
               </a>
+
+              <div style={{ textAlign: 'center', marginTop: '12px', fontSize: '0.78rem', color: '#999' }}>
+                ⚡ Instant direct response from our master technicians • Custom bundles welcome
+              </div>
             </div>
 
           </motion.div>
