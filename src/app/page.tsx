@@ -199,15 +199,76 @@ export default function Home() {
           box-shadow: 0 16px 36px rgba(0,0,0,0.08);
         }
 
-        .product-image {
+        .product-image-container {
+          position: relative;
           width: 100%;
           height: 350px;
-          object-fit: cover;
-          transition: transform 0.4s ease;
+          perspective: 1200px;
+          -webkit-perspective: 1200px;
+          overflow: hidden;
+          background-color: #fbf8f5;
         }
 
-        .product-card:hover .product-image {
-          transform: scale(1.03);
+        .product-image-flipper {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+          transform-style: preserve-3d;
+          -webkit-transform-style: preserve-3d;
+        }
+
+        .product-card:hover .product-image-flipper,
+        .product-card.flipped .product-image-flipper {
+          transform: rotateY(180deg);
+        }
+
+        .product-image-face {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+        }
+
+        .product-image-front {
+          transform: rotateY(0deg) translateZ(1px);
+          z-index: 2;
+        }
+
+        .product-image-back {
+          transform: rotateY(180deg) translateZ(1px);
+          z-index: 1;
+        }
+
+        .flip-badge {
+          position: absolute;
+          bottom: 12px;
+          right: 12px;
+          background: rgba(255, 255, 255, 0.92);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(197, 148, 58, 0.35);
+          border-radius: 20px;
+          padding: 3px 9px;
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #7a5518;
+          letter-spacing: 0.4px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          pointer-events: none;
+          z-index: 5;
+          transition: all 0.3s ease;
+        }
+
+        .product-card:hover .flip-badge {
+          background: rgba(255, 255, 255, 0.98);
+          border-color: rgba(197, 148, 58, 0.6);
         }
 
         .product-info {
@@ -596,73 +657,118 @@ export default function Home() {
           
           <div className="product-grid" style={{ rowGap: '32px' }}>
             {[
-              // Row 1: Model Showcase
+              // Row 1: Model Showcase (Models by default -> Flip to Product Pack on hover)
               { 
                 title: "ClipOn Extensions", 
                 desc: "Instantly add length and volume with our easy-to-use, damage-free clip-on extensions.", 
                 img: "/images/seamless_clipon.jpg",
-                link: "/seamless-clipon-extensions"
+                hoverImg: "/images/products/clipon.webp",
+                link: "/seamless-clipon-extensions",
+                objectPosition: "center center",
+                hoverObjectPosition: "center 22%",
+                frontBadge: "View Product",
+                backBadge: "Model Look"
               },
               { 
                 title: "Genius Wefts", 
                 desc: "Ultra-thin and flexible wefts that lay perfectly flat against your scalp for seamless blending.", 
                 img: "/images/genius_wefts_light.jpg",
-                link: "/genius-wefts"
+                hoverImg: "/images/products/geniusweft.jpg",
+                link: "/genius-wefts",
+                objectPosition: "center center",
+                hoverObjectPosition: "center 42%",
+                frontBadge: "View Product",
+                backBadge: "Model Look"
               },
               { 
                 title: "Tape Extensions", 
                 desc: "Lightweight and discreet tape-ins that provide a natural, full-bodied look with long-lasting hold.", 
                 img: "/images/tape_extensions.jpg",
-                link: "/tape-extensions"
+                hoverImg: "/images/products/tapeextensions.webp",
+                link: "/tape-extensions",
+                objectPosition: "center center",
+                hoverObjectPosition: "center 56%",
+                frontBadge: "View Product",
+                backBadge: "Model Look"
               },
               { 
                 title: "K Tips", 
                 desc: "Premium keratin-tipped extensions for individual strand-by-strand application and natural movement.", 
                 img: "/images/k_tips_light.jpg",
-                link: "/k-tips"
+                hoverImg: "/images/products/KTip2.png",
+                link: "/k-tips",
+                objectPosition: "center center",
+                hoverObjectPosition: "center 25%",
+                frontBadge: "View Product",
+                backBadge: "Model Look"
               },
               { 
                 title: "Butterfly Wefts", 
                 desc: "Innovative weft design providing maximum volume with incredible comfort and durability.", 
                 img: "/images/butterfly_wefts.jpg",
-                link: "/butterfly-wefts"
+                hoverImg: "/images/products/butterflyweft.jpg",
+                link: "/butterfly-wefts",
+                objectPosition: "center center",
+                hoverObjectPosition: "58% 36%",
+                frontBadge: "View Product",
+                backBadge: "Model Look"
               },
 
-              // Row 2: Physical Product Showcase
+              // Row 2: Physical Product Showcase (Products by default -> Flip to Model on hover!)
               { 
                 title: "ClipOn Extensions", 
                 desc: "Instantly add length and volume with our easy-to-use, damage-free clip-on extensions.", 
                 img: "/images/products/clipon.webp",
+                hoverImg: "/images/seamless_clipon.jpg",
                 link: "/seamless-clipon-extensions",
-                objectPosition: "center 22%"
+                objectPosition: "center 22%",
+                hoverObjectPosition: "center center",
+                frontBadge: "View on Model",
+                backBadge: "Product Pack"
               },
               { 
                 title: "Genius Wefts", 
                 desc: "Ultra-thin and flexible wefts that lay perfectly flat against your scalp for seamless blending.", 
                 img: "/images/products/geniusweft.jpg",
+                hoverImg: "/images/genius_wefts_light.jpg",
                 link: "/genius-wefts",
-                objectPosition: "center 42%"
+                objectPosition: "center 42%",
+                hoverObjectPosition: "center center",
+                frontBadge: "View on Model",
+                backBadge: "Product Pack"
               },
               { 
                 title: "Tape Extensions", 
                 desc: "Lightweight and discreet tape-ins that provide a natural, full-bodied look with long-lasting hold.", 
                 img: "/images/products/tapeextensions.webp",
+                hoverImg: "/images/tape_extensions.jpg",
                 link: "/tape-extensions",
-                objectPosition: "center 56%"
+                objectPosition: "center 56%",
+                hoverObjectPosition: "center center",
+                frontBadge: "View on Model",
+                backBadge: "Product Pack"
               },
               { 
                 title: "K Tips", 
                 desc: "Premium keratin-tipped extensions for individual strand-by-strand application and natural movement.", 
                 img: "/images/products/KTip2.png",
+                hoverImg: "/images/k_tips_light.jpg",
                 link: "/k-tips",
-                objectPosition: "center 25%"
+                objectPosition: "center 25%",
+                hoverObjectPosition: "center center",
+                frontBadge: "View on Model",
+                backBadge: "Product Pack"
               },
               { 
                 title: "Butterfly Wefts", 
                 desc: "Innovative weft design providing maximum volume with incredible comfort and durability.", 
                 img: "/images/products/butterflyweft.jpg",
+                hoverImg: "/images/butterfly_wefts.jpg",
                 link: "/butterfly-wefts",
-                objectPosition: "58% 36%"
+                objectPosition: "58% 36%",
+                hoverObjectPosition: "center center",
+                frontBadge: "View on Model",
+                backBadge: "Product Pack"
               }
             ].map((product, idx) => (
               <motion.div 
@@ -673,16 +779,46 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: (idx % 5) * 0.08 + 0.1 }}
               >
-                <Link href={product.link} style={{ display: 'block', overflow: 'hidden' }}>
-                  <img 
-                    src={product.img} 
-                    alt={product.title} 
-                    className="product-image" 
-                    style={{ 
-                      objectPosition: product.objectPosition || 'center',
-                      backgroundColor: '#fbf8f5'
-                    }} 
-                  />
+                <Link href={product.link} style={{ display: 'block', overflow: 'hidden', textDecoration: 'none' }}>
+                  <div className="product-image-container">
+                    <div className="product-image-flipper">
+                      {/* Front Face: Default View */}
+                      <div className="product-image-face product-image-front">
+                        <img 
+                          src={product.img} 
+                          alt={product.title} 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover', 
+                            objectPosition: product.objectPosition || 'center' 
+                          }} 
+                        />
+                        <span className="flip-badge">
+                          <span>⟲</span>
+                          <span>{product.frontBadge}</span>
+                        </span>
+                      </div>
+
+                      {/* Back Face: Flipped View on Hover */}
+                      <div className="product-image-face product-image-back">
+                        <img 
+                          src={product.hoverImg} 
+                          alt={`${product.title} alternate view`} 
+                          style={{ 
+                            width: '100%', 
+                            height: '100%', 
+                            objectFit: 'cover', 
+                            objectPosition: product.hoverObjectPosition || 'center' 
+                          }} 
+                        />
+                        <span className="flip-badge">
+                          <span>⟲</span>
+                          <span>{product.backBadge}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </Link>
                 <div className="product-info">
                   <Link href={product.link} style={{ textDecoration: 'none', color: 'inherit' }}>
