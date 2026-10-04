@@ -412,7 +412,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               <div>
                 <div style={{ fontSize: '1.2rem', marginBottom: '4px' }}>🌍</div>
                 <strong style={{ display: 'block', fontSize: '0.82rem', color: '#1a1a1a', fontWeight: 700 }}>Worldwide Direct</strong>
-                <span style={{ fontSize: '0.72rem', color: '#777' }}>Express DHL / FedEx</span>
+                <span style={{ fontSize: '0.72rem', color: '#777' }}>DHL • FedEx • UPS • Aramex</span>
               </div>
             </div>
 
@@ -1011,8 +1011,175 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </a>
               </div>
 
-              <div style={{ textAlign: 'center', marginTop: '8px', fontSize: '0.74rem', color: '#998473' }}>
-                🌍 Direct Factory Floor • Express Worldwide Dispatch via DHL / FedEx Priority
+              {/* Worldwide Express Shipping Options Panel */}
+              <div style={{ 
+                marginTop: '18px', 
+                padding: '16px 18px', 
+                background: 'linear-gradient(180deg, #fffbf6 0%, #fbf5ee 100%)', 
+                borderRadius: '16px', 
+                border: '1px solid rgba(220, 185, 145, 0.4)',
+                boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '1.05rem' }}>✈️</span>
+                    <div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2b231d', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
+                        Worldwide Express Shipping
+                      </div>
+                      <div style={{ fontSize: '0.72rem', color: '#7e6d60' }}>
+                        Door-to-door courier delivery with live tracking
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ 
+                    fontSize: '0.66rem', 
+                    fontWeight: 700, 
+                    color: '#8a622c', 
+                    background: 'rgba(218, 165, 32, 0.12)', 
+                    padding: '3px 8px', 
+                    borderRadius: '20px',
+                    whiteSpace: 'nowrap'
+                  }}>
+                    Global Priority
+                  </span>
+                </div>
+
+                {/* 4 Carriers Grid */}
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: 'repeat(2, 1fr)', 
+                  gap: '10px' 
+                }}>
+                  {/* FedEx */}
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid rgba(220, 185, 145, 0.45)',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '66px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src="/images/carriers/fedex.svg" 
+                        alt="FedEx Express" 
+                        style={{ height: '18px', width: 'auto', maxWidth: '72px', objectFit: 'contain' }} 
+                      />
+                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#4d148c', background: 'rgba(77, 20, 140, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
+                        3–5 Days
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
+                      FedEx Express
+                    </div>
+                  </div>
+
+                  {/* DHL */}
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid rgba(220, 185, 145, 0.45)',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '66px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src="/images/carriers/dhl.svg" 
+                        alt="DHL Express" 
+                        style={{ height: '16px', width: 'auto', maxWidth: '72px', objectFit: 'contain' }} 
+                      />
+                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#d40511', background: 'rgba(212, 5, 17, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
+                        3–5 Days
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
+                      DHL Worldwide
+                    </div>
+                  </div>
+
+                  {/* UPS */}
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid rgba(220, 185, 145, 0.45)',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '66px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src="/images/carriers/ups.svg" 
+                        alt="UPS Worldwide" 
+                        style={{ height: '22px', width: 'auto', maxWidth: '35px', objectFit: 'contain' }} 
+                      />
+                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#68451f', background: 'rgba(104, 69, 31, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
+                        3–6 Days
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
+                      UPS Saver
+                    </div>
+                  </div>
+
+                  {/* Aramex */}
+                  <div style={{
+                    background: '#ffffff',
+                    border: '1px solid rgba(220, 185, 145, 0.45)',
+                    borderRadius: '12px',
+                    padding: '10px 12px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '66px',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src="/images/carriers/aramex.svg" 
+                        alt="Aramex Priority" 
+                        style={{ height: '14px', width: 'auto', maxWidth: '75px', objectFit: 'contain' }} 
+                      />
+                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#e31837', background: 'rgba(227, 24, 55, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
+                        4–7 Days
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
+                      Aramex Priority
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Assurance Info */}
+                <div style={{ 
+                  marginTop: '12px', 
+                  paddingTop: '10px', 
+                  borderTop: '1px dashed rgba(220, 185, 145, 0.45)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '6px',
+                  fontSize: '0.71rem', 
+                  color: '#7e6d60' 
+                }}>
+                  <span>📦 Dispatches in 24–48h directly from Chennai factory</span>
+                  <span style={{ fontWeight: 600, color: '#2b231d' }}>✓ Full Customs Documentation Included</span>
+                </div>
               </div>
             </div>
 
