@@ -100,14 +100,46 @@ export default function Navigation() {
                       zIndex: 100,
                       display: 'grid',
                       gridTemplateColumns: '1.2fr 2fr',
-                      gap: '30px'
+                      gap: '30px',
+                      overflow: 'hidden'
                     }}
                   >
+                    {/* Washed-out floral corner accent fading leftwards (~2 inches / 200px) */}
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: '200px',
+                        height: '100%',
+                        pointerEvents: 'none',
+                        zIndex: 0,
+                        overflow: 'hidden',
+                        borderTopRightRadius: '16px',
+                        borderBottomRightRadius: '16px'
+                      }}
+                    >
+                      <div 
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          backgroundImage: "url('/images/mega_menu_floral.png')",
+                          backgroundPosition: 'right top',
+                          backgroundSize: 'cover',
+                          backgroundRepeat: 'no-repeat',
+                          opacity: 0.42,
+                          filter: 'brightness(1.05) saturate(0.88)',
+                          WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 100%)',
+                          maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 100%)'
+                        }}
+                      />
+                    </div>
+
                     {/* Featured Left Panel */}
                     <Link
                       href="/#products-section"
                       onClick={() => setProductsOpen(false)}
-                      style={{ borderRadius: '12px', overflow: 'hidden', position: 'relative', display: 'flex', alignItems: 'flex-end', padding: '20px', minHeight: '200px', textDecoration: 'none' }}
+                      style={{ borderRadius: '12px', overflow: 'hidden', position: 'relative', zIndex: 1, display: 'flex', alignItems: 'flex-end', padding: '20px', minHeight: '200px', textDecoration: 'none' }}
                     >
                       <MiniImageSlider 
                         images={["/images/hero_general_1.jpg", "/images/genius_wefts_light.jpg", "/images/hero_general_2.jpg", "/images/k_tips_light.jpg"]} 
@@ -120,7 +152,7 @@ export default function Navigation() {
                     </Link>
 
                     {/* Products Grid Right Panel */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', position: 'relative', zIndex: 1 }}>
                       {PRODUCTS.map(product => (
                         <Link 
                           key={product.href} 
