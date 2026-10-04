@@ -103,7 +103,6 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const { formatPrice, currency } = useCurrency();
   const { addItem, totalCount, setIsOpen: openGlobalEnquiry } = useEnquiry();
   const [quantity, setQuantity] = useState<number>(1);
-  const [addedToast, setAddedToast] = useState<boolean>(false);
   const [length, setLength] = useState(LENGTHS[0]);
   const [weight, setWeight] = useState(WEIGHTS[1]);
   const [style, setStyle] = useState(STYLES[0]);
@@ -211,8 +210,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
       quantity,
       basePriceUsd: currentPrice
     });
-    setAddedToast(true);
-    setTimeout(() => setAddedToast(false), 4500);
+    openGlobalEnquiry(true);
   };
 
   return (
@@ -970,96 +968,33 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </span>
               </div>
 
-              {/* Toast Feedback */}
-              {addedToast && (
-                <div style={{
-                  background: '#dcfce7',
-                  border: '1px solid #86efac',
-                  color: '#15803d',
-                  padding: '10px 14px',
-                  borderRadius: '10px',
-                  fontSize: '0.84rem',
-                  fontWeight: 600,
-                  marginBottom: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  gap: '8px'
-                }}>
-                  <span>✓ Added to Wholesale Enquiry ({totalCount} in portfolio)</span>
-                  <button
-                    type="button"
-                    onClick={() => openGlobalEnquiry(true)}
-                    style={{ background: '#16a34a', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
-                  >
-                    Review Portfolio →
-                  </button>
-                </div>
-              )}
-
-              {/* Main Enquiry Actions */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {/* 1. Add to Wholesale Enquiry List (Primary) */}
-                <button 
-                  type="button"
-                  onClick={handleAddToGlobalEnquiry}
-                  className="btn-gold" 
-                  style={{ 
-                    width: '100%', 
-                    padding: '15px 20px', 
-                    fontSize: '1rem', 
-                    fontWeight: 700,
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'center', 
-                    gap: '10px',
-                    borderRadius: '12px',
-                    boxShadow: '0 6px 20px rgba(228, 82, 88, 0.35)',
-                    border: 'none',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <span>➕ Add to Wholesale Enquiry List</span>
-                  {totalCount > 0 && (
-                    <span style={{ background: '#ffffff', color: 'var(--color-primary)', borderRadius: '12px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: 800 }}>
-                      {totalCount} in List
-                    </span>
-                  )}
-                </button>
-
-                {/* 2. Review Enquiry Portfolio & Send Combined Message */}
-                <button
-                  type="button"
-                  onClick={() => openGlobalEnquiry(true)}
-                  style={{
-                    width: '100%',
-                    padding: '12px 18px',
-                    fontSize: '0.88rem',
-                    fontWeight: 700,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    borderRadius: '12px',
-                    background: '#ffffff',
-                    border: '1.5px solid rgba(197, 148, 58, 0.45)',
-                    color: '#6e4c19',
-                    cursor: 'pointer',
-                    boxShadow: '0 2px 8px rgba(197, 148, 58, 0.08)',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(197, 148, 58, 0.8)';
-                    e.currentTarget.style.background = '#fefcf8';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(197, 148, 58, 0.45)';
-                    e.currentTarget.style.background = '#ffffff';
-                  }}
-                >
-                  <span>📋 Review Enquiry Portfolio ({totalCount}) • Send 1 Message</span>
-                </button>
-              </div>
+              {/* Primary Enquiry Action */}
+              <button 
+                type="button"
+                onClick={handleAddToGlobalEnquiry}
+                className="btn-gold" 
+                style={{ 
+                  width: '100%', 
+                  padding: '16px 20px', 
+                  fontSize: '1rem', 
+                  fontWeight: 700,
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '10px',
+                  borderRadius: '12px',
+                  boxShadow: '0 6px 20px rgba(228, 82, 88, 0.35)',
+                  border: 'none',
+                  cursor: 'pointer'
+                }}
+              >
+                <span>➕ Add to Wholesale Enquiry</span>
+                {totalCount > 0 && (
+                  <span style={{ background: '#ffffff', color: 'var(--color-primary)', borderRadius: '12px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: 800 }}>
+                    {totalCount}
+                  </span>
+                )}
+              </button>
 
               {/* Secondary single-item quick WhatsApp link */}
               <div style={{ textAlign: 'center', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(197, 148, 58, 0.18)' }}>

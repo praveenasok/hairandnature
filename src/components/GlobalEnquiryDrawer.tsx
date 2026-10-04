@@ -464,36 +464,6 @@ export default function GlobalEnquiryDrawer() {
                 ) : (
                   /* Populated Items View */
                   <div>
-                    {/* Consolidate Notice */}
-                    <div style={{
-                      background: 'linear-gradient(135deg, #f0fdf4 0%, #e6f9ed 100%)',
-                      border: '1px solid #bbf7d0',
-                      borderRadius: '12px',
-                      padding: '12px 14px',
-                      marginBottom: '16px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px'
-                    }}>
-                      <div style={{
-                        width: '26px',
-                        height: '26px',
-                        borderRadius: '50%',
-                        background: '#16a34a',
-                        color: '#fff',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: '14px',
-                        flexShrink: 0
-                      }}>
-                        ✓
-                      </div>
-                      <div style={{ fontSize: '0.82rem', color: '#166534', lineHeight: 1.4 }}>
-                        <strong>Single-Message Consolidation:</strong> All {totalCount} items below will be sent as <strong>1 unified wholesale manifest</strong> to factory managers.
-                      </div>
-                    </div>
-
                     {/* Items List */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '18px' }}>
                       {items.map((item) => (
