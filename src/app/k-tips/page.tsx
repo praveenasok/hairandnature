@@ -10,6 +10,7 @@ export default function KTips() {
         "/images/k_tips_light.jpg",
         "/images/products/KTip2.png",
         "/images/products/KTip.jpg",
+        "/images/products/ktip_application.jpg",
         "/images/k_tips.jpg"
       ]}
       specs={[

@@ -9,6 +9,7 @@ export default function SeamlessClipOn() {
       images={[
         "/images/seamless_clipon.jpg",
         "/images/products/clipon.webp",
+        "/images/products/clipon_application.jpg",
         "/images/products/clipon2.jpeg",
         "/images/products/clipon3.jpeg"
       ]}

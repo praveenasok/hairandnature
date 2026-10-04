@@ -9,7 +9,8 @@ export default function TapeExtensions() {
       images={[
         "/images/tape_extensions.jpg",
         "/images/products/tapeextensions.webp",
-        "/images/products/tapeextensions2.webp"
+        "/images/products/tapeextensions2.webp",
+        "/images/products/tape_application.jpg"
       ]}
       specs={[
         { label: "Material", value: "100% Remy Human Hair" },

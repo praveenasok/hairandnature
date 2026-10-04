@@ -10,6 +10,7 @@ export default function GeniusWefts() {
         "/images/genius_wefts_light.jpg",
         "/images/products/geniusweft.jpg",
         "/images/products/geniusweft2.webp",
+        "/images/products/genius_weft_application.jpg",
         "/images/products/geniusweft3.jpeg",
         "/images/products/geniusweft4.webp",
         "/images/genius_wefts.jpg"

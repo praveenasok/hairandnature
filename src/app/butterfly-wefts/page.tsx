@@ -9,6 +9,7 @@ export default function ButterflyWefts() {
       images={[
         "/images/butterfly_wefts.jpg",
         "/images/products/butterflyweft.jpg",
+        "/images/products/butterfly_weft_application.jpg",
         "/images/products/butterflyweft2.jpg",
         "/images/products/butterflyweft3.webp"
       ]}
