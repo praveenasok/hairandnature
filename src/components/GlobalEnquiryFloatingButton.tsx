@@ -6,12 +6,19 @@ import { ShoppingBag, Sparkles } from 'lucide-react';
 import { useEnquiry } from '../context/EnquiryContext';
 
 export default function GlobalEnquiryFloatingButton() {
-  const { totalCount, setIsOpen } = useEnquiry();
+  const { totalCount, setIsOpen, sendGeneralEnquiry } = useEnquiry();
 
   return (
     <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9998 }}>
       <motion.button
-        onClick={() => setIsOpen(true)}
+        onClick={() => {
+          if (totalCount > 0) {
+            setIsOpen(true);
+          } else {
+            sendGeneralEnquiry();
+          }
+        }}
+        title={totalCount > 0 ? "Review Wholesale Enquiry Portfolio" : "Send General Wholesale Enquiry"}
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         whileHover={{ scale: 1.06, y: -2 }}

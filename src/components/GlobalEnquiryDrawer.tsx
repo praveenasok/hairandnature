@@ -98,6 +98,7 @@ export default function GlobalEnquiryDrawer() {
     customerDetails,
     setCustomerDetails,
     sendCombinedEnquiry,
+    sendGeneralEnquiry,
     generateCombinedMessage,
   } = useEnquiry();
 
@@ -370,9 +371,32 @@ export default function GlobalEnquiryDrawer() {
                     <h4 style={{ fontSize: '1.2rem', color: '#1a1a1a', marginBottom: '8px', fontWeight: 700, fontFamily: 'var(--font-serif), Georgia, serif' }}>
                       Your Enquiry Portfolio is Empty
                     </h4>
-                    <p style={{ fontSize: '0.88rem', color: '#777', lineHeight: 1.6, maxWidth: '340px', margin: '0 auto 24px auto' }}>
-                      Browse any collection below, select your desired length, texture, and hair shade, then click <strong>"➕ Add to Wholesale Enquiry"</strong> to combine them into 1 single message.
+                    <p style={{ fontSize: '0.88rem', color: '#777', lineHeight: 1.6, maxWidth: '340px', margin: '0 auto 18px auto' }}>
+                      Browse any collection below to configure specific items, or send a general wholesale enquiry directly to our factory export team.
                     </p>
+
+                    {/* Direct General Enquiry Button */}
+                    <div style={{ marginBottom: '24px' }}>
+                      <button
+                        onClick={() => sendGeneralEnquiry()}
+                        className="btn-gold"
+                        style={{
+                          padding: '12px 22px',
+                          fontSize: '0.88rem',
+                          fontWeight: 700,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          borderRadius: '30px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 14px rgba(228, 82, 88, 0.3)'
+                        }}
+                      >
+                        <MessageCircle size={18} />
+                        <span>Send General Wholesale Enquiry</span>
+                      </button>
+                    </div>
 
                     {/* Quick navigation pill grid */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', maxWidth: '380px', margin: '0 auto' }}>

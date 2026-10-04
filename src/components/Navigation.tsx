@@ -20,7 +20,7 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
-  const { setIsOpen: setEnquiryOpen, totalCount } = useEnquiry();
+  const { setIsOpen: setEnquiryOpen, totalCount, sendGeneralEnquiry } = useEnquiry();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -285,7 +285,13 @@ export default function Navigation() {
             
             {/* Unified Luxury Inquire Now CTA */}
             <button
-              onClick={() => setEnquiryOpen(true)}
+              onClick={() => {
+                if (totalCount > 0) {
+                  setEnquiryOpen(true);
+                } else {
+                  sendGeneralEnquiry();
+                }
+              }}
               className="btn-gold"
               style={{
                 padding: '10px 22px',
@@ -300,7 +306,7 @@ export default function Navigation() {
                   : '0 4px 14px rgba(228, 82, 88, 0.25)',
                 position: 'relative'
               }}
-              title="Open Wholesale Enquiry Concierge"
+              title={totalCount > 0 ? "Open Wholesale Enquiry Concierge" : "Send General Wholesale Enquiry"}
             >
               <span>Inquire Now</span>
               {totalCount > 0 && (
@@ -322,7 +328,13 @@ export default function Navigation() {
           {/* Mobile Right Controls */}
           <div className="mobile-header-actions" style={{ display: 'none', alignItems: 'center', gap: '8px' }}>
             <button
-              onClick={() => setEnquiryOpen(true)}
+              onClick={() => {
+                if (totalCount > 0) {
+                  setEnquiryOpen(true);
+                } else {
+                  sendGeneralEnquiry();
+                }
+              }}
               style={{
                 background: totalCount > 0 ? 'var(--color-primary)' : '#f5f0ea',
                 border: totalCount > 0 ? '1px solid var(--color-primary)' : '1px solid #d9d0c7',
@@ -336,6 +348,7 @@ export default function Navigation() {
                 gap: '6px',
                 cursor: 'pointer'
               }}
+              title={totalCount > 0 ? "Review Enquiry Portfolio" : "Send General Wholesale Enquiry"}
             >
               <span>📋</span>
               <span>Inquire</span>
@@ -401,10 +414,14 @@ export default function Navigation() {
                   style={{ width: '100%', justifyContent: 'center', padding: '14px 20px', fontSize: '0.95rem', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
                   onClick={() => {
                     setIsOpen(false);
-                    setEnquiryOpen(true);
+                    if (totalCount > 0) {
+                      setEnquiryOpen(true);
+                    } else {
+                      sendGeneralEnquiry();
+                    }
                   }}
                 >
-                  <span>{totalCount > 0 ? `Review Enquiry Portfolio (${totalCount})` : 'Wholesale Enquiry Concierge'}</span>
+                  <span>{totalCount > 0 ? `Review Enquiry Portfolio (${totalCount})` : 'Send General Wholesale Enquiry'}</span>
                 </button>
               </div>
             </nav>

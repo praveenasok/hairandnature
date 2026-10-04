@@ -40,7 +40,9 @@ interface EnquiryContextType {
   customerDetails: CustomerDetails;
   setCustomerDetails: React.Dispatch<React.SetStateAction<CustomerDetails>>;
   sendCombinedEnquiry: (details?: CustomerDetails) => void;
+  sendGeneralEnquiry: (details?: CustomerDetails) => void;
   generateCombinedMessage: (details?: CustomerDetails) => string;
+  generateGeneralMessage: (details?: CustomerDetails) => string;
 }
 
 const STORAGE_KEY = 'hairandnature_global_enquiries_v1';
@@ -58,7 +60,9 @@ const EnquiryContext = createContext<EnquiryContextType>({
   customerDetails: {},
   setCustomerDetails: () => {},
   sendCombinedEnquiry: () => {},
+  sendGeneralEnquiry: () => {},
   generateCombinedMessage: () => '',
+  generateGeneralMessage: () => '',
 });
 
 export function EnquiryProvider({ children }: { children: React.ReactNode }) {
@@ -228,8 +232,63 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
     return msg;
   };
 
+  const generateGeneralMessage = (details?: CustomerDetails) => {
+    const cust = { ...customerDetails, ...details };
+    const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    let msg = `✨ *hair&nature® General Wholesale Enquiry* ✨\n`;
+    msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `📅 *Date:* ${dateStr}\n`;
+    msg += `🏭 *Dispatch Origin:* Direct Factory Export Hub (New Delhi, India)\n`;
+
+    if (cust.name || cust.salonName || cust.country) {
+      msg += `\n👤 *Salon / Master Stylist Profile:*\n`;
+      if (cust.name) msg += `• Contact Person: ${cust.name}\n`;
+      if (cust.salonName) msg += `• Salon / Studio: ${cust.salonName}\n`;
+      if (cust.city || cust.country) msg += `• Location: ${[cust.city, cust.country].filter(Boolean).join(', ')}\n`;
+      if (cust.notes) msg += `• Special Notes: ${cust.notes}\n`;
+    }
+
+    msg += `\nHello hair&nature® Team,\n\n`;
+    msg += `I am reaching out regarding your 100% Virgin Temple Remy Human Hair extensions (Tape-Ins, K-Tips, Genius Wefts, Butterfly Wefts, Seamless Clip-Ons).\n\n`;
+    msg += `Could you please share your latest wholesale salon catalog, price list (${currency}), minimum order quantities, and custom shade/texture options?\n\n`;
+    msg += `Looking forward to your response. Thank you!`;
+
+    return msg;
+  };
+
+  const sendGeneralEnquiry = async (details?: CustomerDetails) => {
+    const message = generateGeneralMessage(details);
+    const cust = { ...customerDetails, ...details };
+
+    try {
+      fetch('/api/enquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: cust.name || 'Anonymous Stylist',
+          salonName: cust.salonName || 'General Wholesale Lead',
+          location: [cust.city, cust.country].filter(Boolean).join(', ') || 'Global Client',
+          items: [],
+          totalItems: 0,
+          currency: currency,
+          estimatedTotal: 0,
+          notes: cust.notes || 'General Wholesale Catalog & Pricing Inquiry'
+        })
+      }).catch(err => console.error('Could not log general enquiry:', err));
+    } catch (e) {
+      // Non-blocking
+    }
+
+    const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   const sendCombinedEnquiry = async (details?: CustomerDetails) => {
-    if (items.length === 0) return;
+    // If cart is 0, send a general enquiry message
+    if (items.length === 0) {
+      return sendGeneralEnquiry(details);
+    }
 
     const message = generateCombinedMessage(details);
     const cust = { ...customerDetails, ...details };
@@ -282,7 +341,9 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
         customerDetails,
         setCustomerDetails: updateCustomerDetails,
         sendCombinedEnquiry,
+        sendGeneralEnquiry,
         generateCombinedMessage,
+        generateGeneralMessage,
       }}
     >
       {children}
