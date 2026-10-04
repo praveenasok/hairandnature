@@ -160,11 +160,21 @@ button {
 }
 .site-header.scrolled {
   height: 70px;
-  background-color: rgba(235, 225, 216, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background-color: #ebe1d8;
   border-bottom: 1px solid rgba(0,0,0,0.08);
   box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* Responsive Sticky Gallery for Product Detail Pages */
+.product-gallery-sticky {
+  position: sticky;
+  top: 100px;
+}
+
+@media (max-width: 992px) {
+  .product-gallery-sticky {
+    position: static !important;
+  }
 }
 
 .site-header .container {

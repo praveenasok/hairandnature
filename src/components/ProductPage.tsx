@@ -236,12 +236,12 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
         {/* Main 2-Column Luxury Showcase Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))', gap: 'clamp(32px, 5vw, 64px)', alignItems: 'start' }}>
           
-          {/* Left Column: Sticky Luxury Product Gallery */}
+          {/* Left Column: Sticky Luxury Product Gallery (desktop only) */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.6 }}
-            style={{ position: 'sticky', top: '100px' }}
+            className="product-gallery-sticky"
           >
             
             {/* Main Interactive Product Image Frame */}
