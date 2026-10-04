@@ -180,8 +180,7 @@ export default function TestimonialsSection() {
         <div style={{ 
           display: 'grid', 
           gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', 
-          gap: '24px',
-          marginBottom: 'clamp(40px, 6vw, 60px)'
+          gap: '24px'
         }}>
           {filtered.map((item, idx) => (
             <motion.div
@@ -287,52 +286,6 @@ export default function TestimonialsSection() {
               </div>
             </motion.div>
           ))}
-        </div>
-
-        {/* Global Salon Trust Metrics Ribbon */}
-        <div style={{
-          background: 'linear-gradient(135deg, #1f1d1b 0%, #2a2522 100%)',
-          borderRadius: '24px',
-          padding: 'clamp(24px, 4vw, 36px)',
-          color: '#ffffff',
-          boxShadow: '0 20px 45px rgba(0,0,0,0.15)',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: '24px',
-          textAlign: 'center'
-        }}>
-          <div>
-            <div style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', fontWeight: 800, color: 'var(--color-primary)', lineHeight: 1.1 }}>
-              500+
-            </div>
-            <span style={{ fontSize: '0.85rem', color: '#ccc', display: 'block', marginTop: '6px' }}>
-              Certified Partner Salons
-            </span>
-          </div>
-          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.1)', borderRight: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', fontWeight: 800, color: '#f59e0b', lineHeight: 1.1 }}>
-              100%
-            </div>
-            <span style={{ fontSize: '0.85rem', color: '#ccc', display: 'block', marginTop: '6px' }}>
-              Cuticle-Aligned Temple Remy
-            </span>
-          </div>
-          <div>
-            <div style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', fontWeight: 800, color: '#4ade80', lineHeight: 1.1 }}>
-              99.4%
-            </div>
-            <span style={{ fontSize: '0.85rem', color: '#ccc', display: 'block', marginTop: '6px' }}>
-              Salon Repeat Reorder Rate
-            </span>
-          </div>
-          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.1)' }}>
-            <div style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', fontWeight: 800, color: '#60a5fa', lineHeight: 1.1 }}>
-              35+
-            </div>
-            <span style={{ fontSize: '0.85rem', color: '#ccc', display: 'block', marginTop: '6px' }}>
-              Export Countries Served
-            </span>
-          </div>
         </div>
 
       </div>
