@@ -234,8 +234,11 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
     }
   }, [metadata, length, weight, style]);
 
-  const keyWithWeight = `${title}|${length}|${style}|${color}|${weight}`;
-  const keyLegacy = `${title}|${length}|${style}|${color}`;
+  const currentColorObj = SPECTRUM_COLORS.find(c => c.name === color);
+  const colorCategory = currentColorObj ? currentColorObj.category : 'Unknown';
+
+  const keyWithWeight = `${title}|${length}|${style}|${colorCategory}|${weight}`;
+  const keyLegacy = `${title}|${length}|${style}|${colorCategory}`;
 
   let currentPrice = prices[keyWithWeight];
   if (currentPrice === undefined && prices[keyLegacy] !== undefined) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { SPECTRUM_COLORS } from "@/data/colors";
+import { SPECTRUM_COLORS, COLOR_CATEGORIES } from "@/data/colors";
 import { HAIR_STYLES, STYLE_NAMES } from "@/data/styles";
 import { Testimonial } from "@/app/api/testimonials/route";
 
@@ -9,9 +9,9 @@ import { Testimonial } from "@/app/api/testimonials/route";
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
 const STYLES = STYLE_NAMES;
-const COLORS = SPECTRUM_COLORS.map(c => c.name);
+const CATEGORIES = COLOR_CATEGORIES.filter(c => c !== 'All');
 
-type SortKey = 'product' | 'length' | 'weight' | 'style' | 'color' | 'price' | 'unit';
+type SortKey = 'product' | 'length' | 'weight' | 'style' | 'category' | 'price' | 'unit';
 type SortDirection = 'asc' | 'desc';
 
 export default function AdminPage() {
@@ -31,8 +31,8 @@ export default function AdminPage() {
   const [selectedLengths, setSelectedLengths] = useState<string[]>([LENGTHS[0]]);
   const [selectedWeights, setSelectedWeights] = useState<string[]>([WEIGHTS[1]]); // default 100g
   const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([COLORS[0]]);
-  const [expandedColorGroups, setExpandedColorGroups] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([CATEGORIES[0]]);
   
   const [actionType, setActionType] = useState<"exact" | "percentage" | "delete">("exact");
   const [inputValue, setInputValue] = useState("");
@@ -273,6 +273,33 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteProduct = async () => {
+    if (products.length <= 1) {
+      alert("You must have at least one product.");
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete "${product}"? This will also remove its prices, description, and metadata.`)) return;
+
+    const updatedProducts = products.filter(p => p !== product);
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProducts)
+      });
+      if (res.ok) {
+        setProducts(updatedProducts);
+        handleProductChange(updatedProducts[0]);
+        alert(`Successfully deleted "${product}"!`);
+      } else {
+        alert("Failed to delete product.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error deleting product.");
+    }
+  };
+
   const handleSaveUnit = async (prodName: string, unitVal: string) => {
     const cleaned = unitVal.trim() || 'unit';
     const updatedUnits = { ...units, [prodName]: cleaned };
@@ -363,11 +390,11 @@ export default function AdminPage() {
     for (const len of selectedLengths) {
       for (const wt of selectedWeights) {
         for (const st of selectedStyles) {
-          // Find base price for Product + Length + Weight + Style across colors
+          // Find base price for Product + Length + Weight + Style across categories
           let basePrice: number | undefined = undefined;
-          for (const anyColor of COLORS) {
-            const checkKeyWithWeight = `${product}|${len}|${st}|${anyColor}|${wt}`;
-            const checkKeyLegacy = `${product}|${len}|${st}|${anyColor}`;
+          for (const anyCategory of CATEGORIES) {
+            const checkKeyWithWeight = `${product}|${len}|${st}|${anyCategory}|${wt}`;
+            const checkKeyLegacy = `${product}|${len}|${st}|${anyCategory}`;
             if (updatedPrices[checkKeyWithWeight] !== undefined) {
               basePrice = updatedPrices[checkKeyWithWeight];
               break;
@@ -377,8 +404,8 @@ export default function AdminPage() {
             }
           }
 
-          for (const col of selectedColors) {
-            const key = `${product}|${len}|${st}|${col}|${wt}`;
+          for (const cat of selectedCategories) {
+            const key = `${product}|${len}|${st}|${cat}|${wt}`;
             
             if (actionType === "exact") {
               updatedPrices[key] = numValue;
@@ -395,7 +422,7 @@ export default function AdminPage() {
                 updatedCount++;
               }
               // Also clean up any legacy 4-part key matching this combination if weight is standard 100g
-              const legacyKey = `${product}|${len}|${st}|${col}`;
+              const legacyKey = `${product}|${len}|${st}|${cat}`;
               if (wt === '100 Grams' && updatedPrices[legacyKey] !== undefined) {
                 delete updatedPrices[legacyKey];
               }
@@ -516,10 +543,10 @@ export default function AdminPage() {
       const prodName = parts[0];
       const length = parts[1] || '';
       const style = parts[2] || '';
-      const color = parts[3] || '';
+      const category = parts[3] || '';
       const weight = parts[4] || '100 Grams';
       const unit = units[prodName] || 'unit';
-      return { key, product: prodName, length, weight, style, color, price, unit };
+      return { key, product: prodName, length, weight, style, category, price, unit };
     });
 
     if (searchQuery) {
@@ -529,7 +556,7 @@ export default function AdminPage() {
         item.length.toLowerCase().includes(q) ||
         item.weight.toLowerCase().includes(q) ||
         item.style.toLowerCase().includes(q) ||
-        item.color.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q) ||
         item.unit.toLowerCase().includes(q)
       );
     }
@@ -682,6 +709,13 @@ export default function AdminPage() {
                 >
                   {products.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
+                <button
+                  type="button"
+                  onClick={handleDeleteProduct}
+                  style={{ padding: '0 16px', background: '#ff4d4f', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
+                >
+                  Delete
+                </button>
               </div>
               
               <div style={{ display: 'flex', gap: '10px' }}>
@@ -950,60 +984,21 @@ export default function AdminPage() {
               </div>
             </div>
             
-            {/* Colors Multi-Select */}
+            {/* Category Multi-Select */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label style={{ fontWeight: 600 }}>Colors ({selectedColors.length})</label>
-                <button onClick={() => setSelectedColors(selectedColors.length === COLORS.length ? [] : COLORS)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}>
-                  {selectedColors.length === COLORS.length ? 'Deselect All' : 'Select All'}
+                <label style={{ fontWeight: 600 }}>Color Categories ({selectedCategories.length})</label>
+                <button onClick={() => setSelectedCategories(selectedCategories.length === CATEGORIES.length ? [] : CATEGORIES)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}>
+                  {selectedCategories.length === CATEGORIES.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {Array.from(new Set(SPECTRUM_COLORS.map(c => c.category))).map(category => {
-                  const categoryColors = SPECTRUM_COLORS.filter(c => c.category === category);
-                  const categoryColorNames = categoryColors.map(c => c.name);
-                  const isAllSelected = categoryColorNames.every(name => selectedColors.includes(name));
-                  const isExpanded = expandedColorGroups.includes(category);
-
-                  const toggleCategory = () => {
-                    if (isAllSelected) {
-                      setSelectedColors(selectedColors.filter(name => !categoryColorNames.includes(name)));
-                    } else {
-                      setSelectedColors(Array.from(new Set([...selectedColors, ...categoryColorNames])));
-                    }
-                  };
-
-                  const toggleExpand = () => {
-                    setExpandedColorGroups(prev => 
-                      prev.includes(category) ? prev.filter(g => g !== category) : [...prev, category]
-                    );
-                  };
-
-                  return (
-                    <div key={category} style={{ marginBottom: '16px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', background: '#f0f0f0', padding: '6px 10px', borderRadius: '6px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={toggleExpand}>
-                          <span style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s', fontSize: '0.8rem' }}>▶</span>
-                          <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#444' }}>{category}</span>
-                        </div>
-                        <button type="button" onClick={toggleCategory} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
-                          {isAllSelected ? 'Deselect Group' : 'Select Group'}
-                        </button>
-                      </div>
-                      {isExpanded && (
-                        <div style={{ paddingLeft: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                          {categoryColors.map(c => (
-                            <label key={c.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
-                              <input type="checkbox" checked={selectedColors.includes(c.name)} onChange={() => toggleSelection(c.name, selectedColors, setSelectedColors)} />
-                              <img src={c.image} alt={c.name} style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #ddd' }} />
-                              <span>{c.name}</span>
-                            </label>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+              <div style={{ maxHeight: '190px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
+                {CATEGORIES.map(cat => (
+                  <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
+                    <input type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => toggleSelection(cat, selectedCategories, setSelectedCategories)} />
+                    <span style={{ fontWeight: 500 }}>{cat}</span>
+                  </label>
+                ))}
               </div>
             </div>
 
@@ -1106,8 +1101,8 @@ export default function AdminPage() {
                     <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('style')}>
                       Style {getSortIcon('style')}
                     </th>
-                    <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('color')}>
-                      Color {getSortIcon('color')}
+                    <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('category')}>
+                      Color Category {getSortIcon('category')}
                     </th>
                     <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('unit')}>
                       Unit {getSortIcon('unit')}
@@ -1139,7 +1134,7 @@ export default function AdminPage() {
                           </span>
                         </td>
                         <td style={{ padding: '12px' }}>{item.style}</td>
-                        <td style={{ padding: '12px' }}>{item.color}</td>
+                        <td style={{ padding: '12px' }}>{item.category}</td>
                         <td style={{ padding: '12px' }}>
                           <span style={{ background: '#f0f0f0', padding: '3px 8px', borderRadius: '6px', fontSize: '0.82rem', fontWeight: 600, color: '#555' }}>
                             {item.unit}
