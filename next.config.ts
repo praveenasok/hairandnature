@@ -1,18 +1,18 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  webpack: (config, { isServer }) => {
+  turbopack: {
+    root: path.resolve(__dirname),
+  },
+  webpack: (config) => {
     config.cache = false;
-    config.infrastructureLogging = { level: 'verbose' };
     return config;
   },
-  turbopack: {},
   experimental: {
-    workerThreads: false,
-    cpus: 1,
     optimizePackageImports: ['lucide-react'],
   }
 };
