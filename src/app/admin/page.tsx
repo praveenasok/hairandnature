@@ -31,7 +31,6 @@ export default function AdminPage() {
   const [selectedLengths, setSelectedLengths] = useState<string[]>([LENGTHS[0]]);
   const [selectedWeights, setSelectedWeights] = useState<string[]>([WEIGHTS[1]]); // default 100g
   const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
-  const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([CATEGORIES[0]]);
   
   const [actionType, setActionType] = useState<"exact" | "percentage" | "delete">("exact");
