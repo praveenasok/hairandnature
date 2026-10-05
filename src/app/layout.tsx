@@ -9,6 +9,7 @@ import GlobalEnquiryFloatingButton from "../components/GlobalEnquiryFloatingButt
 
 const quicksand = Quicksand({
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
   variable: "--font-quicksand",
 });
 
@@ -38,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${quicksand.variable}`}>
+    <html lang="en" className={quicksand.variable}>
       <body>
         <CurrencyProvider>
           <EnquiryProvider>

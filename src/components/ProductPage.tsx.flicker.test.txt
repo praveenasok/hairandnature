@@ -1,0 +1,5 @@
+I have applied the following fixes to ProductPage.tsx:
+1. Replaced framer-motion with native CSS opacity transitions.
+2. Rendered all images simultaneously (opacity: 0) to prevent download flashes.
+3. Added WebKit hardware acceleration fixes (translate3d, backface-visibility).
+4. Tracked prevSlide to maintain opacity: 1 on the old image during the crossfade.

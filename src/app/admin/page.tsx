@@ -5,18 +5,7 @@ import { SPECTRUM_COLORS } from "@/data/colors";
 import { HAIR_STYLES, STYLE_NAMES } from "@/data/styles";
 import { Testimonial } from "@/app/api/testimonials/route";
 
-const PRODUCTS = [
-  "Tape Extensions",
-  "K Tips",
-  "Genius Wefts",
-  "Butterfly Wefts",
-  "ClipOn Extensions",
-  "Premium DIY Hair Bun",
-  "Caramel Brown Highlights",
-  "Sleek Flatclip Ponytail",
-  "Elegant Clutch Bun",
-  "Volume Boost Cover Patch"
-];
+
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
 const STYLES = STYLE_NAMES;
@@ -29,8 +18,13 @@ export default function AdminPage() {
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [units, setUnits] = useState<Record<string, string>>({});
   const [descriptions, setDescriptions] = useState<Record<string, string>>({});
+  const [metadata, setMetadata] = useState<Record<string, any>>({});
   
-  const [product, setProduct] = useState(PRODUCTS[0]);
+  const [products, setProducts] = useState<string[]>([]);
+  const [newProductName, setNewProductName] = useState("");
+  const [addingProduct, setAddingProduct] = useState(false);
+
+  const [product, setProduct] = useState("");
   const [selectedUnit, setSelectedUnit] = useState<string>("pack");
   const [selectedDescription, setSelectedDescription] = useState<string>("");
   
@@ -38,6 +32,7 @@ export default function AdminPage() {
   const [selectedWeights, setSelectedWeights] = useState<string[]>([WEIGHTS[1]]); // default 100g
   const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
   const [selectedColors, setSelectedColors] = useState<string[]>([COLORS[0]]);
+  const [expandedColorGroups, setExpandedColorGroups] = useState<string[]>([]);
   
   const [actionType, setActionType] = useState<"exact" | "percentage" | "delete">("exact");
   const [inputValue, setInputValue] = useState("");
@@ -50,6 +45,14 @@ export default function AdminPage() {
   // Feedback badges
   const [unitSavedMsg, setUnitSavedMsg] = useState("");
   const [descSavedMsg, setDescSavedMsg] = useState("");
+  const [metadataSavedMsg, setMetadataSavedMsg] = useState("");
+
+  const [modelImage, setModelImage] = useState<string>("");
+  const [productImages, setProductImages] = useState<string>(""); // comma separated
+  const [optLengths, setOptLengths] = useState<string[]>([]);
+  const [optWeights, setOptWeights] = useState<string[]>([]);
+  const [optStyles, setOptStyles] = useState<string[]>([]);
+  const [savingMetadata, setSavingMetadata] = useState(false);
 
   // Testimonials & Enquiries state
   const [activeAdminTab, setActiveAdminTab] = useState<'products' | 'testimonials' | 'enquiries'>('products');
@@ -87,16 +90,31 @@ export default function AdminPage() {
       fetch('/api/units').then(res => res.json()).catch(() => ({})),
       fetch('/api/descriptions').then(res => res.json()).catch(() => ({})),
       fetch('/api/testimonials').then(res => res.json()).catch(() => ([])),
-      fetch('/api/enquiries').then(res => res.json()).catch(() => ([]))
-    ]).then(([priceData, unitData, descData, testimonialsData, enquiriesData]) => {
+      fetch('/api/enquiries').then(res => res.json()).catch(() => ([])),
+      fetch('/api/product-metadata').then(res => res.json()).catch(() => ({})),
+      fetch('/api/products').then(res => res.json()).catch(() => ([]))
+    ]).then(([priceData, unitData, descData, testimonialsData, enquiriesData, metadataData, productsData]) => {
+      const loadedProducts = Array.isArray(productsData) && productsData.length > 0 ? productsData : [];
+      setProducts(loadedProducts);
+      const defaultProduct = loadedProducts[0] || "";
+      setProduct(defaultProduct);
+
       setPrices(priceData || {});
       const loadedUnits = unitData || {};
       setUnits(loadedUnits);
-      setSelectedUnit(loadedUnits[PRODUCTS[0]] || "pack");
+      if (defaultProduct) setSelectedUnit(loadedUnits[defaultProduct] || "pack");
       
       const loadedDescs = descData || {};
       setDescriptions(loadedDescs);
-      setSelectedDescription(loadedDescs[PRODUCTS[0]] || "");
+      if (defaultProduct) setSelectedDescription(loadedDescs[defaultProduct] || "");
+
+      setMetadata(metadataData || {});
+      const pMeta = metadataData?.[defaultProduct] || {};
+      setModelImage(pMeta.modelImage || "");
+      setProductImages((pMeta.productImages || []).join(", "));
+      setOptLengths(pMeta.availableLengths || []);
+      setOptWeights(pMeta.availableWeights || []);
+      setOptStyles(pMeta.availableStyles || []);
 
       if (Array.isArray(testimonialsData) && testimonialsData.length > 0) {
         setTestimonials(testimonialsData);
@@ -184,8 +202,75 @@ export default function AdminPage() {
     setProduct(newProduct);
     setSelectedUnit(units[newProduct] || "pack");
     setSelectedDescription(descriptions[newProduct] || "");
+    const pMeta = metadata[newProduct] || {};
+    setModelImage(pMeta.modelImage || "");
+    setProductImages((pMeta.productImages || []).join(", "));
+    setOptLengths(pMeta.availableLengths || []);
+    setOptWeights(pMeta.availableWeights || []);
+    setOptStyles(pMeta.availableStyles || []);
     setUnitSavedMsg("");
     setDescSavedMsg("");
+    setMetadataSavedMsg("");
+  };
+
+  const handleSaveMetadata = async () => {
+    setSavingMetadata(true);
+    const updatedMeta = { ...metadata };
+    updatedMeta[product] = {
+      modelImage,
+      productImages: productImages.split(',').map(s => s.trim()).filter(Boolean),
+      availableLengths: optLengths,
+      availableWeights: optWeights,
+      availableStyles: optStyles
+    };
+
+    try {
+      const res = await fetch('/api/product-metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedMeta)
+      });
+      if (res.ok) {
+        setMetadata(updatedMeta);
+        setMetadataSavedMsg("Options & Images saved successfully!");
+        setTimeout(() => setMetadataSavedMsg(""), 3500);
+      } else {
+        alert("Failed to save product options.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error saving product options.");
+    } finally {
+      setSavingMetadata(false);
+    }
+  };
+
+  const handleAddProduct = async () => {
+    const trimmed = newProductName.trim();
+    if (!trimmed) return;
+    if (products.includes(trimmed)) return alert("Product already exists!");
+    
+    setAddingProduct(true);
+    const updatedProducts = [...products, trimmed];
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProducts)
+      });
+      if (res.ok) {
+        setProducts(updatedProducts);
+        setNewProductName("");
+        handleProductChange(trimmed);
+      } else {
+        alert("Failed to save product.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error adding product.");
+    } finally {
+      setAddingProduct(false);
+    }
   };
 
   const handleSaveUnit = async (prodName: string, unitVal: string) => {
@@ -589,13 +674,33 @@ export default function AdminPage() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '20px', marginBottom: '20px' }}>
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Active Product</label>
-              <select 
-                value={product} 
-                onChange={e => handleProductChange(e.target.value)} 
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem', background: '#fff' }}
-              >
-                {PRODUCTS.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                <select 
+                  value={product} 
+                  onChange={e => handleProductChange(e.target.value)} 
+                  style={{ flex: 1, padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem', background: '#fff' }}
+                >
+                  {products.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input 
+                  type="text" 
+                  value={newProductName}
+                  onChange={e => setNewProductName(e.target.value)}
+                  placeholder="New product name..."
+                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '0.9rem' }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddProduct}
+                  disabled={addingProduct || !newProductName.trim()}
+                  style={{ padding: '10px 16px', background: '#333', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontSize: '0.85rem' }}
+                >
+                  {addingProduct ? 'Adding...' : 'Add Product'}
+                </button>
+              </div>
             </div>
 
             <div>
@@ -685,6 +790,101 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+
+          {/* Product Images and Available Options */}
+          <div style={{ marginTop: '25px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 600 }}>Product Media & Available Options</h3>
+              {metadataSavedMsg && (
+                <span style={{ fontSize: '0.85rem', color: '#2e7d32', fontWeight: 600, background: '#e8f5e9', padding: '3px 10px', borderRadius: '12px' }}>
+                  ✓ {metadataSavedMsg}
+                </span>
+              )}
+            </div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Model Image URL</label>
+                <input 
+                  type="text" 
+                  value={modelImage}
+                  onChange={e => setModelImage(e.target.value)}
+                  placeholder="https://..."
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Product Image URLs (Comma Separated)</label>
+                <input 
+                  type="text" 
+                  value={productImages}
+                  onChange={e => setProductImages(e.target.value)}
+                  placeholder="https://img1.jpg, https://img2.jpg"
+                  style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '1rem' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Available Lengths</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {LENGTHS.map(item => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => toggleSelection(item, optLengths, setOptLengths)}
+                      style={{ padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem', border: '1px solid #ddd', background: optLengths.includes(item) ? 'var(--color-primary)' : '#fff', color: optLengths.includes(item) ? '#fff' : '#444', cursor: 'pointer' }}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Available Weights</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {WEIGHTS.map(item => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => toggleSelection(item, optWeights, setOptWeights)}
+                      style={{ padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem', border: '1px solid #ddd', background: optWeights.includes(item) ? 'var(--color-primary)' : '#fff', color: optWeights.includes(item) ? '#fff' : '#444', cursor: 'pointer' }}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 600 }}>Available Styles</label>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {STYLES.map(item => (
+                    <button
+                      key={item}
+                      type="button"
+                      onClick={() => toggleSelection(item, optStyles, setOptStyles)}
+                      style={{ padding: '6px 12px', borderRadius: '20px', fontSize: '0.85rem', border: '1px solid #ddd', background: optStyles.includes(item) ? 'var(--color-primary)' : '#fff', color: optStyles.includes(item) ? '#fff' : '#444', cursor: 'pointer' }}
+                    >
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+              <button
+                type="button"
+                onClick={handleSaveMetadata}
+                disabled={savingMetadata}
+                className="btn-gold"
+                style={{ padding: '10px 20px', fontSize: '0.9rem', border: 'none', cursor: 'pointer', borderRadius: '8px' }}
+              >
+                {savingMetadata ? 'Saving...' : 'Save Options & Images'}
+              </button>
+            </div>
+          </div>
         </div>
         
         {/* CARD 2: Bulk Pricing Matrix (with Weight Options) */}
@@ -758,15 +958,52 @@ export default function AdminPage() {
                   {selectedColors.length === COLORS.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {SPECTRUM_COLORS.map(c => (
-                  <label key={c.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
-                    <input type="checkbox" checked={selectedColors.includes(c.name)} onChange={() => toggleSelection(c.name, selectedColors, setSelectedColors)} />
-                    <img src={c.image} alt={c.name} style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #ddd' }} />
-                    <span>{c.name}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#888', marginLeft: 'auto' }}>{c.category}</span>
-                  </label>
-                ))}
+              <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
+                {Array.from(new Set(SPECTRUM_COLORS.map(c => c.category))).map(category => {
+                  const categoryColors = SPECTRUM_COLORS.filter(c => c.category === category);
+                  const categoryColorNames = categoryColors.map(c => c.name);
+                  const isAllSelected = categoryColorNames.every(name => selectedColors.includes(name));
+                  const isExpanded = expandedColorGroups.includes(category);
+
+                  const toggleCategory = () => {
+                    if (isAllSelected) {
+                      setSelectedColors(selectedColors.filter(name => !categoryColorNames.includes(name)));
+                    } else {
+                      setSelectedColors(Array.from(new Set([...selectedColors, ...categoryColorNames])));
+                    }
+                  };
+
+                  const toggleExpand = () => {
+                    setExpandedColorGroups(prev => 
+                      prev.includes(category) ? prev.filter(g => g !== category) : [...prev, category]
+                    );
+                  };
+
+                  return (
+                    <div key={category} style={{ marginBottom: '16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px', background: '#f0f0f0', padding: '6px 10px', borderRadius: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={toggleExpand}>
+                          <span style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s', fontSize: '0.8rem' }}>▶</span>
+                          <span style={{ fontWeight: 600, fontSize: '0.85rem', color: '#444' }}>{category}</span>
+                        </div>
+                        <button type="button" onClick={toggleCategory} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
+                          {isAllSelected ? 'Deselect Group' : 'Select Group'}
+                        </button>
+                      </div>
+                      {isExpanded && (
+                        <div style={{ paddingLeft: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          {categoryColors.map(c => (
+                            <label key={c.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
+                              <input type="checkbox" checked={selectedColors.includes(c.name)} onChange={() => toggleSelection(c.name, selectedColors, setSelectedColors)} />
+                              <img src={c.image} alt={c.name} style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #ddd' }} />
+                              <span>{c.name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -1235,7 +1472,7 @@ export default function AdminPage() {
               <div style={{ background: '#fff', padding: '20px', borderRadius: '14px', border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
                 <span style={{ fontSize: '0.82rem', color: '#888', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Estimated Pipeline Value</span>
                 <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#2563eb', marginTop: '4px' }}>
-                  ${enquiries.reduce((acc, e) => acc + (e.estimatedTotal || 0), 0).toLocaleString()} CAD
+                  ${enquiries.reduce((acc, e) => acc + (e.estimatedTotal || 0), 0).toLocaleString()} USD
                 </div>
               </div>
             </div>
@@ -1355,7 +1592,7 @@ export default function AdminPage() {
                         ) : <div />}
                         {enq.estimatedTotal > 0 && (
                           <div style={{ fontSize: '0.92rem', fontWeight: 800, color: '#1a1a1a' }}>
-                            Est. Value: ${enq.estimatedTotal.toLocaleString()} {enq.currency || 'CAD'}
+                            Est. Value: ${enq.estimatedTotal.toLocaleString()} USD
                           </div>
                         )}
                       </div>

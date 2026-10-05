@@ -35,22 +35,39 @@ export default function MiniImageSlider({
   images, 
   style, 
   className,
-  imgStyle 
+  imgStyle,
+  onImageChange
 }: { 
   images: string[]; 
   style?: React.CSSProperties; 
   className?: string;
   imgStyle?: React.CSSProperties;
+  onImageChange?: (src: string) => void;
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [prevIndex, setPrevIndex] = useState<number | null>(null);
+
+  const changeSlide = (next: number) => {
+    setPrevIndex(currentIndex);
+    setCurrentIndex(next);
+    if (onImageChange) onImageChange(images[next]);
+    setTimeout(() => {
+      setPrevIndex(null);
+    }, 800);
+  };
 
   useEffect(() => {
-    if (images.length <= 1) return;
+    if (images.length <= 1) {
+      if (images.length === 1 && onImageChange) onImageChange(images[0]);
+      return;
+    }
     const timer = setInterval(() => {
-      setCurrentIndex(prev => (prev + 1) % images.length);
+      changeSlide((currentIndex + 1) % images.length);
     }, 3000);
+    // Initial call
+    if (onImageChange) onImageChange(images[currentIndex]);
     return () => clearInterval(timer);
-  }, [images]);
+  }, [images, onImageChange, currentIndex]);
 
   if (!images || images.length === 0) return null;
 
@@ -59,28 +76,31 @@ export default function MiniImageSlider({
 
   return (
     <div style={{ position: 'relative', overflow: 'hidden', ...style }} className={className}>
-      <AnimatePresence>
-        <motion.img
-          key={currentIndex}
-          src={currentSrc}
-          alt="Product thumbnail"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
-          style={{ 
-            width: '100%', 
-            height: '100%', 
-            objectFit: 'cover', 
-            objectPosition: config.position,
-            transform: config.transform || 'none',
-            position: 'absolute', 
-            top: 0, 
-            left: 0,
-            ...imgStyle
-          }}
-        />
-      </AnimatePresence>
+      {images.map((src, index) => {
+        const conf = PRODUCT_IMAGE_CONFIG[src] || { position: "center center" };
+        return (
+          <img
+            key={src + index}
+            src={src}
+            alt="Product thumbnail"
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover', 
+              objectPosition: conf.position,
+              transform: conf.transform || 'none',
+              position: 'absolute', 
+              top: 0, 
+              left: 0,
+              zIndex: currentIndex === index ? 1 : 0,
+              pointerEvents: currentIndex === index ? 'auto' : 'none',
+              opacity: currentIndex === index || prevIndex === index ? 1 : 0,
+              transition: 'opacity 0.8s ease-in-out',
+              ...imgStyle
+            }}
+          />
+        );
+      })}
     </div>
   );
 }

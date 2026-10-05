@@ -1,0 +1,121 @@
+{
+  "Tape Extensions": {
+    "modelImage": "",
+    "productImages": [],
+    "availableLengths": [
+      "16 Inches",
+      "18 Inches",
+      "20 Inches",
+      "22 Inches",
+      "24 Inches",
+      "26 Inches",
+      "28 Inches",
+      "30 Inches"
+    ],
+    "availableWeights": [
+      "100 Grams"
+    ],
+    "availableStyles": [
+      "Natural Straight",
+      "Natural Wave",
+      "Body Wave",
+      "Deep Wave"
+    ]
+  },
+  "K Tips": {
+    "modelImage": "",
+    "productImages": [],
+    "availableLengths": [
+      "16 Inches",
+      "18 Inches",
+      "20 Inches",
+      "22 Inches",
+      "24 Inches",
+      "26 Inches",
+      "28 Inches",
+      "30 Inches"
+    ],
+    "availableWeights": [
+      "50 Grams",
+      "100 Grams"
+    ],
+    "availableStyles": [
+      "Natural Straight",
+      "Natural Wave",
+      "Body Wave",
+      "Deep Wave"
+    ]
+  },
+  "Genius Wefts": {
+    "modelImage": "",
+    "productImages": [],
+    "availableLengths": [
+      "16 Inches",
+      "18 Inches",
+      "20 Inches",
+      "22 Inches",
+      "24 Inches",
+      "26 Inches",
+      "30 Inches",
+      "28 Inches"
+    ],
+    "availableWeights": [
+      "50 Grams",
+      "100 Grams"
+    ],
+    "availableStyles": [
+      "Natural Straight",
+      "Natural Wave",
+      "Body Wave",
+      "Deep Wave"
+    ]
+  },
+  "Butterfly Wefts": {
+    "modelImage": "",
+    "productImages": [],
+    "availableLengths": [
+      "16 Inches",
+      "18 Inches",
+      "20 Inches",
+      "22 Inches",
+      "24 Inches",
+      "26 Inches",
+      "28 Inches",
+      "30 Inches"
+    ],
+    "availableWeights": [
+      "100 Grams",
+      "50 Grams"
+    ],
+    "availableStyles": [
+      "Natural Straight",
+      "Natural Wave",
+      "Body Wave"
+    ]
+  },
+  "ClipOn Extensions": {
+    "modelImage": "",
+    "productImages": [],
+    "availableLengths": [
+      "16 Inches",
+      "18 Inches",
+      "20 Inches",
+      "22 Inches",
+      "24 Inches",
+      "26 Inches",
+      "28 Inches",
+      "30 Inches"
+    ],
+    "availableWeights": [
+      "100 Grams",
+      "150 Grams",
+      "200 Grams"
+    ],
+    "availableStyles": [
+      "Natural Straight",
+      "Natural Wave",
+      "Body Wave",
+      "Deep Wave"
+    ]
+  }
+}

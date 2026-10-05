@@ -9,7 +9,7 @@ import MiniImageSlider from "./MiniImageSlider";
 import CurrencySelector from "./CurrencySelector";
 import { useEnquiry } from "../context/EnquiryContext";
 
-const PRODUCTS = [
+const INITIAL_PRODUCTS = [
   { name: "Tape Extensions", href: "/tape-extensions", imgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
   { name: "K Tips", href: "/k-tips", imgs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"] },
   { name: "Genius Wefts", href: "/genius-wefts", imgs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"] },
@@ -23,6 +23,31 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const { setIsOpen: setEnquiryOpen, totalCount, sendGeneralEnquiry } = useEnquiry();
+  const [navProducts, setNavProducts] = useState(INITIAL_PRODUCTS);
+
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/products').then(res => res.json()).catch(() => []),
+      fetch('/api/product-metadata').then(res => res.json()).catch(() => ({}))
+    ]).then(([productsData, metadataData]) => {
+      if (Array.isArray(productsData) && productsData.length > 0) {
+        const generated = productsData.map(pName => {
+          const pMeta = metadataData[pName] || {};
+          let imgs = pMeta.productImages || [];
+          if (pMeta.modelImage) imgs = [pMeta.modelImage, ...imgs];
+          if (imgs.length === 0) {
+            const initialMatch = INITIAL_PRODUCTS.find(p => p.name === pName);
+            if (initialMatch) imgs = initialMatch.imgs;
+            else imgs = ["/images/products/clipon.webp"]; // Fallback
+          }
+          let href = "/" + pName.toLowerCase().replace(/\s+/g, '-');
+          if (pName === "ClipOn Extensions") href = "/seamless-clipon-extensions";
+          return { name: pName, href, imgs };
+        });
+        setNavProducts(generated);
+      }
+    });
+  }, []);
 
   // Close mega menu and mobile menu on any route change
   useEffect(() => {
@@ -88,47 +113,47 @@ export default function Navigation() {
                     transition={{ duration: 0.2 }}
                     style={{
                       position: 'absolute',
-                      top: 'calc(100% + 15px)',
+                      top: '100%',
                       left: '24px',
                       right: '24px',
                       width: 'calc(100% - 48px)',
+                      paddingTop: '15px',
+                      zIndex: 100
+                    }}
+                  >
+                    <div style={{
                       background: 'rgba(255, 255, 255, 0.95)',
                       backdropFilter: 'blur(10px)',
                       boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
                       borderRadius: '16px',
                       padding: '30px',
-                      zIndex: 100,
                       display: 'grid',
                       gridTemplateColumns: '1.2fr 2fr',
                       gap: '30px',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    {/* Washed-out floral corner accent fading leftwards (~2 inches / 200px) */}
-                    <div 
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        right: 0,
-                        width: '200px',
-                        height: '100%',
-                        pointerEvents: 'none',
-                        zIndex: 0,
-                        overflow: 'hidden',
-                        borderTopRightRadius: '16px',
-                        borderBottomRightRadius: '16px'
-                      }}
-                    >
+                      overflow: 'hidden',
+                      position: 'relative'
+                    }}>
+                      {/* Washed-out hero slide corner accent fading leftwards (~2 inches / 200px) */}
                       <div 
                         style={{
-                          width: '100%',
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          width: '200px',
                           height: '100%',
-                          backgroundImage: "url('/images/mega_menu_floral.png')",
-                          backgroundPosition: 'right top',
-                          backgroundSize: 'cover',
-                          backgroundRepeat: 'no-repeat',
+                          pointerEvents: 'none',
+                          zIndex: 0,
+                          overflow: 'hidden',
+                          borderTopRightRadius: '16px',
+                          borderBottomRightRadius: '16px'
+                        }}
+                      >
+                      <MiniImageSlider
+                        images={["/images/hero_general_1.jpg", "/images/genius_wefts_light.jpg", "/images/hero_general_2.jpg", "/images/k_tips_light.jpg"]}
+                        style={{ width: '100%', height: '100%' }}
+                        imgStyle={{
                           opacity: 0.42,
-                          filter: 'brightness(1.05) saturate(0.88)',
+                          filter: 'brightness(1.05) saturate(0.88) blur(4px)',
                           WebkitMaskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 100%)',
                           maskImage: 'linear-gradient(to left, rgba(0,0,0,1) 0%, rgba(0,0,0,0.65) 40%, rgba(0,0,0,0.15) 75%, rgba(0,0,0,0) 100%)'
                         }}
@@ -153,7 +178,7 @@ export default function Navigation() {
 
                     {/* Products Grid Right Panel */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', position: 'relative', zIndex: 1 }}>
-                      {PRODUCTS.map(product => (
+                      {navProducts.map(product => (
                         <Link 
                           key={product.href} 
                           href={product.href}
@@ -170,7 +195,7 @@ export default function Navigation() {
                             e.currentTarget.style.transform = 'translateY(0)';
                           }}
                         >
-                          <MiniImageSlider images={product.imgs} style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid #eee', boxShadow: '0 6px 15px rgba(0,0,0,0.08)', flexShrink: 0, pointerEvents: 'none' }} />
+                          <img src={product.imgs[0] || ""} alt={product.name} style={{ width: '80px', height: '80px', borderRadius: '50%', border: '2px solid #eee', boxShadow: '0 6px 15px rgba(0,0,0,0.08)', flexShrink: 0, pointerEvents: 'none', objectFit: 'cover', background: '#f5f5f5' }} />
                           {product.name}
                         </Link>
                       ))}
@@ -340,6 +365,7 @@ export default function Navigation() {
                         </svg>
                       </Link>
                     </div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -446,14 +472,14 @@ export default function Navigation() {
               <div style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc' }}>
                 <span style={{ color: '#1a1a1a', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '14px', fontSize: '0.9rem' }}>Our Products</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  {PRODUCTS.map(product => (
+                  {navProducts.map(product => (
                     <Link 
                       key={product.href} 
                       href={product.href} 
                       style={{ color: '#2b231d', fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '14px', padding: '6px 0', textDecoration: 'none' }} 
                       onClick={() => setIsOpen(false)}
                     >
-                      <MiniImageSlider images={product.imgs} style={{ width: '46px', height: '46px', borderRadius: '50%', border: '1.5px solid #ebd9c8', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }} />
+                      <img src={product.imgs[0] || ""} alt={product.name} style={{ width: '46px', height: '46px', borderRadius: '50%', border: '1.5px solid #ebd9c8', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', objectFit: 'cover', background: '#f5f5f5' }} />
                       <span>{product.name}</span>
                     </Link>
                   ))}

@@ -110,6 +110,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const [color, setColor] = useState(SPECTRUM_COLORS[0].name);
   const [colorCategory, setColorCategory] = useState<string>('All');
   const [description, setDescription] = useState(desc);
+  const [metadata, setMetadata] = useState<any>(null);
 
   const filteredColors = useMemo(() => {
     if (colorCategory === 'All') return SPECTRUM_COLORS;
@@ -129,28 +130,43 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
 
   // Slider State
   const slideImages = useMemo(() => {
+    if (metadata && (metadata.modelImage || (metadata.productImages && metadata.productImages.length > 0))) {
+      const arr = [];
+      if (metadata.modelImage) arr.push(metadata.modelImage);
+      if (metadata.productImages) arr.push(...metadata.productImages);
+      return arr;
+    }
     if (images && images.length > 0) return images;
     if (DEFAULT_PRODUCT_IMAGES[title]) return DEFAULT_PRODUCT_IMAGES[title];
     return [img];
-  }, [images, title, img]);
+  }, [images, title, img, metadata]);
 
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [prevSlide, setPrevSlide] = useState<number | null>(null);
+
+  const changeSlide = (next: number) => {
+    setPrevSlide(currentSlide);
+    setCurrentSlide(next);
+    setTimeout(() => {
+      setPrevSlide(null);
+    }, 600);
+  };
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (slideImages.length <= 1 || isPaused) return;
     const timer = setInterval(() => {
-      setCurrentSlide(prev => (prev + 1) % slideImages.length);
+      changeSlide((currentSlide + 1) % slideImages.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [slideImages.length, isPaused]);
+  }, [slideImages.length, isPaused, currentSlide]);
 
   const handlePrevSlide = () => {
-    setCurrentSlide(prev => (prev - 1 + slideImages.length) % slideImages.length);
+    changeSlide((currentSlide - 1 + slideImages.length) % slideImages.length);
   };
 
   const handleNextSlide = () => {
-    setCurrentSlide(prev => (prev + 1) % slideImages.length);
+    changeSlide((currentSlide + 1) % slideImages.length);
   };
   
   useEffect(() => {
@@ -176,7 +192,47 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
         }
       })
       .catch(err => console.error("Could not load descriptions", err));
+
+    fetch('/api/product-metadata')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data[title]) {
+          setMetadata(data[title]);
+        }
+      })
+      .catch(err => console.error("Could not load product metadata", err));
   }, [title]);
+
+  const availableLengths = useMemo(() => {
+    if (metadata && metadata.availableLengths && metadata.availableLengths.length > 0) return metadata.availableLengths;
+    return LENGTHS;
+  }, [metadata]);
+
+  const availableWeights = useMemo(() => {
+    if (metadata && metadata.availableWeights && metadata.availableWeights.length > 0) return metadata.availableWeights;
+    return WEIGHTS;
+  }, [metadata]);
+
+  const availableStyles = useMemo(() => {
+    if (metadata && metadata.availableStyles && metadata.availableStyles.length > 0) {
+      return HAIR_STYLES.filter(s => metadata.availableStyles.includes(s.name));
+    }
+    return HAIR_STYLES;
+  }, [metadata]);
+
+  useEffect(() => {
+    if (metadata) {
+      if (metadata.availableLengths && metadata.availableLengths.length > 0 && !metadata.availableLengths.includes(length)) {
+        setLength(metadata.availableLengths[0]);
+      }
+      if (metadata.availableWeights && metadata.availableWeights.length > 0 && !metadata.availableWeights.includes(weight)) {
+        setWeight(metadata.availableWeights[0]);
+      }
+      if (metadata.availableStyles && metadata.availableStyles.length > 0 && !metadata.availableStyles.includes(style)) {
+        setStyle(metadata.availableStyles[0]);
+      }
+    }
+  }, [metadata, length, weight, style]);
 
   const keyWithWeight = `${title}|${length}|${style}|${color}|${weight}`;
   const keyLegacy = `${title}|${length}|${style}|${color}`;
@@ -256,23 +312,27 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               background: '#f8f6f4',
               border: '1px solid rgba(0,0,0,0.04)'
             }}>
-              <AnimatePresence initial={false} mode="wait">
-                <motion.img 
-                  key={currentSlide}
-                  src={slideImages[currentSlide]} 
-                  alt={`${title} detail view`}
-                  initial={{ opacity: 0, scale: 1.02 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
+              {slideImages.map((src, index) => (
+                <img 
+                  key={src + index}
+                  src={src} 
+                  alt={`${title} detail view ${index + 1}`}
                   style={{ 
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    zIndex: currentSlide === index ? 1 : 0,
                     width: '100%', 
                     height: '100%', 
                     objectFit: 'cover',
-                    objectPosition: PRODUCT_IMAGE_CONFIG[slideImages[currentSlide]]?.position || 'center center'
+                    objectPosition: PRODUCT_IMAGE_CONFIG[src]?.position || 'center center',
+                    zIndex: currentSlide === index ? 1 : 0,
+                    pointerEvents: currentSlide === index ? 'auto' : 'none',
+                    opacity: currentSlide === index || prevSlide === index ? 1 : 0,
+                    transition: 'opacity 0.6s ease-in-out'
                   }} 
                 />
-              </AnimatePresence>
+              ))}
 
               {/* Floating Quality Tag */}
               <div style={{
@@ -366,7 +426,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 {slideImages.map((sImg, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setCurrentSlide(idx)}
+                    onClick={() => changeSlide(idx)}
                     style={{
                       height: '74px',
                       borderRadius: '12px',
@@ -474,7 +534,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {LENGTHS.map(len => {
+                {availableLengths.map(len => {
                   const isSelected = len === length;
                   return (
                     <button 
@@ -508,7 +568,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {WEIGHTS.map(w => {
+                {availableWeights.map(w => {
                   const isSelected = w === weight;
                   return (
                     <button 
@@ -549,7 +609,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 gap: '8px',
                 marginBottom: '10px'
               }}>
-                {HAIR_STYLES.map(st => {
+                {availableStyles.map(st => {
                   const isSelected = st.name === style;
                   return (
                     <button
