@@ -71,6 +71,7 @@ const heroProducts = [
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const [pinnedBalloon, setPinnedBalloon] = useState<string | null>(null);
   const activeProduct = heroProducts.find(p => p.slideIdx === currentSlide) || heroProducts[0];
   const heroSlides = [
     { 
@@ -169,12 +170,12 @@ export default function Home() {
   const dockRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (isCategoryDrawerOpen) return;
+    if (isCategoryDrawerOpen || pinnedBalloon) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, [isCategoryDrawerOpen]);
+  }, [isCategoryDrawerOpen, pinnedBalloon]);
 
   useEffect(() => {
     if (dockRef.current) {
@@ -191,19 +192,40 @@ export default function Home() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsCategoryDrawerOpen(false);
+      if (e.key === 'Escape') {
+        setIsCategoryDrawerOpen(false);
+        setPinnedBalloon(null);
+      }
     };
     if (isCategoryDrawerOpen) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     } else {
       document.body.style.overflow = '';
+      window.addEventListener('keydown', handleKeyDown);
     }
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [isCategoryDrawerOpen]);
+
+  // Click outside dock to close active balloon
+  useEffect(() => {
+    if (!pinnedBalloon) return;
+    const handleOutsideClick = (e: MouseEvent | TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.hero-dock-wrapper')) {
+        setPinnedBalloon(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, [pinnedBalloon]);
 
   const currentProductImg = heroSlides[currentSlide]?.productImg || activeProduct.image;
   const currentProductBadge = heroSlides[currentSlide]?.badge || activeProduct.badge;
@@ -447,8 +469,9 @@ export default function Home() {
         }
 
         .hero-dock-item:hover,
-        .hero-dock-item:focus-visible {
-          z-index: 60;
+        .hero-dock-item:focus-visible,
+        .hero-dock-item.balloon-open {
+          z-index: 95;
           background: rgba(255, 255, 255, 0.12);
           color: #ffffff;
           border-color: rgba(255, 255, 255, 0.2);
@@ -461,42 +484,56 @@ export default function Home() {
           box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
         }
 
-        /* Luxury Hover Balloon Popover */
+        /* Luxury Hover & Persistent Click Balloon Popover */
         .dock-balloon {
           position: absolute;
-          bottom: calc(100% + 16px);
+          bottom: calc(100% + 14px);
           left: 50%;
           transform: translateX(-50%) translateY(10px) scale(0.9);
           transform-origin: bottom center;
           opacity: 0;
           visibility: hidden;
           pointer-events: none;
-          z-index: 80;
-          transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
-                      transform 0.32s cubic-bezier(0.34, 1.45, 0.64, 1),
-                      visibility 0.26s ease;
-          background: linear-gradient(168deg, rgba(28, 28, 34, 0.97) 0%, rgba(14, 14, 18, 0.98) 100%);
+          z-index: 120;
+          transition: opacity 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.28s cubic-bezier(0.34, 1.45, 0.64, 1),
+                      visibility 0.24s ease;
+          background: linear-gradient(168deg, rgba(28, 28, 34, 0.98) 0%, rgba(14, 14, 18, 0.99) 100%);
           backdrop-filter: blur(28px);
           -webkit-backdrop-filter: blur(28px);
-          border: 1px solid rgba(212, 175, 55, 0.42);
+          border: 1px solid rgba(212, 175, 55, 0.45);
           border-radius: 18px;
           padding: 9px 9px 11px 9px;
           box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.85),
-                      0 0 28px rgba(212, 175, 55, 0.22),
+                      0 0 28px rgba(212, 175, 55, 0.25),
                       inset 0 1px 0 rgba(255, 255, 255, 0.25);
           display: flex;
           flex-direction: column;
           align-items: center;
           width: 200px;
+          text-decoration: none;
+          cursor: pointer;
         }
 
-        @media (hover: hover) and (pointer: fine) {
-          .hero-dock-item:hover .dock-balloon,
-          .hero-dock-item:focus-visible .dock-balloon {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(-50%) translateY(0) scale(1);
-          }
+        /* Invisible bridge area between balloon and dock item so cursor travel is continuous */
+        .dock-balloon-bridge {
+          position: absolute;
+          top: 100%;
+          left: -15px;
+          right: -15px;
+          height: 22px;
+          background: transparent;
+          pointer-events: auto;
+        }
+
+        /* Persistent Click Active & Hover States */
+        .dock-balloon.is-active,
+        .hero-dock-item:hover .dock-balloon,
+        .hero-dock-item:focus-within .dock-balloon {
+          opacity: 1 !important;
+          visibility: visible !important;
+          pointer-events: auto !important;
+          transform: translateX(-50%) translateY(0) scale(1) !important;
         }
 
         /* Balloon downward arrow pointer */
@@ -509,6 +546,7 @@ export default function Home() {
           border-width: 10px 9px 0 9px;
           border-style: solid;
           border-color: rgba(212, 175, 55, 0.55) transparent transparent transparent;
+          pointer-events: none;
         }
 
         .dock-balloon::after {
@@ -520,6 +558,7 @@ export default function Home() {
           border-width: 9px 8px 0 8px;
           border-style: solid;
           border-color: #141418 transparent transparent transparent;
+          pointer-events: none;
         }
 
         /* First item alignment to avoid left screen edge clipping */
@@ -527,11 +566,10 @@ export default function Home() {
           left: 0;
           transform: translateX(0) translateY(10px) scale(0.9);
         }
-        @media (hover: hover) and (pointer: fine) {
-          .hero-dock-item:first-child:hover .dock-balloon,
-          .hero-dock-item:first-child:focus-visible .dock-balloon {
-            transform: translateX(0) translateY(0) scale(1);
-          }
+        .hero-dock-item:first-child .dock-balloon.is-active,
+        .hero-dock-item:first-child:hover .dock-balloon,
+        .hero-dock-item:first-child:focus-within .dock-balloon {
+          transform: translateX(0) translateY(0) scale(1) !important;
         }
         .hero-dock-item:first-child .dock-balloon::before,
         .hero-dock-item:first-child .dock-balloon::after {
@@ -545,17 +583,45 @@ export default function Home() {
           right: 0;
           transform: translateX(0) translateY(10px) scale(0.9);
         }
-        @media (hover: hover) and (pointer: fine) {
-          .hero-dock-item:last-child:hover .dock-balloon,
-          .hero-dock-item:last-child:focus-visible .dock-balloon {
-            transform: translateX(0) translateY(0) scale(1);
-          }
+        .hero-dock-item:last-child .dock-balloon.is-active,
+        .hero-dock-item:last-child:hover .dock-balloon,
+        .hero-dock-item:last-child:focus-within .dock-balloon {
+          transform: translateX(0) translateY(0) scale(1) !important;
         }
         .hero-dock-item:last-child .dock-balloon::before,
         .hero-dock-item:last-child .dock-balloon::after {
           left: auto;
           right: 30px;
           transform: none;
+        }
+
+        /* Subtle close button on pinned balloon */
+        .dock-balloon-close {
+          position: absolute;
+          top: 6px;
+          right: 6px;
+          z-index: 5;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.7);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          color: rgba(255, 255, 255, 0.85);
+          font-size: 11px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          padding: 0;
+          line-height: 1;
+        }
+
+        .dock-balloon-close:hover {
+          background: rgba(212, 175, 55, 0.85);
+          color: #000000;
+          border-color: #ffd88a;
+          transform: scale(1.1);
         }
 
         /* Frame inside the balloon */
@@ -589,7 +655,8 @@ export default function Home() {
         }
 
         @media (hover: hover) and (pointer: fine) {
-          .hero-dock-item:hover .dock-balloon-frame::after {
+          .hero-dock-item:hover .dock-balloon-frame::after,
+          .dock-balloon:hover .dock-balloon-frame::after {
             left: 170%;
           }
         }
@@ -603,7 +670,8 @@ export default function Home() {
         }
 
         @media (hover: hover) and (pointer: fine) {
-          .hero-dock-item:hover .dock-balloon-img {
+          .hero-dock-item:hover .dock-balloon-img,
+          .dock-balloon:hover .dock-balloon-img {
             transform: scale(1.08);
           }
         }
@@ -701,13 +769,15 @@ export default function Home() {
         }
 
         @media (hover: hover) and (pointer: fine) {
-          .hero-dock-item:hover .dock-balloon-cta {
-            background: rgba(212, 175, 55, 0.22);
-            border-color: rgba(212, 175, 55, 0.5);
+          .hero-dock-item:hover .dock-balloon-cta,
+          .dock-balloon:hover .dock-balloon-cta {
+            background: rgba(212, 175, 55, 0.3);
+            border-color: rgba(212, 175, 55, 0.7);
             color: #ffd88a;
           }
-          .hero-dock-item:hover .dock-balloon-arrow {
-            transform: translateX(2px);
+          .hero-dock-item:hover .dock-balloon-arrow,
+          .dock-balloon:hover .dock-balloon-arrow {
+            transform: translateX(3px);
           }
         }
 
@@ -1303,15 +1373,51 @@ export default function Home() {
           <nav ref={dockRef} className="hero-dock" aria-label="Hero Product Categories">
             {heroProducts.map((prod) => {
               const isActive = currentSlide === prod.slideIdx;
+              const isPinned = pinnedBalloon === prod.name;
               return (
-                <button
+                <div
                   key={prod.name}
-                  onClick={() => setCurrentSlide(prod.slideIdx)}
-                  className={`hero-dock-item ${isActive ? 'active' : ''}`}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setCurrentSlide(prod.slideIdx);
+                    setPinnedBalloon(prev => prev === prod.name ? null : prod.name);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setCurrentSlide(prod.slideIdx);
+                      setPinnedBalloon(prev => prev === prod.name ? null : prod.name);
+                    }
+                  }}
+                  className={`hero-dock-item ${isActive ? 'active' : ''} ${isPinned ? 'balloon-open' : ''}`}
                   title={`View ${prod.name}`}
                 >
                   {/* Luxury Balloon Popover with Bigger Product Image Frame */}
-                  <div className="dock-balloon" aria-hidden="true">
+                  <Link
+                    href={prod.link}
+                    className={`dock-balloon ${isPinned ? 'is-active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    aria-label={`View ${prod.fullName} product details`}
+                  >
+                    <div className="dock-balloon-bridge" />
+                    {isPinned && (
+                      <button 
+                        type="button" 
+                        className="dock-balloon-close" 
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setPinnedBalloon(null);
+                        }}
+                        aria-label="Close popup"
+                        title="Close popup"
+                      >
+                        ✕
+                      </button>
+                    )}
                     <div className="dock-balloon-frame">
                       <span className="dock-balloon-badge">{prod.badge}</span>
                       <img 
@@ -1332,14 +1438,14 @@ export default function Home() {
                         <span className="dock-balloon-arrow">→</span>
                       </span>
                     </div>
-                  </div>
+                  </Link>
 
                   <span className="dock-thumb">
                     <img src={prod.thumb} alt={prod.name} />
                   </span>
                   <span>{prod.name}</span>
                   {isActive && <span className="dock-indicator" />}
-                </button>
+                </div>
               );
             })}
           </nav>
