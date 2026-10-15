@@ -393,6 +393,25 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
     }
   }
 
+  // Resilient fallback baseline so a product NEVER shows empty/blank price
+  if (currentPrice === undefined) {
+    const BASELINE_PRICES_BY_LENGTH: Record<string, number> = {
+      '16 Inches': 74,
+      '18 Inches': 89,
+      '20 Inches': 100,
+      '22 Inches': 110,
+      '24 Inches': 127,
+      '26 Inches': 130,
+      '28 Inches': 147,
+      '30 Inches': 164
+    };
+    const isBlonde = currentColorCategory === 'Blondes & Ash' || color.toLowerCase().includes('blonde');
+    const baseLenPrice = BASELINE_PRICES_BY_LENGTH[length] || 74;
+    const colorMult = isBlonde ? 1.2 : 1.0;
+    const weightMult = mults[weight] || 1.0;
+    currentPrice = Math.round(baseLenPrice * colorMult * weightMult);
+  }
+
   const formattedPriceWithUnit = currentPrice !== undefined ? formatPrice(currentPrice, unit) : '';
 
   const [isJustAdded, setIsJustAdded] = useState(false);
