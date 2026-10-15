@@ -676,3 +676,55 @@ button {
     gap: 20px;
   }
 }
+
+/* Floating Action Buttons - Universal */
+.global-enquiry-floating-wrapper {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9998;
+}
+
+.theme-switcher-floating-wrapper {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9998;
+  font-family: var(--font-sans);
+}
+
+@media (max-width: 768px) {
+  /* On mobile hero, keep the enquiry button hidden so it never blocks the card or dock, then smoothly reveal on scroll */
+  .global-enquiry-floating-wrapper {
+    bottom: 20px;
+    right: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  .global-enquiry-floating-wrapper.scrolled {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .global-enquiry-floating-btn {
+    padding: 8px 14px !important;
+    font-size: 0.78rem !important;
+    gap: 6px !important;
+  }
+
+  /* Move theme switcher to top-left below the header on mobile so it never overlaps ClipOn */
+  .theme-switcher-floating-wrapper {
+    top: 78px !important;
+    bottom: auto !important;
+    left: 14px !important;
+  }
+
+  .theme-switcher-trigger-btn {
+    width: 36px !important;
+    height: 36px !important;
+  }
+}

@@ -1,12 +1,77 @@
 "use client";
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import TestimonialsSection from '../components/TestimonialsSection';
 
+const heroProducts = [
+  { 
+    name: "ClipOn", 
+    fullName: "ClipOn Extensions",
+    tagline: "Instant Length & Volume",
+    badge: "✨ 100% Temple",
+    price: "CA$ 76",
+    slideIdx: 1, 
+    link: "/seamless-clipon-extensions", 
+    thumb: "/images/products/clipon.webp",
+    image: "/images/products/clipon.webp",
+    objectPosition: "center 22%"
+  },
+  { 
+    name: "Genius Wefts", 
+    fullName: "Genius Wefts",
+    tagline: "Ultra-Flat Seamless Lay",
+    badge: "✨ Bestseller",
+    price: "CA$ 84",
+    slideIdx: 2, 
+    link: "/genius-wefts", 
+    thumb: "/images/products/geniusweft.jpg",
+    image: "/images/products/geniusweft.jpg",
+    objectPosition: "center 42%"
+  },
+  { 
+    name: "Tape Extensions", 
+    fullName: "Tape Extensions",
+    tagline: "Discreet & Featherlight",
+    badge: "✨ Invisible",
+    price: "CA$ 54",
+    slideIdx: 3, 
+    link: "/tape-extensions", 
+    thumb: "/images/products/tapeextensions.webp",
+    image: "/images/products/tapeextensions.webp",
+    objectPosition: "center center"
+  },
+  { 
+    name: "K Tips", 
+    fullName: "K Tips Extensions",
+    tagline: "Individual 360° Movement",
+    badge: "✨ Italian Keratin",
+    price: "CA$ 74",
+    slideIdx: 4, 
+    link: "/k-tips", 
+    thumb: "/images/products/KTip2.png",
+    image: "/images/products/KTip2.png",
+    objectPosition: "center center"
+  },
+  { 
+    name: "Butterfly Wefts", 
+    fullName: "Butterfly Wefts",
+    tagline: "Max Volume & Comfort",
+    badge: "✨ Innovation",
+    price: "CA$ 76",
+    slideIdx: 5, 
+    link: "/butterfly-wefts", 
+    thumb: "/images/products/butterflyweft.jpg",
+    image: "/images/products/butterflyweft.jpg",
+    objectPosition: "58% 36%"
+  }
+];
+
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const activeProduct = heroProducts.find(p => p.slideIdx === currentSlide) || heroProducts[0];
   const heroSlides = [
     { 
       img: "/images/hero_general_1.jpg", 
@@ -17,6 +82,8 @@ export default function Home() {
       link: null,
       buttonText: null,
       titleNowrap: false,
+      productImg: "/images/products/geniusweft.jpg",
+      badge: "✨ 100% TEMPLE",
       thumbs: null
     },
     { 
@@ -28,6 +95,8 @@ export default function Home() {
       link: "/seamless-clipon-extensions",
       buttonText: "View Product",
       titleNowrap: true,
+      productImg: "/images/products/clipon.webp",
+      badge: "✨ 100% TEMPLE",
       thumbs: ["/images/products/clipon.webp", "/images/products/clipon2.jpeg", "/images/products/clipon3.jpeg"]
     },
     { 
@@ -39,6 +108,8 @@ export default function Home() {
       link: "/genius-wefts",
       buttonText: "View Product",
       titleNowrap: true,
+      productImg: "/images/products/geniusweft.jpg",
+      badge: "✨ BESTSELLER",
       thumbs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"]
     },
     { 
@@ -50,6 +121,8 @@ export default function Home() {
       link: "/tape-extensions",
       buttonText: "View Product",
       titleNowrap: true,
+      productImg: "/images/products/tapeextensions.webp",
+      badge: "✨ INVISIBLE",
       thumbs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"]
     },
     { 
@@ -61,6 +134,8 @@ export default function Home() {
       link: "/k-tips",
       buttonText: "View Product",
       titleNowrap: true,
+      productImg: "/images/products/KTip2.png",
+      badge: "✨ ITALIAN KERATIN",
       thumbs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"]
     },
     { 
@@ -72,6 +147,8 @@ export default function Home() {
       link: "/butterfly-wefts",
       buttonText: "View Product",
       titleNowrap: true,
+      productImg: "/images/products/butterflyweft.jpg",
+      badge: "✨ INNOVATION",
       thumbs: ["/images/products/butterflyweft.jpg", "/images/products/butterflyweft2.jpg", "/images/products/butterflyweft3.webp"]
     },
     { 
@@ -83,16 +160,53 @@ export default function Home() {
       link: null,
       buttonText: null,
       titleNowrap: false,
+      productImg: "/images/products/clipon.webp",
+      badge: "✨ REMY LUXURY",
       thumbs: null
     }
   ];
 
+  const dockRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
+    if (isCategoryDrawerOpen) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [isCategoryDrawerOpen]);
+
+  useEffect(() => {
+    if (dockRef.current) {
+      const activeItem = dockRef.current.querySelector('.hero-dock-item.active') as HTMLElement;
+      if (activeItem) {
+        activeItem.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }, [currentSlide]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsCategoryDrawerOpen(false);
+    };
+    if (isCategoryDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isCategoryDrawerOpen]);
+
+  const currentProductImg = heroSlides[currentSlide]?.productImg || activeProduct.image;
+  const currentProductBadge = heroSlides[currentSlide]?.badge || activeProduct.badge;
 
   return (
     <>
@@ -105,6 +219,14 @@ export default function Home() {
           overflow: hidden;
           color: white;
           background: #111;
+        }
+
+        .hero-content-body {
+          display: block;
+        }
+
+        .hero-card-product-img-wrap {
+          display: none;
         }
         
         .hero-bg {
@@ -306,6 +428,8 @@ export default function Home() {
         }
 
         .hero-dock-item {
+          position: relative;
+          z-index: 1;
           display: inline-flex;
           align-items: center;
           gap: 8px;
@@ -322,7 +446,9 @@ export default function Home() {
           white-space: nowrap;
         }
 
-        .hero-dock-item:hover {
+        .hero-dock-item:hover,
+        .hero-dock-item:focus-visible {
+          z-index: 60;
           background: rgba(255, 255, 255, 0.12);
           color: #ffffff;
           border-color: rgba(255, 255, 255, 0.2);
@@ -333,6 +459,262 @@ export default function Home() {
           color: #ffffff;
           border-color: var(--color-accent-gold, #C5943A);
           box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Luxury Hover Balloon Popover */
+        .dock-balloon {
+          position: absolute;
+          bottom: calc(100% + 16px);
+          left: 50%;
+          transform: translateX(-50%) translateY(10px) scale(0.9);
+          transform-origin: bottom center;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+          z-index: 80;
+          transition: opacity 0.26s cubic-bezier(0.16, 1, 0.3, 1),
+                      transform 0.32s cubic-bezier(0.34, 1.45, 0.64, 1),
+                      visibility 0.26s ease;
+          background: linear-gradient(168deg, rgba(28, 28, 34, 0.97) 0%, rgba(14, 14, 18, 0.98) 100%);
+          backdrop-filter: blur(28px);
+          -webkit-backdrop-filter: blur(28px);
+          border: 1px solid rgba(212, 175, 55, 0.42);
+          border-radius: 18px;
+          padding: 9px 9px 11px 9px;
+          box-shadow: 0 24px 50px -10px rgba(0, 0, 0, 0.85),
+                      0 0 28px rgba(212, 175, 55, 0.22),
+                      inset 0 1px 0 rgba(255, 255, 255, 0.25);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 200px;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .hero-dock-item:hover .dock-balloon,
+          .hero-dock-item:focus-visible .dock-balloon {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+          }
+        }
+
+        /* Balloon downward arrow pointer */
+        .dock-balloon::before {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 10px 9px 0 9px;
+          border-style: solid;
+          border-color: rgba(212, 175, 55, 0.55) transparent transparent transparent;
+        }
+
+        .dock-balloon::after {
+          content: '';
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%);
+          border-width: 9px 8px 0 8px;
+          border-style: solid;
+          border-color: #141418 transparent transparent transparent;
+        }
+
+        /* First item alignment to avoid left screen edge clipping */
+        .hero-dock-item:first-child .dock-balloon {
+          left: 0;
+          transform: translateX(0) translateY(10px) scale(0.9);
+        }
+        @media (hover: hover) and (pointer: fine) {
+          .hero-dock-item:first-child:hover .dock-balloon,
+          .hero-dock-item:first-child:focus-visible .dock-balloon {
+            transform: translateX(0) translateY(0) scale(1);
+          }
+        }
+        .hero-dock-item:first-child .dock-balloon::before,
+        .hero-dock-item:first-child .dock-balloon::after {
+          left: 28px;
+          transform: none;
+        }
+
+        /* Last item alignment to avoid right screen edge clipping */
+        .hero-dock-item:last-child .dock-balloon {
+          left: auto;
+          right: 0;
+          transform: translateX(0) translateY(10px) scale(0.9);
+        }
+        @media (hover: hover) and (pointer: fine) {
+          .hero-dock-item:last-child:hover .dock-balloon,
+          .hero-dock-item:last-child:focus-visible .dock-balloon {
+            transform: translateX(0) translateY(0) scale(1);
+          }
+        }
+        .hero-dock-item:last-child .dock-balloon::before,
+        .hero-dock-item:last-child .dock-balloon::after {
+          left: auto;
+          right: 30px;
+          transform: none;
+        }
+
+        /* Frame inside the balloon */
+        .dock-balloon-frame {
+          width: 182px;
+          height: 160px;
+          border-radius: 14px;
+          overflow: hidden;
+          background: #fbf9f6;
+          position: relative;
+          border: 1px solid rgba(255, 255, 255, 0.45);
+          box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.35);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        /* Diagonal light shimmer sweep on hover */
+        .dock-balloon-frame::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -120%;
+          width: 70%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+          transform: skewX(-20deg);
+          transition: left 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+          pointer-events: none;
+          z-index: 2;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .hero-dock-item:hover .dock-balloon-frame::after {
+            left: 170%;
+          }
+        }
+
+        .dock-balloon-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          display: block;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .hero-dock-item:hover .dock-balloon-img {
+            transform: scale(1.08);
+          }
+        }
+
+        /* Floating luxury chip over the frame */
+        .dock-balloon-badge {
+          position: absolute;
+          top: 8px;
+          left: 8px;
+          z-index: 3;
+          background: rgba(14, 14, 18, 0.8);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(212, 175, 55, 0.55);
+          border-radius: 20px;
+          padding: 3px 8px;
+          font-size: 0.62rem;
+          font-weight: 700;
+          letter-spacing: 0.6px;
+          color: var(--color-accent-gold, #C5943A);
+          text-transform: uppercase;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+        }
+
+        .dock-balloon-caption {
+          margin-top: 8px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 2px;
+          width: 100%;
+          padding: 0 4px;
+        }
+
+        .dock-balloon-title {
+          font-size: 0.88rem;
+          font-weight: 600;
+          color: #ffffff;
+          letter-spacing: 0.3px;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .dock-balloon-tagline {
+          font-size: 0.67rem;
+          color: rgba(255, 255, 255, 0.65);
+          line-height: 1.2;
+          white-space: nowrap;
+          font-weight: 400;
+        }
+
+        .dock-balloon-footer {
+          margin-top: 7px;
+          padding-top: 7px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding-left: 2px;
+          padding-right: 2px;
+        }
+
+        .dock-balloon-price {
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 0.68rem;
+        }
+
+        .dock-balloon-price strong {
+          color: var(--color-accent-gold, #C5943A);
+          font-weight: 700;
+          font-size: 0.8rem;
+          margin-left: 2px;
+        }
+
+        .dock-balloon-cta {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          color: #ffffff;
+          font-size: 0.66rem;
+          font-weight: 600;
+          letter-spacing: 0.3px;
+          background: rgba(255, 255, 255, 0.1);
+          padding: 3px 8px;
+          border-radius: 12px;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          transition: all 0.22s ease;
+        }
+
+        .dock-balloon-arrow {
+          transition: transform 0.22s ease;
+          display: inline-block;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .hero-dock-item:hover .dock-balloon-cta {
+            background: rgba(212, 175, 55, 0.22);
+            border-color: rgba(212, 175, 55, 0.5);
+            color: #ffd88a;
+          }
+          .hero-dock-item:hover .dock-balloon-arrow {
+            transform: translateX(2px);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .dock-balloon {
+            display: none !important;
+          }
         }
 
         .dock-thumb {
@@ -360,115 +742,491 @@ export default function Home() {
           margin-left: 2px;
         }
 
-        @media (max-width: 992px) {
-          .hero-dock-wrapper {
-            bottom: 14px;
-            width: calc(100% - 24px);
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            justify-content: flex-start;
-          }
-          .hero-dock-wrapper::-webkit-scrollbar {
-            display: none;
-          }
-          .hero-dock {
-            width: max-content;
-            padding: 4px 6px;
-            gap: 4px;
-          }
-          .hero-dock-item {
-            padding: 6px 11px;
-            font-size: 0.76rem;
-            gap: 6px;
-          }
-          .dock-thumb {
-            width: 18px;
-            height: 18px;
-          }
+        /* Mobile Category Bar (Hidden on desktop by default) */
+        .mobile-category-bar-wrapper {
+          display: none;
+        }
+
+        /* Slide-up Visual Drawer / Sheet Base Styles */
+        .category-drawer-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(4, 4, 8, 0.72);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          z-index: 9998;
+        }
+
+        .category-drawer-sheet {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          max-height: 88vh;
+          background: linear-gradient(180deg, #1c1c24 0%, #101015 100%);
+          border-radius: 28px 28px 0 0;
+          border-top: 1px solid rgba(212, 175, 55, 0.45);
+          box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+          z-index: 9999;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          padding-bottom: max(18px, env(safe-area-inset-bottom));
+        }
+
+        .drawer-handle-bar {
+          width: 44px;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.28);
+          border-radius: 3px;
+          margin: 10px auto 4px auto;
+          cursor: pointer;
+        }
+
+        .drawer-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 20px 14px 20px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .drawer-eyebrow {
+          font-size: 0.65rem;
+          color: var(--color-accent-gold, #C5943A);
+          letter-spacing: 1.2px;
+          font-weight: 700;
+          display: block;
+          margin-bottom: 2px;
+          text-transform: uppercase;
+        }
+
+        .drawer-title {
+          font-size: 1.24rem;
+          font-family: var(--font-serif);
+          color: #ffffff;
+          margin: 0;
+          font-weight: 500;
+          letter-spacing: -0.3px;
+        }
+
+        .drawer-close-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          color: #ffffff;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .drawer-close-btn:active {
+          transform: scale(0.92);
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        .drawer-body {
+          padding: 14px 18px;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          overflow-y: auto;
+          max-height: calc(88vh - 190px);
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+        }
+
+        .drawer-product-card {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 14px;
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.09);
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          text-align: left;
+          width: 100%;
+          color: inherit;
+        }
+
+        .drawer-product-card:active {
+          transform: scale(0.98);
+        }
+
+        .drawer-product-card.active {
+          background: rgba(212, 175, 55, 0.14);
+          border-color: rgba(212, 175, 55, 0.7);
+          box-shadow: 0 4px 22px rgba(197, 148, 58, 0.22);
+        }
+
+        .drawer-card-img-wrap {
+          width: 58px;
+          height: 58px;
+          border-radius: 12px;
+          overflow: hidden;
+          position: relative;
+          flex-shrink: 0;
+          background: #202026;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .drawer-card-img-wrap img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        .drawer-card-details {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .drawer-card-header-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 8px;
+        }
+
+        .drawer-card-badge {
+          font-size: 0.62rem;
+          color: var(--color-accent-gold, #C5943A);
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
+
+        .drawer-card-price {
+          font-size: 0.72rem;
+          color: rgba(255, 255, 255, 0.72);
+          font-weight: 500;
+        }
+
+        .drawer-card-title {
+          font-size: 0.94rem;
+          font-weight: 600;
+          color: #ffffff;
+          margin: 0;
+          line-height: 1.25;
+        }
+
+        .drawer-card-tagline {
+          font-size: 0.75rem;
+          color: rgba(255, 255, 255, 0.64);
+          margin: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .drawer-card-action {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          padding-left: 6px;
+        }
+
+        .drawer-active-pill {
+          font-size: 0.68rem;
+          font-weight: 700;
+          color: #111;
+          background: var(--color-accent-gold, #C5943A);
+          padding: 4px 9px;
+          border-radius: 12px;
+          letter-spacing: 0.4px;
+        }
+
+        .drawer-select-arrow {
+          color: rgba(255, 255, 255, 0.45);
+          font-size: 1.15rem;
+          font-weight: 600;
+        }
+
+        .drawer-footer {
+          padding: 10px 18px 6px 18px;
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          display: flex;
+        }
+
+        .drawer-cta-btn {
+          width: 100%;
+          text-align: center;
+          justify-content: center;
+          padding: 11px 18px;
+          font-size: 0.86rem;
+          border-radius: 22px;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          box-shadow: 0 4px 18px rgba(197, 148, 58, 0.35);
         }
 
         @media (max-width: 992px) {
           .hero-section {
             height: calc(100vh - 70px);
-            min-height: 540px;
+            min-height: 560px;
             margin-top: 70px;
           }
+
           .hero-bg {
-            object-position: center 6% !important;
+            object-position: center 16% !important;
           }
+
           .hero-content {
             left: 14px !important;
             right: 14px !important;
             margin: 0 auto !important;
             max-width: min(440px, calc(100% - 28px)) !important;
             top: auto !important;
-            bottom: 110px !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            padding: 8px 12px 8px 10px !important;
-            gap: 10px !important;
+            bottom: 74px !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            padding: 12px 14px !important;
+            gap: 6px !important;
             border-radius: 18px !important;
-            min-height: 52px !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35) !important;
+            min-height: auto !important;
+            background: rgba(14, 14, 16, 0.78) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.16) !important;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+            z-index: 10 !important;
           }
-          .hero-thumb-wrapper {
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
+
+          .hero-eyebrow {
+            font-size: 0.62rem !important;
+            letter-spacing: 0.8px !important;
+            margin-bottom: 2px !important;
           }
-          .hero-slider-thumb {
-            width: 38px !important;
-            height: 38px !important;
-          }
-          .hero-text-content {
+
+          .hero-content-body {
             display: flex !important;
             flex-direction: row !important;
             align-items: center !important;
-            justify-content: space-between !important;
-            gap: 10px !important;
+            gap: 12px !important;
+            width: 100% !important;
+          }
+
+          .hero-card-product-img-wrap {
+            display: flex !important;
+            flex-direction: column !important;
+            width: 78px !important;
+            height: 78px !important;
+            flex-shrink: 0 !important;
+            border-radius: 14px !important;
+            overflow: hidden !important;
+            border: 1.5px solid rgba(212, 175, 55, 0.55) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 14px rgba(197, 148, 58, 0.28) !important;
+            background: #18181e !important;
+            position: relative !important;
+          }
+
+          .hero-card-product-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+          }
+
+          .hero-card-img-badge {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: rgba(14, 14, 18, 0.9) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            font-size: 0.48rem !important;
+            color: #ffd88a !important;
+            text-align: center !important;
+            padding: 2px 2px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.3px !important;
+            border-top: 1px solid rgba(212, 175, 55, 0.4) !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+          }
+
+          .hero-text-content {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 4px !important;
             flex: 1 !important;
             min-width: 0 !important;
             text-align: left !important;
           }
-          .hero-title-group {
-            flex: 1;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-          }
+
           .hero-title { 
-            font-size: 0.98rem !important; 
-            margin-bottom: 1px !important; 
-            line-height: 1.15 !important;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            font-size: clamp(0.96rem, 3.8vw, 1.22rem) !important; 
+            margin-bottom: 2px !important; 
+            line-height: 1.22 !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
             font-weight: 600 !important;
+            color: #ffffff !important;
           }
+
           .hero-subtitle { 
-            font-size: 0.72rem !important; 
-            margin-bottom: 0 !important; 
-            line-height: 1.25 !important;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            opacity: 0.82;
+            font-size: 0.74rem !important; 
+            margin-bottom: 4px !important; 
+            line-height: 1.38 !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            opacity: 0.88 !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            overflow: hidden !important;
           }
+
           .hero-cta-btn {
             flex-shrink: 0 !important;
-            padding: 6px 14px !important;
-            font-size: 0.74rem !important;
+            padding: 7px 16px !important;
+            font-size: 0.78rem !important;
             letter-spacing: 0.4px !important;
             border-radius: 20px !important;
             white-space: nowrap !important;
-            height: 32px !important;
+            height: auto !important;
+            display: inline-flex !important;
+            align-self: flex-start !important;
           }
-          .hero-product-cards-wrapper {
-            bottom: 12px !important;
+
+          /* Hide desktop horizontal dock on mobile */
+          .desktop-only-dock {
+            display: none !important;
           }
+
+          /* Show mobile category bar contained in frame */
+          .mobile-category-bar-wrapper {
+            display: flex !important;
+            position: absolute !important;
+            bottom: 14px !important;
+            left: 14px !important;
+            right: 14px !important;
+            margin: 0 auto !important;
+            max-width: min(440px, calc(100% - 28px)) !important;
+            z-index: 25 !important;
+            box-sizing: border-box !important;
+          }
+
+          .mobile-category-bar {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: rgba(14, 14, 18, 0.9);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 35px;
+            padding: 6px 8px 6px 10px;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            outline: none;
+            color: inherit;
+            transition: transform 0.18s ease, border-color 0.2s ease, background 0.2s ease;
+          }
+
+          .mobile-category-bar:active {
+            transform: scale(0.98);
+            border-color: rgba(212, 175, 55, 0.55);
+          }
+
+          .mobile-bar-product-info {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            flex: 1;
+            text-align: left;
+          }
+
+          .mobile-bar-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1.5px solid var(--color-accent-gold, #C5943A);
+            box-shadow: 0 0 10px rgba(197, 148, 58, 0.35);
+            flex-shrink: 0;
+            background: #222;
+          }
+
+          .mobile-bar-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          .mobile-bar-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            min-width: 0;
+          }
+
+          .mobile-bar-badge {
+            font-size: 0.62rem;
+            color: var(--color-accent-gold, #C5943A);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.1;
+          }
+
+          .mobile-bar-name {
+            font-size: 0.85rem;
+            color: #ffffff;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+          }
+
+          .mobile-bar-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(197, 148, 58, 0.42) 100%);
+            border: 1px solid rgba(212, 175, 55, 0.65);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.74rem;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+          }
+
+          .mobile-bar-chevron {
+            stroke: #ffd88a;
+            transition: transform 0.2s ease;
+          }
+
+          .dock-balloon {
+            display: none !important;
+          }
+
           .section-title { font-size: clamp(1.75rem, 5vw, 2.2rem) !important; }
         }
 
@@ -511,30 +1269,39 @@ export default function Home() {
               <span>✨</span>
               <span>100% TEMPLE REMY HAIR • DIRECT FACTORY FLOOR</span>
             </div>
-            <div className="hero-text-content">
-              <h1 className="hero-title">
-                {heroSlides[currentSlide].title}
-              </h1>
-              <p className="hero-subtitle">{heroSlides[currentSlide].subtitle}</p>
-              {heroSlides[currentSlide].buttonText && heroSlides[currentSlide].link && (
-                <a href={heroSlides[currentSlide].link} className="btn-gold hero-cta-btn">
-                  {heroSlides[currentSlide].buttonText} →
-                </a>
-              )}
+            
+            <div className="hero-content-body">
+              {/* Product Image Frame (Displayed on Mobile) */}
+              <div className="hero-card-product-img-wrap">
+                <img 
+                  src={currentProductImg} 
+                  alt={heroSlides[currentSlide].title} 
+                  className="hero-card-product-img"
+                />
+                <span className="hero-card-img-badge">
+                  {currentProductBadge}
+                </span>
+              </div>
+
+              <div className="hero-text-content">
+                <h1 className="hero-title">
+                  {heroSlides[currentSlide].title}
+                </h1>
+                <p className="hero-subtitle">{heroSlides[currentSlide].subtitle}</p>
+                {heroSlides[currentSlide].buttonText && heroSlides[currentSlide].link && (
+                  <a href={heroSlides[currentSlide].link} className="btn-gold hero-cta-btn">
+                    {heroSlides[currentSlide].buttonText} →
+                  </a>
+                )}
+              </div>
             </div>
           </motion.div>
         </AnimatePresence>
         
-        {/* Sleek Minimalist Luxury Category Dock */}
-        <div className="hero-dock-wrapper">
-          <nav className="hero-dock" aria-label="Hero Product Categories">
-            {[
-              { name: "ClipOn", slideIdx: 1, link: "/seamless-clipon-extensions", thumb: "/images/products/clipon.webp" },
-              { name: "Genius Wefts", slideIdx: 2, link: "/genius-wefts", thumb: "/images/products/geniusweft.jpg" },
-              { name: "Tape Extensions", slideIdx: 3, link: "/tape-extensions", thumb: "/images/products/tapeextensions.webp" },
-              { name: "K Tips", slideIdx: 4, link: "/k-tips", thumb: "/images/products/KTip2.png" },
-              { name: "Butterfly Wefts", slideIdx: 5, link: "/butterfly-wefts", thumb: "/images/products/butterflyweft.jpg" }
-            ].map(prod => {
+        {/* Sleek Luxury Category Dock (Desktop > 992px) */}
+        <div className="hero-dock-wrapper desktop-only-dock">
+          <nav ref={dockRef} className="hero-dock" aria-label="Hero Product Categories">
+            {heroProducts.map((prod) => {
               const isActive = currentSlide === prod.slideIdx;
               return (
                 <button
@@ -543,6 +1310,30 @@ export default function Home() {
                   className={`hero-dock-item ${isActive ? 'active' : ''}`}
                   title={`View ${prod.name}`}
                 >
+                  {/* Luxury Balloon Popover with Bigger Product Image Frame */}
+                  <div className="dock-balloon" aria-hidden="true">
+                    <div className="dock-balloon-frame">
+                      <span className="dock-balloon-badge">{prod.badge}</span>
+                      <img 
+                        src={prod.image} 
+                        alt={prod.fullName} 
+                        className="dock-balloon-img"
+                        style={{ objectPosition: prod.objectPosition }}
+                      />
+                    </div>
+                    <div className="dock-balloon-caption">
+                      <span className="dock-balloon-title">{prod.fullName}</span>
+                      <span className="dock-balloon-tagline">{prod.tagline}</span>
+                    </div>
+                    <div className="dock-balloon-footer">
+                      <span className="dock-balloon-price">from <strong>{prod.price}</strong></span>
+                      <span className="dock-balloon-cta">
+                        <span>Quick View</span>
+                        <span className="dock-balloon-arrow">→</span>
+                      </span>
+                    </div>
+                  </div>
+
                   <span className="dock-thumb">
                     <img src={prod.thumb} alt={prod.name} />
                   </span>
@@ -553,6 +1344,125 @@ export default function Home() {
             })}
           </nav>
         </div>
+
+        {/* Mobile Compact Category Bar (<= 992px) - Contained in Frame */}
+        <div className="mobile-category-bar-wrapper">
+          <button 
+            type="button"
+            className="mobile-category-bar"
+            onClick={() => setIsCategoryDrawerOpen(true)}
+            aria-label="Open product categories drawer"
+            aria-expanded={isCategoryDrawerOpen}
+          >
+            <div className="mobile-bar-product-info">
+              <span className="mobile-bar-thumb">
+                <img src={activeProduct.thumb} alt={activeProduct.name} />
+              </span>
+              <div className="mobile-bar-text">
+                <span className="mobile-bar-badge">{activeProduct.badge}</span>
+                <span className="mobile-bar-name">{activeProduct.fullName}</span>
+              </div>
+            </div>
+            
+            <div className="mobile-bar-trigger">
+              <span>All Categories (5)</span>
+              <svg className="mobile-bar-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        {/* Mobile Slide-Up Visual Category Drawer / Sheet */}
+        <AnimatePresence>
+          {isCategoryDrawerOpen && (
+            <>
+              <motion.div 
+                className="category-drawer-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22 }}
+                onClick={() => setIsCategoryDrawerOpen(false)}
+              />
+              <motion.div 
+                className="category-drawer-sheet"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 28, stiffness: 320 }}
+              >
+                <div className="drawer-handle-bar" onClick={() => setIsCategoryDrawerOpen(false)} />
+                
+                <div className="drawer-header">
+                  <div>
+                    <span className="drawer-eyebrow">✨ 100% TEMPLE RAW INDIAN HAIR</span>
+                    <h2 className="drawer-title">Explore Categories</h2>
+                  </div>
+                  <button 
+                    type="button" 
+                    className="drawer-close-btn"
+                    onClick={() => setIsCategoryDrawerOpen(false)}
+                    aria-label="Close categories drawer"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="drawer-body">
+                  {heroProducts.map((prod) => {
+                    const isActive = currentSlide === prod.slideIdx;
+                    return (
+                      <div 
+                        key={prod.name}
+                        className={`drawer-product-card ${isActive ? 'active' : ''}`}
+                        onClick={() => {
+                          setCurrentSlide(prod.slideIdx);
+                          setIsCategoryDrawerOpen(false);
+                        }}
+                      >
+                        <div className="drawer-card-img-wrap">
+                          <img 
+                            src={prod.image} 
+                            alt={prod.fullName} 
+                            style={{ objectPosition: prod.objectPosition }}
+                          />
+                        </div>
+                        
+                        <div className="drawer-card-details">
+                          <div className="drawer-card-header-row">
+                            <span className="drawer-card-badge">{prod.badge}</span>
+                            <span className="drawer-card-price">from {prod.price}</span>
+                          </div>
+                          <h3 className="drawer-card-title">{prod.fullName}</h3>
+                          <p className="drawer-card-tagline">{prod.tagline}</p>
+                        </div>
+
+                        <div className="drawer-card-action">
+                          {isActive ? (
+                            <span className="drawer-active-pill">Active</span>
+                          ) : (
+                            <span className="drawer-select-arrow">→</span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="drawer-footer">
+                  <Link 
+                    href={activeProduct.link}
+                    className="btn-gold drawer-cta-btn"
+                    onClick={() => setIsCategoryDrawerOpen(false)}
+                  >
+                    View {activeProduct.name} Details →
+                  </Link>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </section>
 
       <section id="products-section" className="section" style={{ background: '#fcfcfc' }}>

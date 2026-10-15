@@ -199,18 +199,13 @@ export default function ThemeSwitcher() {
   return (
     <aside 
       aria-label="Theme Palette Selector"
-      style={{
-        position: 'fixed',
-        bottom: '24px',
-        left: '24px',
-        zIndex: 9998,
-        fontFamily: 'var(--font-sans)',
-      }}
+      className="theme-switcher-floating-wrapper"
     >
       {/* Collapsed Compact Circular Trigger */}
       {!isExpanded ? (
         <button
           onClick={() => setIsExpanded(true)}
+          className="theme-switcher-trigger-btn"
           title={`Active Palette: ${THEMES.find(t => t.id === activeTheme)?.name}. Click to switch.`}
           aria-label="Theme Palette Switcher"
           style={{

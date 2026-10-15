@@ -1,16 +1,27 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Sparkles } from 'lucide-react';
 import { useEnquiry } from '../context/EnquiryContext';
 
 export default function GlobalEnquiryFloatingButton() {
   const { totalCount, setIsOpen, sendGeneralEnquiry } = useEnquiry();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 200);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 9998 }}>
+    <div className={`global-enquiry-floating-wrapper ${isScrolled ? 'scrolled' : ''}`}>
       <motion.button
+        className="global-enquiry-floating-btn"
         onClick={() => {
           if (totalCount > 0) {
             setIsOpen(true);

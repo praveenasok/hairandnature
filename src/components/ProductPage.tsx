@@ -776,7 +776,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {availableLengths.map(len => {
+                {availableLengths.map((len: string) => {
                   const isSelected = len === length;
                   return (
                     <button 
@@ -810,7 +810,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 </span>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                {availableWeights.map(w => {
+                {availableWeights.map((w: string) => {
                   const isSelected = w === weight;
                   return (
                     <button 
