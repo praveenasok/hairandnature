@@ -396,8 +396,8 @@ export default function Navigation() {
                 cursor: 'pointer',
                 border: 'none',
                 boxShadow: totalCount > 0 
-                  ? '0 6px 20px rgba(228, 82, 88, 0.4)' 
-                  : '0 4px 14px rgba(228, 82, 88, 0.25)',
+                  ? '0 6px 20px var(--color-primary-glow, rgba(0, 0, 0, 0.3))' 
+                  : '0 4px 14px var(--color-primary-subtle, rgba(0, 0, 0, 0.15))',
                 position: 'relative'
               }}
               title={totalCount > 0 ? "Open Wholesale Enquiry Concierge" : "Send General Wholesale Enquiry"}
@@ -463,31 +463,31 @@ export default function Navigation() {
             className="mobile-nav-overlay"
           >
             <nav style={{ display: 'flex', flexDirection: 'column', padding: '24px 20px', minHeight: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid #f0e6dc' }}>
-                <span style={{ fontSize: '0.85rem', color: '#666', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Currency</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '16px', borderBottom: '1px solid var(--color-border)' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-light, #666)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>Currency</span>
                 <CurrencySelector />
               </div>
-              <Link href="/" style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc', color: '#1a1a1a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Home</Link>
+              <Link href="/" style={{ padding: '16px 0', borderBottom: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Home</Link>
               
-              <div style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc' }}>
-                <span style={{ color: '#1a1a1a', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '14px', fontSize: '0.9rem' }}>Our Products</span>
+              <div style={{ padding: '16px 0', borderBottom: '1px solid var(--color-border)' }}>
+                <span style={{ color: 'var(--color-text)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '14px', fontSize: '0.9rem' }}>Our Products</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {navProducts.map(product => (
                     <Link 
                       key={product.href} 
                       href={product.href} 
-                      style={{ color: '#2b231d', fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '14px', padding: '6px 0', textDecoration: 'none' }} 
+                      style={{ color: 'var(--color-text)', fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '14px', padding: '6px 0', textDecoration: 'none' }} 
                       onClick={() => setIsOpen(false)}
                     >
-                      <img src={product.imgs[0] || ""} alt={product.name} style={{ width: '46px', height: '46px', borderRadius: '50%', border: '1.5px solid #ebd9c8', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', objectFit: 'cover', background: '#f5f5f5' }} />
+                      <img src={product.imgs[0] || ""} alt={product.name} style={{ width: '46px', height: '46px', borderRadius: '50%', border: '1.5px solid var(--color-border)', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', objectFit: 'cover', background: '#f5f5f5' }} />
                       <span>{product.name}</span>
                     </Link>
                   ))}
                 </div>
               </div>
 
-              <Link href="/#about-section" style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc', color: '#1a1a1a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>About Us</Link>
-              <Link href="/#contact-section" style={{ padding: '16px 0', borderBottom: '1px solid #f0e6dc', color: '#1a1a1a', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Contact</Link>
+              <Link href="/#about-section" style={{ padding: '16px 0', borderBottom: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>About Us</Link>
+              <Link href="/#contact-section" style={{ padding: '16px 0', borderBottom: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', textDecoration: 'none' }} onClick={() => setIsOpen(false)}>Contact</Link>
               
               <div style={{ paddingTop: '24px', paddingBottom: '20px' }}>
                 <button 
