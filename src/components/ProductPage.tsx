@@ -960,9 +960,9 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               {/* Color Swatches Grid with In-Place Zoom on Selected Swatch */}
               <div style={{ 
                 display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(72px, 1fr))', 
+                gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))', 
                 gap: '10px', 
-                maxHeight: '260px', 
+                maxHeight: '280px', 
                 overflowY: 'auto', 
                 padding: '14px 12px',
                 border: '1px solid #e5e5e5',
@@ -984,18 +984,20 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: '4px',
-                        padding: '6px 2px',
+                        justifyContent: 'flex-start',
+                        gap: '6px',
+                        padding: '7px 4px 6px 4px',
+                        minHeight: '84px',
                         borderRadius: '10px',
                         border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
                         background: isSelected ? '#ffffff' : '#fff',
                         cursor: 'pointer',
                         position: 'relative',
                         zIndex: isSelected ? 20 : 1,
-                        transform: isSelected ? 'scale(1.24)' : 'scale(1)',
+                        transform: isSelected ? 'scale(1.15)' : 'scale(1)',
                         transformOrigin: 'center center',
                         boxShadow: isSelected 
-                          ? '0 12px 26px -2px var(--color-primary-glow, rgba(143, 35, 43, 0.42)), 0 0 0 2px var(--color-primary)' 
+                          ? '0 10px 22px -2px var(--color-primary-glow, rgba(143, 35, 43, 0.4)), 0 0 0 2px var(--color-primary)' 
                           : '0 1px 3px rgba(0,0,0,0.04)',
                         transition: 'transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease'
                       }}
@@ -1032,7 +1034,8 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         border: isSelected ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.08)', 
                         background: '#eee',
                         boxShadow: isSelected ? '0 0 0 1.5px var(--color-primary)' : 'none',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        flexShrink: 0
                       }}>
                         <img 
                           src={c.image} 
@@ -1047,17 +1050,21 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         />
                       </div>
 
-                      {/* Swatch Label */}
+                      {/* Swatch Label: Full Name Display without Truncation */}
                       <span style={{ 
-                        fontSize: isSelected ? '0.73rem' : '0.68rem', 
+                        fontSize: isSelected ? '0.71rem' : '0.67rem', 
                         fontWeight: isSelected ? 800 : 500, 
-                        color: isSelected ? 'var(--color-primary)' : '#444',
+                        color: isSelected ? 'var(--color-primary)' : '#334155',
                         textAlign: 'center',
-                        lineHeight: 1.2,
-                        maxWidth: '68px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
+                        lineHeight: 1.15,
+                        width: '100%',
+                        padding: '0 2px',
+                        whiteSpace: 'normal',
+                        wordBreak: 'normal',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: '26px',
                         transition: 'all 0.2s ease'
                       }}>
                         {c.name}
