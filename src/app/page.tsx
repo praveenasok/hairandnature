@@ -3,7 +3,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import MiniImageSlider from '../components/MiniImageSlider';
 import TestimonialsSection from '../components/TestimonialsSection';
 
 export default function Home() {
@@ -122,38 +121,50 @@ export default function Home() {
         .hero-content {
           position: absolute;
           z-index: 10;
-          padding: 24px 28px;
-          background: rgba(15, 15, 15, 0.52);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          padding: 22px 26px;
+          background: rgba(14, 14, 16, 0.52);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
           border: 1px solid rgba(255, 255, 255, 0.16);
-          border-radius: 24px;
-          box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
-          max-width: clamp(320px, 26vw, 420px);
-          top: clamp(24px, 5.5vh, 55px);
+          border-radius: 20px;
+          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+          max-width: clamp(320px, 28vw, 440px);
+          top: clamp(26px, 6vh, 60px);
+        }
+
+        .hero-eyebrow {
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          color: var(--color-accent-gold, #C5943A);
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
         }
 
         .hero-title {
-          font-size: clamp(1.8rem, 2.3vw, 2.3rem);
-          margin-bottom: 10px;
+          font-size: clamp(1.7rem, 2.2vw, 2.2rem);
+          margin-bottom: 8px;
           line-height: 1.15;
           font-weight: 500;
           letter-spacing: -0.5px;
         }
 
         .hero-subtitle {
-          font-size: clamp(0.85rem, 0.95vw, 0.95rem);
+          font-size: clamp(0.84rem, 0.92vw, 0.92rem);
           font-family: var(--font-sans);
-          opacity: 0.9;
-          margin-bottom: 20px;
+          opacity: 0.88;
+          margin-bottom: 18px;
           line-height: 1.5;
           font-weight: 300;
         }
 
         .hero-content .btn-gold {
-          padding: 10px 24px;
-          font-size: 0.85rem;
-          letter-spacing: 0.8px;
+          padding: 9px 20px;
+          font-size: 0.82rem;
+          letter-spacing: 0.6px;
         }
 
         .section-title {
@@ -267,165 +278,113 @@ export default function Home() {
           flex-grow: 1;
         }
 
-        .hero-product-cards-wrapper {
+        /* Sleek Luxury Hero Category Dock */
+        .hero-dock-wrapper {
           position: absolute;
-          bottom: 22px;
+          bottom: 24px;
           left: 50%;
           transform: translateX(-50%);
           z-index: 10;
-          width: calc(100% - 48px);
-          max-width: 1280px;
-          padding: 0 8px 8px 0;
-        }
-
-        .hero-product-cards {
-          display: grid;
-          grid-template-columns: repeat(5, 1fr);
-          gap: 16px;
-          width: 100%;
-        }
-
-        .mobile-clone {
-          display: none !important;
-        }
-
-        .hero-card-container {
-          position: relative;
-          text-decoration: none;
           display: flex;
-          flex-direction: column;
-          transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-          min-width: 0;
-        }
-
-        .hero-card-container:hover {
-          transform: translateY(-4px);
-        }
-
-        .hero-card {
-          flex-grow: 1;
-          background: rgba(18, 18, 18, 0.58);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255, 255, 255, 0.16);
-          border-radius: 16px;
-          padding: 10px 14px;
-          text-align: center;
-          color: white;
-          min-height: 68px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
           justify-content: center;
-          box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-          -webkit-mask-image: radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), transparent 25px, black 26px);
-          mask-image: radial-gradient(circle at calc(100% - 14px) calc(100% - 14px), transparent 25px, black 26px);
+          align-items: center;
+          max-width: min(92vw, 760px);
+          width: auto;
         }
 
-        .hero-card .eyebrow {
-          font-size: clamp(0.78rem, 0.9vw, 0.86rem);
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.6px;
-          opacity: 0.92;
-          margin-bottom: 3px;
-          line-height: 1.15;
+        .hero-dock {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: rgba(14, 14, 16, 0.68);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          border-radius: 40px;
+          padding: 5px 8px;
+          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-dock-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 7px 14px;
+          border-radius: 30px;
+          color: rgba(255, 255, 255, 0.78);
+          font-size: 0.82rem;
+          font-weight: 600;
+          letter-spacing: 0.3px;
+          background: transparent;
+          border: 1px solid transparent;
+          cursor: pointer;
+          transition: all 0.22s ease;
           white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
         }
 
-        .hero-card h3 {
-          font-size: clamp(1.14rem, 1.35vw, 1.32rem);
-          font-weight: 700;
-          margin: 0;
-          line-height: 1.2;
-          letter-spacing: -0.2px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
+        .hero-dock-item:hover {
+          background: rgba(255, 255, 255, 0.12);
+          color: #ffffff;
+          border-color: rgba(255, 255, 255, 0.2);
         }
 
-        .arrow-btn {
-          position: absolute;
-          bottom: -5px;
-          right: -5px;
-          width: 44px;
-          height: 44px;
+        .hero-dock-item.active {
+          background: rgba(255, 255, 255, 0.18);
+          color: #ffffff;
+          border-color: var(--color-accent-gold, #C5943A);
+          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        .dock-thumb {
+          width: 22px;
+          height: 22px;
           border-radius: 50%;
+          overflow: hidden;
+          flex-shrink: 0;
+          border: 1px solid rgba(255, 255, 255, 0.6);
           background: #fff;
           display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          border: 2.5px solid #e45258;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        }
-        
-        .hero-card-container:hover .arrow-btn {
-          transform: scale(1.12);
-          box-shadow: 0 6px 16px rgba(228, 82, 88, 0.55);
-          border-color: white;
         }
 
-        .arrow-icon {
+        .dock-thumb img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          border-radius: 50%;
         }
 
-        .hero-slider-thumb {
-          width: 90px;
-          height: 90px;
+        .dock-indicator {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: var(--color-accent-gold, #C5943A);
+          margin-left: 2px;
         }
 
         @media (max-width: 992px) {
-          .hero-product-cards-wrapper {
-            bottom: 18px;
-            width: 100%;
-            left: 0;
-            transform: none;
-            padding: 0 0 10px 0;
-            overflow: hidden;
-            -ms-overflow-style: none;
+          .hero-dock-wrapper {
+            bottom: 14px;
+            width: calc(100% - 24px);
+            overflow-x: auto;
             scrollbar-width: none;
+            -ms-overflow-style: none;
+            justify-content: flex-start;
           }
-          .hero-product-cards-wrapper::-webkit-scrollbar {
+          .hero-dock-wrapper::-webkit-scrollbar {
             display: none;
           }
-          .hero-product-cards {
-            display: flex;
-            grid-template-columns: none;
-            justify-content: flex-start;
+          .hero-dock {
             width: max-content;
-            gap: 12px;
-            animation: marquee 25s linear infinite;
-            padding: 0 16px 10px 16px;
+            padding: 4px 6px;
+            gap: 4px;
           }
-          .hero-card-container {
-            width: 185px;
-            flex-shrink: 0;
+          .hero-dock-item {
+            padding: 6px 11px;
+            font-size: 0.76rem;
+            gap: 6px;
           }
-          .hero-card {
-            min-height: 64px;
-            padding: 8px 12px;
-          }
-          .hero-card .eyebrow {
-            font-size: 0.74rem;
-          }
-          .hero-card h3 {
-            font-size: 1.05rem;
-          }
-          .mobile-clone {
-            display: flex !important;
-          }
-          @keyframes marquee {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-50% - 7px)); }
+          .dock-thumb {
+            width: 18px;
+            height: 18px;
           }
         }
 
@@ -546,73 +505,53 @@ export default function Home() {
               textAlign: heroSlides[currentSlide].textAlign, 
               left: heroSlides[currentSlide].align === 'flex-start' ? 'clamp(20px, 5vw, 60px)' : 'auto',
               right: heroSlides[currentSlide].align === 'flex-end' ? 'clamp(20px, 5vw, 60px)' : 'auto',
-              display: 'flex',
-              flexDirection: heroSlides[currentSlide].align === 'flex-start' ? 'row' : 'row-reverse',
-              alignItems: 'center',
-              gap: '24px'
             }}
           >
-            {heroSlides[currentSlide].thumbs && (
-              <div className="hero-thumb-wrapper" style={{ flexShrink: 0 }}>
-                <MiniImageSlider 
-                  images={heroSlides[currentSlide].thumbs!} 
-                  className="hero-slider-thumb"
-                  style={{ borderRadius: '50%', border: '2px solid rgba(255,255,255,0.35)', boxShadow: '0 8px 25px rgba(0,0,0,0.35)' }}
-                />
-              </div>
-            )}
+            <div className="hero-eyebrow">
+              <span>✨</span>
+              <span>100% TEMPLE REMY HAIR • DIRECT FACTORY FLOOR</span>
+            </div>
             <div className="hero-text-content">
-              <div className="hero-title-group">
-                <h1 className="hero-title">
-                  {heroSlides[currentSlide].title}
-                </h1>
-                <p className="hero-subtitle">{heroSlides[currentSlide].subtitle}</p>
-              </div>
+              <h1 className="hero-title">
+                {heroSlides[currentSlide].title}
+              </h1>
+              <p className="hero-subtitle">{heroSlides[currentSlide].subtitle}</p>
               {heroSlides[currentSlide].buttonText && heroSlides[currentSlide].link && (
-                <a href={heroSlides[currentSlide].link} className="btn-gold hero-cta-btn">{heroSlides[currentSlide].buttonText}</a>
+                <a href={heroSlides[currentSlide].link} className="btn-gold hero-cta-btn">
+                  {heroSlides[currentSlide].buttonText} →
+                </a>
               )}
             </div>
           </motion.div>
         </AnimatePresence>
         
-        <div className="hero-product-cards-wrapper">
-          <div className="hero-product-cards">
+        {/* Sleek Minimalist Luxury Category Dock */}
+        <div className="hero-dock-wrapper">
+          <nav className="hero-dock" aria-label="Hero Product Categories">
             {[
-              { title: "ClipOn Extensions", link: "/seamless-clipon-extensions", eyebrow: "Instantly Add Volume", iconImgs: ["/images/products/clipon.webp", "/images/products/clipon2.jpeg", "/images/products/clipon3.jpeg"] },
-              { title: "Genius Wefts", link: "/genius-wefts", eyebrow: "Ultra-Thin & Flexible", iconImgs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"] },
-              { title: "Tape Extensions", link: "/tape-extensions", eyebrow: "Lightweight & Discreet", iconImgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
-              { title: "K Tips", link: "/k-tips", eyebrow: "Premium Keratin", iconImgs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"] },
-              { title: "Butterfly Wefts", link: "/butterfly-wefts", eyebrow: "Maximum Volume", iconImgs: ["/images/products/butterflyweft.jpg", "/images/products/butterflyweft2.jpg", "/images/products/butterflyweft3.webp"] }
-            ].map(prod => (
-              <a href={prod.link} className="hero-card-container" key={prod.title}>
-                <div className="hero-card">
-                  <span className="eyebrow">{prod.eyebrow}</span>
-                  <h3>{prod.title}</h3>
-                </div>
-                <div className="arrow-btn">
-                  <MiniImageSlider images={prod.iconImgs} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
-                </div>
-              </a>
-            ))}
-            {/* Clone for seamless infinite scrolling */}
-            {[
-              { title: "ClipOn Extensions", link: "/seamless-clipon-extensions", eyebrow: "Instantly Add Volume", iconImgs: ["/images/products/clipon.webp", "/images/products/clipon2.jpeg", "/images/products/clipon3.jpeg"] },
-              { title: "Genius Wefts", link: "/genius-wefts", eyebrow: "Ultra-Thin & Flexible", iconImgs: ["/images/products/geniusweft.jpg", "/images/products/geniusweft2.webp", "/images/products/geniusweft3.jpeg", "/images/products/geniusweft4.webp"] },
-              { title: "Tape Extensions", link: "/tape-extensions", eyebrow: "Lightweight & Discreet", iconImgs: ["/images/products/tapeextensions.webp", "/images/products/tapeextensions2.webp"] },
-              { title: "K Tips", link: "/k-tips", eyebrow: "Premium Keratin", iconImgs: ["/images/products/KTip2.png", "/images/products/KTip.jpg"] },
-              { title: "Butterfly Wefts", link: "/butterfly-wefts", eyebrow: "Maximum Volume", iconImgs: ["/images/products/butterflyweft.jpg", "/images/products/butterflyweft2.jpg", "/images/products/butterflyweft3.webp"] }
-            ].map(prod => (
-              <a href={prod.link} className="hero-card-container mobile-clone" key={prod.title + "-clone"}>
-                <div className="hero-card">
-                  <span className="eyebrow">{prod.eyebrow}</span>
-                  <h3>{prod.title}</h3>
-                </div>
-                <div className="arrow-btn">
-                  <MiniImageSlider images={prod.iconImgs} style={{ width: '100%', height: '100%', borderRadius: '50%' }} />
-                </div>
-              </a>
-            ))}
-          </div>
+              { name: "ClipOn", slideIdx: 1, link: "/seamless-clipon-extensions", thumb: "/images/products/clipon.webp" },
+              { name: "Genius Wefts", slideIdx: 2, link: "/genius-wefts", thumb: "/images/products/geniusweft.jpg" },
+              { name: "Tape Extensions", slideIdx: 3, link: "/tape-extensions", thumb: "/images/products/tapeextensions.webp" },
+              { name: "K Tips", slideIdx: 4, link: "/k-tips", thumb: "/images/products/KTip2.png" },
+              { name: "Butterfly Wefts", slideIdx: 5, link: "/butterfly-wefts", thumb: "/images/products/butterflyweft.jpg" }
+            ].map(prod => {
+              const isActive = currentSlide === prod.slideIdx;
+              return (
+                <button
+                  key={prod.name}
+                  onClick={() => setCurrentSlide(prod.slideIdx)}
+                  className={`hero-dock-item ${isActive ? 'active' : ''}`}
+                  title={`View ${prod.name}`}
+                >
+                  <span className="dock-thumb">
+                    <img src={prod.thumb} alt={prod.name} />
+                  </span>
+                  <span>{prod.name}</span>
+                  {isActive && <span className="dock-indicator" />}
+                </button>
+              );
+            })}
+          </nav>
         </div>
       </section>
 

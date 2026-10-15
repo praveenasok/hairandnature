@@ -48,3 +48,12 @@ export const SPECTRUM_COLORS: HairColor[] = [
 ];
 
 export const COLOR_CATEGORIES = ['All', 'Blondes & Ash', 'Balayage & Rooted', 'Brunettes & Warm', 'Dark & Rich'] as const;
+
+export function getSpectrumColors(customNames?: Record<string, string>): HairColor[] {
+  if (!customNames || Object.keys(customNames).length === 0) return SPECTRUM_COLORS;
+  return SPECTRUM_COLORS.map(c => ({
+    ...c,
+    name: customNames[c.id] || customNames[c.name] || c.name
+  }));
+}
+

@@ -6,6 +6,7 @@ import { CurrencyProvider } from "../context/CurrencyContext";
 import { EnquiryProvider } from "../context/EnquiryContext";
 import GlobalEnquiryDrawer from "../components/GlobalEnquiryDrawer";
 import GlobalEnquiryFloatingButton from "../components/GlobalEnquiryFloatingButton";
+import ThemeSwitcher from "../components/ThemeSwitcher";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={quicksand.variable}>
+    <html lang="en" data-scroll-behavior="smooth" className={quicksand.variable}>
       <body>
         <CurrencyProvider>
           <EnquiryProvider>
@@ -78,6 +79,7 @@ export default function RootLayout({
           </footer>
             <GlobalEnquiryDrawer />
             <GlobalEnquiryFloatingButton />
+            <ThemeSwitcher />
           </EnquiryProvider>
         </CurrencyProvider>
       </body>

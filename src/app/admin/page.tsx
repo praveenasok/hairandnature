@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { SPECTRUM_COLORS, COLOR_CATEGORIES } from "@/data/colors";
+import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor, getSpectrumColors } from "@/data/colors";
 import { HAIR_STYLES, STYLE_NAMES } from "@/data/styles";
 import { Testimonial } from "@/app/api/testimonials/route";
+import { fuzzySearch } from "@/lib/fuzzySearch";
 
 
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
@@ -31,7 +32,8 @@ export default function AdminPage() {
   const [selectedLengths, setSelectedLengths] = useState<string[]>([LENGTHS[0]]);
   const [selectedWeights, setSelectedWeights] = useState<string[]>([WEIGHTS[1]]); // default 100g
   const [selectedStyles, setSelectedStyles] = useState<string[]>([STYLES[0]]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([CATEGORIES[0]]);
+  const [selectedPricingColors, setSelectedPricingColors] = useState<string[]>([]);
+  const [pricingColorFilter, setPricingColorFilter] = useState<string>("All");
   
   const [actionType, setActionType] = useState<"exact" | "percentage" | "delete">("exact");
   const [inputValue, setInputValue] = useState("");
@@ -51,10 +53,22 @@ export default function AdminPage() {
   const [optLengths, setOptLengths] = useState<string[]>([]);
   const [optWeights, setOptWeights] = useState<string[]>([]);
   const [optStyles, setOptStyles] = useState<string[]>([]);
+  const [optColors, setOptColors] = useState<string[]>([]);
+  const [adminColorTab, setAdminColorTab] = useState<string>("All");
+  const [adminColorSearch, setAdminColorSearch] = useState<string>("");
   const [savingMetadata, setSavingMetadata] = useState(false);
 
-  // Testimonials & Enquiries state
-  const [activeAdminTab, setActiveAdminTab] = useState<'products' | 'testimonials' | 'enquiries'>('products');
+  // Color Manager state
+  const [allColors, setAllColors] = useState<HairColor[]>(SPECTRUM_COLORS);
+  const [customColorNames, setCustomColorNames] = useState<Record<string, string>>({});
+  const [editingColorNames, setEditingColorNames] = useState<Record<string, string>>({});
+  const [savingColors, setSavingColors] = useState(false);
+  const [colorSavedMsg, setColorSavedMsg] = useState("");
+  const [colorManagerSearch, setColorManagerSearch] = useState("");
+  const [colorManagerTab, setColorManagerTab] = useState("All");
+
+  // Navigation tab state
+  const [activeAdminTab, setActiveAdminTab] = useState<'products' | 'colors' | 'testimonials' | 'enquiries'>('products');
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const [savingTestimonials, setSavingTestimonials] = useState(false);
@@ -91,8 +105,9 @@ export default function AdminPage() {
       fetch('/api/testimonials').then(res => res.json()).catch(() => ([])),
       fetch('/api/enquiries').then(res => res.json()).catch(() => ([])),
       fetch('/api/product-metadata').then(res => res.json()).catch(() => ({})),
-      fetch('/api/products').then(res => res.json()).catch(() => ([]))
-    ]).then(([priceData, unitData, descData, testimonialsData, enquiriesData, metadataData, productsData]) => {
+      fetch('/api/products').then(res => res.json()).catch(() => ([])),
+      fetch('/api/colors').then(res => res.json()).catch(() => ({ colors: SPECTRUM_COLORS, customNames: {} }))
+    ]).then(([priceData, unitData, descData, testimonialsData, enquiriesData, metadataData, productsData, colorsData]) => {
       const loadedProducts = Array.isArray(productsData) && productsData.length > 0 ? productsData : [];
       setProducts(loadedProducts);
       const defaultProduct = loadedProducts[0] || "";
@@ -111,9 +126,27 @@ export default function AdminPage() {
       const pMeta = metadataData?.[defaultProduct] || {};
       setModelImage(pMeta.modelImage || "");
       setProductImages((pMeta.productImages || []).join(", "));
-      setOptLengths(pMeta.availableLengths || []);
-      setOptWeights(pMeta.availableWeights || []);
-      setOptStyles(pMeta.availableStyles || []);
+      const initLengths = pMeta.availableLengths || [];
+      const initWeights = pMeta.availableWeights || [];
+      const initStyles = pMeta.availableStyles || [];
+      const initColors = pMeta.availableColors || [];
+      setOptLengths(initLengths);
+      setOptWeights(initWeights);
+      setOptStyles(initStyles);
+      setOptColors(initColors);
+
+      if (initLengths.length > 0) setSelectedLengths([initLengths[0]]);
+      if (initWeights.length > 0) setSelectedWeights([initWeights[0]]);
+      if (initStyles.length > 0) setSelectedStyles([initStyles[0]]);
+      if (initColors.length > 0) setSelectedPricingColors(initColors);
+
+      if (colorsData && Array.isArray(colorsData.colors) && colorsData.colors.length > 0) {
+        setAllColors(colorsData.colors);
+        if (colorsData.customNames) {
+          setCustomColorNames(colorsData.customNames);
+          setEditingColorNames(colorsData.customNames);
+        }
+      }
 
       if (Array.isArray(testimonialsData) && testimonialsData.length > 0) {
         setTestimonials(testimonialsData);
@@ -204,9 +237,28 @@ export default function AdminPage() {
     const pMeta = metadata[newProduct] || {};
     setModelImage(pMeta.modelImage || "");
     setProductImages((pMeta.productImages || []).join(", "));
-    setOptLengths(pMeta.availableLengths || []);
-    setOptWeights(pMeta.availableWeights || []);
-    setOptStyles(pMeta.availableStyles || []);
+    const pOptLengths = pMeta.availableLengths || [];
+    setOptLengths(pOptLengths);
+    const validLengths = pOptLengths.length > 0 ? pOptLengths : LENGTHS;
+    setSelectedLengths([validLengths[0]]);
+
+    const pOptWeights = pMeta.availableWeights || [];
+    setOptWeights(pOptWeights);
+    const validWeights = pOptWeights.length > 0 ? pOptWeights : WEIGHTS;
+    setSelectedWeights([validWeights[0]]);
+
+    const pOptStyles = pMeta.availableStyles || [];
+    setOptStyles(pOptStyles);
+    const validStyles = pOptStyles.length > 0 ? pOptStyles : STYLES;
+    setSelectedStyles([validStyles[0]]);
+
+    const pOptColors = pMeta.availableColors || [];
+    setOptColors(pOptColors);
+    if (pOptColors.length > 0) {
+      setSelectedPricingColors(pOptColors);
+    } else {
+      setSelectedPricingColors(allColors.map(c => c.name));
+    }
     setUnitSavedMsg("");
     setDescSavedMsg("");
     setMetadataSavedMsg("");
@@ -220,7 +272,8 @@ export default function AdminPage() {
       productImages: productImages.split(',').map(s => s.trim()).filter(Boolean),
       availableLengths: optLengths,
       availableWeights: optWeights,
-      availableStyles: optStyles
+      availableStyles: optStyles,
+      availableColors: optColors
     };
 
     try {
@@ -370,7 +423,7 @@ export default function AdminPage() {
       alert("Please enter a valid number.");
       return;
     }
-    if (selectedLengths.length === 0 || selectedWeights.length === 0 || selectedStyles.length === 0 || selectedColors.length === 0) {
+    if (selectedLengths.length === 0 || selectedWeights.length === 0 || selectedStyles.length === 0 || selectedPricingColors.length === 0) {
       alert("Please select at least one length, one weight, one style, and one color.");
       return;
     }
@@ -389,41 +442,62 @@ export default function AdminPage() {
     for (const len of selectedLengths) {
       for (const wt of selectedWeights) {
         for (const st of selectedStyles) {
-          // Find base price for Product + Length + Weight + Style across categories
+          // Find base price for Product + Length + Weight + Style across colors
           let basePrice: number | undefined = undefined;
-          for (const anyCategory of CATEGORIES) {
-            const checkKeyWithWeight = `${product}|${len}|${st}|${anyCategory}|${wt}`;
-            const checkKeyLegacy = `${product}|${len}|${st}|${anyCategory}`;
+          for (const col of productColors) {
+            const checkKeyWithWeight = `${product}|${len}|${st}|${col.name}|${wt}`;
+            const checkKey100g = `${product}|${len}|${st}|${col.name}|100 Grams`;
+            const checkKeyLegacy = `${product}|${len}|${st}|${col.name}`;
             if (updatedPrices[checkKeyWithWeight] !== undefined) {
               basePrice = updatedPrices[checkKeyWithWeight];
+              break;
+            } else if (updatedPrices[checkKey100g] !== undefined) {
+              basePrice = updatedPrices[checkKey100g];
               break;
             } else if (updatedPrices[checkKeyLegacy] !== undefined) {
               basePrice = updatedPrices[checkKeyLegacy];
               break;
             }
           }
+          if (basePrice === undefined) {
+            const prefix = `${product}|${len}|${st}|`;
+            for (const [k, p] of Object.entries(updatedPrices)) {
+              if (k.startsWith(prefix)) {
+                basePrice = p;
+                break;
+              }
+            }
+          }
 
-          for (const cat of selectedCategories) {
-            const key = `${product}|${len}|${st}|${cat}|${wt}`;
+          for (const colorName of selectedPricingColors) {
+            const colKey = `${product}|${len}|${st}|${colorName}|${wt}`;
+            const colObj = allColors.find(c => c.name === colorName);
+            const catKey = colObj ? `${product}|${len}|${st}|${colObj.category}|${wt}` : null;
             
             if (actionType === "exact") {
-              updatedPrices[key] = numValue;
+              updatedPrices[colKey] = numValue;
+              if (catKey && updatedPrices[catKey] === undefined) {
+                updatedPrices[catKey] = numValue;
+              }
               updatedCount++;
             } else if (actionType === "percentage") {
               if (basePrice !== undefined) {
                 const increaseAmount = basePrice * (numValue / 100);
-                updatedPrices[key] = Math.round((basePrice + increaseAmount) * 100) / 100;
+                const finalPrice = Math.round((basePrice + increaseAmount) * 100) / 100;
+                updatedPrices[colKey] = finalPrice;
+                if (catKey && updatedPrices[catKey] === undefined) {
+                  updatedPrices[catKey] = finalPrice;
+                }
                 updatedCount++;
               }
             } else if (actionType === "delete") {
-              if (updatedPrices[key] !== undefined) {
-                delete updatedPrices[key];
+              if (updatedPrices[colKey] !== undefined) {
+                delete updatedPrices[colKey];
                 updatedCount++;
               }
-              // Also clean up any legacy 4-part key matching this combination if weight is standard 100g
-              const legacyKey = `${product}|${len}|${st}|${cat}`;
-              if (wt === '100 Grams' && updatedPrices[legacyKey] !== undefined) {
-                delete updatedPrices[legacyKey];
+              const legacyColKey = `${product}|${len}|${st}|${colorName}`;
+              if (wt === '100 Grams' && updatedPrices[legacyColKey] !== undefined) {
+                delete updatedPrices[legacyColKey];
               }
             }
           }
@@ -535,7 +609,279 @@ export default function AdminPage() {
     }
   };
 
-  // Process data for rendering (searching and sorting)
+  // Color Manager Actions
+  const handleColorNameChange = (id: string, newName: string) => {
+    setEditingColorNames(prev => ({
+      ...prev,
+      [id]: newName
+    }));
+  };
+
+  const handleSaveSingleColor = async (id: string) => {
+    const rawVal = editingColorNames[id];
+    const defaultObj = SPECTRUM_COLORS.find(c => c.id === id);
+    const finalName = rawVal !== undefined ? rawVal.trim() : (defaultObj?.name || id);
+
+    setSavingColors(true);
+    try {
+      const res = await fetch('/api/colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name: finalName })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCustomColorNames(data.customNames || {});
+        setAllColors(data.colors || []);
+        const [refreshedPrices, refreshedMeta] = await Promise.all([
+          fetch('/api/prices').then(r => r.json()).catch(() => null),
+          fetch('/api/product-metadata').then(r => r.json()).catch(() => null)
+        ]);
+        if (refreshedPrices) setPrices(refreshedPrices);
+        if (refreshedMeta) setMetadata(refreshedMeta);
+
+        setColorSavedMsg(`Renamed shade to "${finalName}"! Prices and product options automatically synced.`);
+        setTimeout(() => setColorSavedMsg(""), 4000);
+      } else {
+        alert("Failed to save color name.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error saving color name.");
+    } finally {
+      setSavingColors(false);
+    }
+  };
+
+  const handleSaveAllColors = async () => {
+    setSavingColors(true);
+    try {
+      const res = await fetch('/api/colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customNames: editingColorNames })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCustomColorNames(data.customNames || {});
+        setAllColors(data.colors || []);
+        const [refreshedPrices, refreshedMeta] = await Promise.all([
+          fetch('/api/prices').then(r => r.json()).catch(() => null),
+          fetch('/api/product-metadata').then(r => r.json()).catch(() => null)
+        ]);
+        if (refreshedPrices) setPrices(refreshedPrices);
+        if (refreshedMeta) setMetadata(refreshedMeta);
+
+        setColorSavedMsg(`All custom shade names saved successfully! (${data.renamesCount || 0} renamed, ${data.priceMigratedCount || 0} price entries updated)`);
+        setTimeout(() => setColorSavedMsg(""), 5000);
+      } else {
+        alert("Failed to save color names.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error saving color names.");
+    } finally {
+      setSavingColors(false);
+    }
+  };
+
+  const handleResetSingleColor = async (id: string) => {
+    const defaultObj = SPECTRUM_COLORS.find(c => c.id === id);
+    if (!defaultObj) return;
+    const newNames = { ...editingColorNames };
+    delete newNames[id];
+    setEditingColorNames(newNames);
+
+    setSavingColors(true);
+    try {
+      const res = await fetch('/api/colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name: defaultObj.name })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCustomColorNames(data.customNames || {});
+        setAllColors(data.colors || []);
+        const [refreshedPrices, refreshedMeta] = await Promise.all([
+          fetch('/api/prices').then(r => r.json()).catch(() => null),
+          fetch('/api/product-metadata').then(r => r.json()).catch(() => null)
+        ]);
+        if (refreshedPrices) setPrices(refreshedPrices);
+        if (refreshedMeta) setMetadata(refreshedMeta);
+
+        setColorSavedMsg(`Reset "${defaultObj.name}" to factory default!`);
+        setTimeout(() => setColorSavedMsg(""), 4000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingColors(false);
+    }
+  };
+
+  const handleResetAllColors = async () => {
+    if (!confirm("Are you sure you want to reset ALL 39 hair shade names back to factory defaults?")) return;
+    setSavingColors(true);
+    try {
+      const res = await fetch('/api/colors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resetAll: true })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setCustomColorNames({});
+        setEditingColorNames({});
+        setAllColors(SPECTRUM_COLORS);
+        const [refreshedPrices, refreshedMeta] = await Promise.all([
+          fetch('/api/prices').then(r => r.json()).catch(() => null),
+          fetch('/api/product-metadata').then(r => r.json()).catch(() => null)
+        ]);
+        if (refreshedPrices) setPrices(refreshedPrices);
+        if (refreshedMeta) setMetadata(refreshedMeta);
+
+        setColorSavedMsg("All 39 shades reset to factory defaults!");
+        setTimeout(() => setColorSavedMsg(""), 4000);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSavingColors(false);
+    }
+  };
+
+  const productLengths = useMemo(() => {
+    if (optLengths && optLengths.length > 0) {
+      const standard = LENGTHS.filter(l => optLengths.includes(l));
+      const custom = optLengths.filter(l => !LENGTHS.includes(l));
+      const combined = [...standard, ...custom];
+      if (combined.length > 0) return combined;
+    }
+    return LENGTHS;
+  }, [optLengths]);
+
+  const productWeights = useMemo(() => {
+    if (optWeights && optWeights.length > 0) {
+      const standard = WEIGHTS.filter(w => optWeights.includes(w));
+      const custom = optWeights.filter(w => !WEIGHTS.includes(w));
+      const combined = [...standard, ...custom];
+      if (combined.length > 0) return combined;
+    }
+    return WEIGHTS;
+  }, [optWeights]);
+
+  const productStyles = useMemo(() => {
+    if (optStyles && optStyles.length > 0) {
+      const list = HAIR_STYLES.filter(s => optStyles.includes(s.name) || optStyles.includes(s.id));
+      if (list.length > 0) return list;
+      return optStyles.map(name => ({
+        id: name.toLowerCase().replace(/\s+/g, '_'),
+        name,
+        image: '/images/styles/natural_straight.jpg',
+        pattern: 'Texture',
+        description: '',
+        curlType: ''
+      }));
+    }
+    return HAIR_STYLES;
+  }, [optStyles]);
+
+  const productColors = useMemo(() => {
+    if (optColors && optColors.length > 0) {
+      const list = allColors.filter(c => optColors.includes(c.name) || optColors.includes(c.id));
+      if (list.length > 0) return list;
+    }
+    return allColors;
+  }, [optColors, allColors]);
+
+  const filteredPricingColors = useMemo(() => {
+    if (pricingColorFilter === 'All') return productColors;
+    return productColors.filter(c => c.category === pricingColorFilter);
+  }, [productColors, pricingColorFilter]);
+
+  useEffect(() => {
+    if (productLengths.length > 0) {
+      setSelectedLengths(prev => {
+        const stillValid = prev.filter(l => productLengths.includes(l));
+        if (stillValid.length > 0) return stillValid;
+        return [productLengths[0]];
+      });
+    }
+  }, [productLengths]);
+
+  useEffect(() => {
+    if (productWeights.length > 0) {
+      setSelectedWeights(prev => {
+        const stillValid = prev.filter(w => productWeights.includes(w));
+        if (stillValid.length > 0) return stillValid;
+        return [productWeights[0]];
+      });
+    }
+  }, [productWeights]);
+
+  useEffect(() => {
+    if (productStyles.length > 0) {
+      setSelectedStyles(prev => {
+        const stillValid = prev.filter(name => productStyles.some(s => s.name === name));
+        if (stillValid.length > 0) return stillValid;
+        return [productStyles[0].name];
+      });
+    }
+  }, [productStyles]);
+
+  useEffect(() => {
+    if (productColors.length > 0) {
+      setSelectedPricingColors(prev => {
+        const stillValid = prev.filter(name => productColors.some(c => c.name === name));
+        if (stillValid.length > 0) return stillValid;
+        return productColors.map(c => c.name);
+      });
+    }
+  }, [productColors]);
+
+  const filteredAdminColors = useMemo(() => {
+    let list = allColors;
+    if (adminColorTab !== 'All') {
+      list = list.filter(c => c.category === adminColorTab);
+    }
+    const q = adminColorSearch.trim();
+    if (q) {
+      const fuzzy = fuzzySearch(list, q, {
+        fields: [
+          { key: 'name', weight: 1.5 },
+          { key: 'category', weight: 1.2 },
+          { key: 'id', weight: 1.0 }
+        ],
+        threshold: 30
+      });
+      return fuzzy.map(f => f.item);
+    }
+    return list;
+  }, [allColors, adminColorTab, adminColorSearch]);
+
+  const filteredColorManagerColors = useMemo(() => {
+    let list = allColors;
+    if (colorManagerTab !== 'All') {
+      list = list.filter(c => c.category === colorManagerTab);
+    }
+    const q = colorManagerSearch.trim();
+    if (q) {
+      const fuzzy = fuzzySearch(list, q, {
+        fields: [
+          { key: c => editingColorNames[c.id] !== undefined ? editingColorNames[c.id] : c.name, weight: 1.5 },
+          { key: c => SPECTRUM_COLORS.find(d => d.id === c.id)?.name || c.name, weight: 1.2 },
+          { key: 'id', weight: 1.0 },
+          { key: 'category', weight: 1.0 }
+        ],
+        threshold: 30
+      });
+      return fuzzy.map(f => f.item);
+    }
+    return list;
+  }, [allColors, colorManagerTab, colorManagerSearch, editingColorNames]);
+
+  // Process data for rendering (fuzzy searching and sorting)
   const processedPrices = useMemo(() => {
     let result = Object.entries(prices).map(([key, price]) => {
       const parts = key.split('|');
@@ -548,16 +894,22 @@ export default function AdminPage() {
       return { key, product: prodName, length, weight, style, category, price, unit };
     });
 
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      result = result.filter(item => 
-        item.product.toLowerCase().includes(q) ||
-        item.length.toLowerCase().includes(q) ||
-        item.weight.toLowerCase().includes(q) ||
-        item.style.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q) ||
-        item.unit.toLowerCase().includes(q)
-      );
+    const isSearchActive = !!searchQuery.trim();
+
+    if (isSearchActive) {
+      const fuzzy = fuzzySearch(result, searchQuery, {
+        fields: [
+          { key: 'product', weight: 1.5 },
+          { key: 'category', weight: 1.3 },
+          { key: 'style', weight: 1.2 },
+          { key: 'length', weight: 1.2 },
+          { key: 'weight', weight: 1.0 },
+          { key: 'unit', weight: 1.0 },
+          { key: item => `${item.price}`, weight: 0.9 }
+        ],
+        threshold: 28
+      });
+      result = fuzzy.map(f => f.item);
     }
 
     if (sortConfig) {
@@ -645,6 +997,32 @@ export default function AdminPage() {
             }}
           >
             <span>📦</span> Products & Pricing Matrix
+          </button>
+          <button 
+            type="button"
+            onClick={() => setActiveAdminTab('colors')} 
+            style={{ 
+              padding: '12px 24px', 
+              borderRadius: '12px', 
+              background: activeAdminTab === 'colors' ? 'var(--color-primary)' : '#ffffff',
+              color: activeAdminTab === 'colors' ? '#ffffff' : '#444444',
+              border: activeAdminTab === 'colors' ? '2px solid var(--color-primary)' : '1px solid #dddddd',
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              boxShadow: activeAdminTab === 'colors' ? '0 4px 15px rgba(228,82,88,0.25)' : 'none',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            <span>🎨</span> Color & Shade Names ({allColors.length})
+            {Object.keys(customColorNames).length > 0 && (
+              <span style={{ fontSize: '0.72rem', background: activeAdminTab === 'colors' ? 'rgba(255,255,255,0.3)' : 'var(--color-primary)', color: '#fff', padding: '1px 6px', borderRadius: '10px' }}>
+                {Object.keys(customColorNames).length} custom
+              </span>
+            )}
           </button>
           <button 
             type="button"
@@ -906,7 +1284,247 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+            {/* Available Colors for Product */}
+            <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #f0f0f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                    <label style={{ fontSize: '1.05rem', fontWeight: 700, color: '#1a1a1a', margin: 0 }}>
+                      Available Colors for {product || 'Product'}
+                    </label>
+                    <span style={{
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      padding: '3px 10px',
+                      borderRadius: '12px',
+                      background: optColors.length > 0 ? 'rgba(143, 35, 43, 0.1)' : '#f1f5f9',
+                      color: optColors.length > 0 ? 'var(--color-primary)' : '#64748b'
+                    }}>
+                      {optColors.length === 0 ? `All ${allColors.length} Shades Active (Default)` : `${optColors.length} of ${allColors.length} Selected`}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '0.84rem', color: '#666', margin: '4px 0 0 0' }}>
+                    Choose specific shades offered for this product. If none are selected, all {allColors.length} shades remain available on the product page by default.
+                  </p>
+                </div>
+
+                {/* Bulk Actions */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <button
+                    type="button"
+                    onClick={() => setOptColors(allColors.map(c => c.name))}
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      color: '#334155',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Select All {allColors.length} Shades
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setOptColors([])}
+                    style={{
+                      background: '#fff',
+                      border: '1px solid #cbd5e1',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      color: '#ef4444',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Deselect All (Reset to Default)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveAdminTab('colors')}
+                    style={{
+                      background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))',
+                      border: '1.5px solid var(--color-primary)',
+                      borderRadius: '6px',
+                      padding: '6px 12px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      color: 'var(--color-primary)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '5px'
+                    }}
+                  >
+                    <span>✏️</span> Rename / Edit Shade Names
+                  </button>
+                </div>
+              </div>
+
+              {/* Category Filter Tabs & Search */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '14px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {['All', ...CATEGORIES].map(cat => {
+                    const catCount = cat === 'All' ? SPECTRUM_COLORS.length : SPECTRUM_COLORS.filter(c => c.category === cat).length;
+                    const catSelectedCount = cat === 'All'
+                      ? optColors.length
+                      : SPECTRUM_COLORS.filter(c => c.category === cat && optColors.includes(c.name)).length;
+                    const isActive = adminColorTab === cat;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setAdminColorTab(cat)}
+                        style={{
+                          padding: '5px 12px',
+                          borderRadius: '20px',
+                          fontSize: '0.8rem',
+                          border: isActive ? '1px solid var(--color-primary)' : '1px solid #e2e8f0',
+                          background: isActive ? 'var(--color-primary)' : '#fff',
+                          color: isActive ? '#fff' : '#475569',
+                          fontWeight: isActive ? 600 : 500,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <span>{cat}</span>
+                        <span style={{
+                          fontSize: '0.72rem',
+                          opacity: 0.85,
+                          background: isActive ? 'rgba(255,255,255,0.25)' : '#f1f5f9',
+                          padding: '1px 6px',
+                          borderRadius: '10px'
+                        }}>
+                          {optColors.length > 0 ? `${catSelectedCount}/${catCount}` : catCount}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  {adminColorTab !== 'All' && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const shadesInCat = SPECTRUM_COLORS.filter(c => c.category === adminColorTab).map(c => c.name);
+                        const allAlreadyIn = shadesInCat.every(s => optColors.includes(s));
+                        if (allAlreadyIn) {
+                          setOptColors(optColors.filter(s => !shadesInCat.includes(s)));
+                        } else {
+                          const combined = Array.from(new Set([...optColors, ...shadesInCat]));
+                          setOptColors(combined);
+                        }
+                      }}
+                      style={{
+                        background: '#f8fafc',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '6px',
+                        padding: '6px 10px',
+                        fontSize: '0.78rem',
+                        fontWeight: 600,
+                        color: 'var(--color-primary)',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {SPECTRUM_COLORS.filter(c => c.category === adminColorTab).every(s => optColors.includes(s.name))
+                        ? `Deselect '${adminColorTab}'`
+                        : `Select All in '${adminColorTab}'`}
+                    </button>
+                  )}
+                  <input
+                    type="text"
+                    placeholder="Search shade name..."
+                    value={adminColorSearch}
+                    onChange={e => setAdminColorSearch(e.target.value)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.82rem',
+                      width: '180px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Color Grid */}
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+                gap: '10px',
+                maxHeight: '340px',
+                overflowY: 'auto',
+                padding: '12px',
+                background: '#fafafa',
+                border: '1px solid #e5e5e5',
+                borderRadius: '10px'
+              }}>
+                {filteredAdminColors.map(c => {
+                  const isSelected = optColors.includes(c.name);
+                  return (
+                    <div
+                      key={c.id}
+                      onClick={() => toggleSelection(c.name, optColors, setOptColors)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '8px 12px',
+                        borderRadius: '8px',
+                        border: isSelected ? '1.5px solid var(--color-primary)' : '1px solid #e2e8f0',
+                        background: isSelected ? 'rgba(143, 35, 43, 0.05)' : '#ffffff',
+                        cursor: 'pointer',
+                        userSelect: 'none',
+                        transition: 'all 0.15s ease',
+                        boxShadow: isSelected ? '0 2px 6px rgba(143, 35, 43, 0.12)' : '0 1px 2px rgba(0,0,0,0.02)'
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {}} // parent onClick handles toggle
+                        style={{ cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+                      />
+                      <img
+                        src={c.image}
+                        alt={c.name}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: isSelected ? '1.5px solid var(--color-primary)' : '1px solid #ddd'
+                        }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{
+                          fontSize: '0.84rem',
+                          fontWeight: isSelected ? 700 : 500,
+                          color: isSelected ? 'var(--color-primary)' : '#1e293b',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
+                        }}>
+                          {c.name}
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {c.category}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
               <button
                 type="button"
                 onClick={handleSaveMetadata}
@@ -923,79 +1541,167 @@ export default function AdminPage() {
         {/* CARD 2: Bulk Pricing Matrix (with Weight Options) */}
         <div style={{ background: 'white', padding: 'clamp(18px, 4vw, 30px)', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', marginBottom: '30px', border: '1px solid #eee' }}>
           <h2 style={{ fontSize: '1.4rem', marginBottom: '8px', fontWeight: 600 }}>2. Bulk Assign Prices (Lengths, Weights, Styles, Colors)</h2>
-          <p style={{ color: '#666', marginBottom: '22px', lineHeight: 1.6, fontSize: '0.95rem' }}>Select combinations across Lengths, <strong>Weights</strong>, Styles, and Colors to define exact prices or percentage adjustments.</p>
+          <p style={{ color: '#666', marginBottom: '22px', lineHeight: 1.6, fontSize: '0.95rem' }}>
+            Select combinations across the selected Lengths, Weights, Styles & Textures, and Colors configured for <strong>{product || 'this product'}</strong> to define exact prices or adjustments.
+          </p>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 230px), 1fr))', gap: '18px', marginBottom: '25px' }}>
             
             {/* Lengths Multi-Select */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label style={{ fontWeight: 600 }}>Lengths ({selectedLengths.length})</label>
-                <button onClick={() => setSelectedLengths(selectedLengths.length === LENGTHS.length ? [] : LENGTHS)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}>
-                  {selectedLengths.length === LENGTHS.length ? 'Deselect All' : 'Select All'}
+                <label style={{ fontWeight: 600 }}>Lengths ({selectedLengths.length}/{productLengths.length})</label>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedLengths(selectedLengths.length === productLengths.length ? [] : [...productLengths])} 
+                  style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}
+                >
+                  {selectedLengths.length === productLengths.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
               <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {LENGTHS.map(l => (
-                  <label key={l} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.9rem' }}>
-                    <input type="checkbox" checked={selectedLengths.includes(l)} onChange={() => toggleSelection(l, selectedLengths, setSelectedLengths)} />
-                    {l}
-                  </label>
-                ))}
+                {productLengths.length === 0 ? (
+                  <div style={{ padding: '15px 5px', fontSize: '0.84rem', color: '#888', textAlign: 'center' }}>No lengths configured</div>
+                ) : (
+                  productLengths.map(l => (
+                    <label key={l} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.9rem', fontWeight: selectedLengths.includes(l) ? 600 : 400 }}>
+                      <input type="checkbox" checked={selectedLengths.includes(l)} onChange={() => toggleSelection(l, selectedLengths, setSelectedLengths)} />
+                      {l}
+                    </label>
+                  ))
+                )}
               </div>
             </div>
 
-            {/* Weights Multi-Select (NEW) */}
+            {/* Weights Multi-Select */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Weights ({selectedWeights.length})</label>
-                <button onClick={() => setSelectedWeights(selectedWeights.length === WEIGHTS.length ? [] : WEIGHTS)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}>
-                  {selectedWeights.length === WEIGHTS.length ? 'Deselect All' : 'Select All'}
+                <label style={{ fontWeight: 600, color: 'var(--color-primary)' }}>Weights ({selectedWeights.length}/{productWeights.length})</label>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedWeights(selectedWeights.length === productWeights.length ? [] : [...productWeights])} 
+                  style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}
+                >
+                  {selectedWeights.length === productWeights.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
               <div style={{ maxHeight: '180px', overflowY: 'auto', border: '1px solid #eed6d7', padding: '10px', borderRadius: '8px', background: '#fff9f9' }}>
-                {WEIGHTS.map(w => (
-                  <label key={w} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.9rem', fontWeight: selectedWeights.includes(w) ? 600 : 400 }}>
-                    <input type="checkbox" checked={selectedWeights.includes(w)} onChange={() => toggleSelection(w, selectedWeights, setSelectedWeights)} />
-                    {w}
-                  </label>
-                ))}
+                {productWeights.length === 0 ? (
+                  <div style={{ padding: '15px 5px', fontSize: '0.84rem', color: '#888', textAlign: 'center' }}>No weights configured</div>
+                ) : (
+                  productWeights.map(w => (
+                    <label key={w} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '5px 0', cursor: 'pointer', fontSize: '0.9rem', fontWeight: selectedWeights.includes(w) ? 600 : 400 }}>
+                      <input type="checkbox" checked={selectedWeights.includes(w)} onChange={() => toggleSelection(w, selectedWeights, setSelectedWeights)} />
+                      {w}
+                    </label>
+                  ))
+                )}
               </div>
             </div>
             
             {/* Styles Multi-Select */}
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label style={{ fontWeight: 600 }}>Styles ({selectedStyles.length})</label>
-                <button onClick={() => setSelectedStyles(selectedStyles.length === STYLES.length ? [] : STYLES)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}>
-                  {selectedStyles.length === STYLES.length ? 'Deselect All' : 'Select All'}
+                <label style={{ fontWeight: 600 }}>Styles & Textures ({selectedStyles.length}/{productStyles.length})</label>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedStyles(selectedStyles.length === productStyles.length ? [] : productStyles.map(s => s.name))} 
+                  style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}
+                >
+                  {selectedStyles.length === productStyles.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
               <div style={{ maxHeight: '190px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {HAIR_STYLES.map(s => (
-                  <label key={s.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
-                    <input type="checkbox" checked={selectedStyles.includes(s.name)} onChange={() => toggleSelection(s.name, selectedStyles, setSelectedStyles)} />
-                    <img src={s.image} alt={s.name} style={{ width: '26px', height: '26px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #ddd' }} />
-                    <span style={{ fontWeight: 500 }}>{s.name}</span>
-                    <span style={{ fontSize: '0.72rem', color: '#888', marginLeft: 'auto' }}>{s.pattern}</span>
-                  </label>
-                ))}
+                {productStyles.length === 0 ? (
+                  <div style={{ padding: '15px 5px', fontSize: '0.84rem', color: '#888', textAlign: 'center' }}>No styles configured</div>
+                ) : (
+                  productStyles.map(s => (
+                    <label key={s.name} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', cursor: 'pointer', fontSize: '0.88rem', fontWeight: selectedStyles.includes(s.name) ? 600 : 400 }}>
+                      <input type="checkbox" checked={selectedStyles.includes(s.name)} onChange={() => toggleSelection(s.name, selectedStyles, setSelectedStyles)} />
+                      <img src={s.image} alt={s.name} style={{ width: '26px', height: '26px', borderRadius: '6px', objectFit: 'cover', border: '1px solid #ddd' }} />
+                      <span style={{ fontWeight: selectedStyles.includes(s.name) ? 600 : 500 }}>{s.name}</span>
+                      <span style={{ fontSize: '0.72rem', color: '#888', marginLeft: 'auto' }}>{s.pattern}</span>
+                    </label>
+                  ))
+                )}
               </div>
             </div>
             
-            {/* Category Multi-Select */}
+            {/* Colors Multi-Select (Product Specific Colors) */}
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <label style={{ fontWeight: 600 }}>Color Categories ({selectedCategories.length})</label>
-                <button onClick={() => setSelectedCategories(selectedCategories.length === CATEGORIES.length ? [] : CATEGORIES)} style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem' }}>
-                  {selectedCategories.length === CATEGORIES.length ? 'Deselect All' : 'Select All'}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ fontWeight: 600 }}>
+                  Selected Colors ({selectedPricingColors.length}/{productColors.length})
+                </label>
+                <button 
+                  type="button"
+                  onClick={() => setSelectedPricingColors(selectedPricingColors.length === productColors.length ? [] : productColors.map(c => c.name))} 
+                  style={{ background: 'none', border: 'none', color: 'var(--color-primary)', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}
+                >
+                  {selectedPricingColors.length === productColors.length ? 'Deselect All' : 'Select All'}
                 </button>
               </div>
-              <div style={{ maxHeight: '190px', overflowY: 'auto', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                {CATEGORIES.map(cat => (
-                  <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 0', cursor: 'pointer', fontSize: '0.88rem' }}>
-                    <input type="checkbox" checked={selectedCategories.includes(cat)} onChange={() => toggleSelection(cat, selectedCategories, setSelectedCategories)} />
-                    <span style={{ fontWeight: 500 }}>{cat}</span>
+
+              {/* Category Filter Pills (if product has multiple categories) */}
+              {productColors.length > 5 && (
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                  {['All', ...Array.from(new Set(productColors.map(c => c.category)))].map(cat => {
+                    const isActive = pricingColorFilter === cat;
+                    const catCount = cat === 'All' ? productColors.length : productColors.filter(c => c.category === cat).length;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setPricingColorFilter(cat)}
+                        style={{
+                          background: isActive ? 'var(--color-primary)' : '#fff',
+                          color: isActive ? '#fff' : '#64748b',
+                          border: isActive ? '1px solid var(--color-primary)' : '1px solid #e2e8f0',
+                          borderRadius: '12px',
+                          padding: '1px 8px',
+                          fontSize: '0.72rem',
+                          fontWeight: isActive ? 700 : 500,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {cat} ({catCount})
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div style={{ maxHeight: '190px', overflowY: 'auto', border: '1px solid #eee', padding: '8px 10px', borderRadius: '8px', background: '#fafafa' }}>
+                {filteredPricingColors.map(col => (
+                  <label 
+                    key={col.id} 
+                    style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '10px', 
+                      padding: '5px 0', 
+                      cursor: 'pointer', 
+                      fontSize: '0.88rem',
+                      borderBottom: '1px solid #f1f5f9'
+                    }}
+                  >
+                    <input 
+                      type="checkbox" 
+                      checked={selectedPricingColors.includes(col.name)} 
+                      onChange={() => toggleSelection(col.name, selectedPricingColors, setSelectedPricingColors)}
+                      style={{ cursor: 'pointer', accentColor: 'var(--color-primary)' }}
+                    />
+                    <img 
+                      src={col.image} 
+                      alt={col.name} 
+                      style={{ width: '24px', height: '24px', borderRadius: '50%', objectFit: 'cover', border: '1px solid #ddd', flexShrink: 0 }} 
+                    />
+                    <span style={{ fontWeight: selectedPricingColors.includes(col.name) ? 600 : 400, color: '#1e293b' }}>
+                      {col.name}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', color: '#888', marginLeft: 'auto', whiteSpace: 'nowrap' }}>
+                      {col.category}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -1042,16 +1748,69 @@ export default function AdminPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
             <div>
               <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 600 }}>3. Current Defined Prices</h2>
-              <span style={{ fontSize: '0.88rem', color: '#666' }}>Showing {processedPrices.length} active combinations</span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+                <span style={{ fontSize: '0.88rem', color: '#666' }}>
+                  Showing {processedPrices.length} {searchQuery.trim() ? `matching (${Object.keys(prices).length} total)` : 'active combinations'}
+                </span>
+                {searchQuery.trim() && (
+                  <span style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    color: 'var(--color-primary, #8F232B)',
+                    background: 'rgba(143, 35, 43, 0.08)',
+                    padding: '1px 7px',
+                    borderRadius: '10px'
+                  }}>
+                    Fuzzy Search
+                  </span>
+                )}
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%', maxWidth: '600px', justifyContent: 'flex-start' }}>
-              <input 
-                type="text" 
-                placeholder="Search products, lengths, weights, colors..." 
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                style={{ padding: '10px 14px', borderRadius: '8px', border: '1px solid #ddd', flex: '1 1 200px', minWidth: 'min(100%, 200px)', fontSize: '0.95rem' }}
-              />
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%', maxWidth: '640px', justifyContent: 'flex-start' }}>
+              <div style={{ position: 'relative', flex: '1 1 240px', minWidth: 'min(100%, 240px)' }}>
+                <input 
+                  type="text" 
+                  placeholder="Fuzzy search (e.g. 'tape 18 blonde', 'ktip', 'straight')..." 
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  style={{ 
+                    width: '100%',
+                    padding: '10px 32px 10px 14px', 
+                    borderRadius: '8px', 
+                    border: '1px solid #ddd', 
+                    fontSize: '0.95rem',
+                    outline: 'none',
+                    boxShadow: searchQuery.trim() ? '0 0 0 2px rgba(143, 35, 43, 0.12)' : 'none'
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: '#eee',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '18px',
+                      height: '18px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      fontSize: '10px',
+                      color: '#666',
+                      padding: 0
+                    }}
+                    title="Clear search"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
               {selectedRows.length > 0 && (
                 <button 
                   onClick={handleDeleteSelected}
@@ -1074,7 +1833,21 @@ export default function AdminPage() {
           {Object.keys(prices).length === 0 ? (
             <p style={{ color: '#666' }}>No prices have been defined yet. Define a price combination above.</p>
           ) : processedPrices.length === 0 ? (
-            <p style={{ color: '#666' }}>No prices match your search query.</p>
+            <div style={{ padding: '30px 20px', textAlign: 'center', background: '#fafafa', borderRadius: '12px', border: '1px dashed #ddd', margin: '15px 0' }}>
+              <p style={{ color: '#333', margin: '0 0 6px 0', fontWeight: 600, fontSize: '1rem' }}>
+                No price combinations matched &ldquo;{searchQuery}&rdquo;
+              </p>
+              <p style={{ color: '#777', fontSize: '0.88rem', margin: '0 0 14px 0' }}>
+                Fuzzy search checks product names, lengths (e.g. 18&quot;), styles, weights, and colors. Try a broader term.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                style={{ background: '#fff', border: '1px solid #ccc', padding: '6px 16px', borderRadius: '6px', fontSize: '0.85rem', cursor: 'pointer', fontWeight: 600 }}
+              >
+                Clear Search
+              </button>
+            </div>
           ) : (
             <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '780px' }}>
@@ -1101,7 +1874,7 @@ export default function AdminPage() {
                       Style {getSortIcon('style')}
                     </th>
                     <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('category')}>
-                      Color Category {getSortIcon('category')}
+                      Color / Category {getSortIcon('category')}
                     </th>
                     <th style={{ padding: '12px', cursor: 'pointer', userSelect: 'none' }} onClick={() => handleSort('unit')}>
                       Unit {getSortIcon('unit')}
@@ -1152,6 +1925,263 @@ export default function AdminPage() {
           )}
         </div>
         </>
+        )}
+
+        {/* COLOR & SHADE NAMES MANAGER TAB */}
+        {activeAdminTab === 'colors' && (
+          <div>
+            {colorSavedMsg && (
+              <div style={{ background: '#dcfce7', border: '1px solid #86efac', color: '#166534', padding: '14px 20px', borderRadius: '12px', marginBottom: '24px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 2px 10px rgba(22, 101, 52, 0.08)' }}>
+                <span>✓</span> {colorSavedMsg}
+              </div>
+            )}
+
+            {/* Header & Overview Card */}
+            <div style={{ background: 'white', padding: 'clamp(20px, 4vw, 32px)', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', marginBottom: '25px', border: '1px solid #eee' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
+                <div>
+                  <h2 style={{ fontSize: '1.45rem', marginBottom: '6px', fontWeight: 700, color: '#111' }}>
+                    🎨 Color & Shade Names Manager
+                  </h2>
+                  <p style={{ color: '#666', lineHeight: 1.6, fontSize: '0.95rem', margin: 0, maxWidth: '780px' }}>
+                    Customize, rename, or assign specific salon codes to all 39 hair extension shades. Renamed shades automatically update your storefront, pricing combinations, and wholesale quotation summaries.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={handleSaveAllColors}
+                    disabled={savingColors}
+                    className="btn-gold"
+                    style={{ padding: '10px 20px', fontSize: '0.9rem', border: 'none', cursor: 'pointer', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <span>💾</span> {savingColors ? 'Saving...' : 'Save All Custom Shade Names'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleResetAllColors}
+                    disabled={savingColors}
+                    style={{ padding: '10px 18px', fontSize: '0.88rem', border: '1px solid #ef4444', color: '#ef4444', background: '#fff', cursor: 'pointer', borderRadius: '8px', fontWeight: 600 }}
+                  >
+                    Reset All to Defaults
+                  </button>
+                </div>
+              </div>
+
+              {/* Stats Bar */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', paddingTop: '16px', borderTop: '1px solid #f0f0f0' }}>
+                <div style={{ padding: '12px 16px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.76rem', textTransform: 'uppercase', color: '#64748b', fontWeight: 700, letterSpacing: '0.5px' }}>Total Shades</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{allColors.length}</div>
+                </div>
+                <div style={{ padding: '12px 16px', borderRadius: '10px', background: Object.keys(customColorNames).length > 0 ? 'rgba(197, 148, 58, 0.08)' : '#f8fafc', border: Object.keys(customColorNames).length > 0 ? '1px solid rgba(197, 148, 58, 0.3)' : '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.76rem', textTransform: 'uppercase', color: Object.keys(customColorNames).length > 0 ? '#8c6b23' : '#64748b', fontWeight: 700, letterSpacing: '0.5px' }}>Customized Shades</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: Object.keys(customColorNames).length > 0 ? '#8c6b23' : '#0f172a', marginTop: '2px' }}>
+                    {Object.keys(customColorNames).length}
+                  </div>
+                </div>
+                <div style={{ padding: '12px 16px', borderRadius: '10px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.76rem', textTransform: 'uppercase', color: '#64748b', fontWeight: 700, letterSpacing: '0.5px' }}>Factory Defaults</div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{allColors.length - Object.keys(customColorNames).length}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Filter & Search Toolbar */}
+            <div style={{ background: 'white', padding: '18px 24px', borderRadius: '14px', boxShadow: '0 4px 16px rgba(0,0,0,0.04)', marginBottom: '20px', border: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {['All', ...CATEGORIES].map(cat => {
+                  const isActive = colorManagerTab === cat;
+                  const catCount = cat === 'All' ? allColors.length : allColors.filter(c => c.category === cat).length;
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setColorManagerTab(cat)}
+                      style={{
+                        padding: '6px 14px',
+                        borderRadius: '20px',
+                        fontSize: '0.85rem',
+                        border: isActive ? '1px solid var(--color-primary)' : '1px solid #e2e8f0',
+                        background: isActive ? 'var(--color-primary)' : '#fff',
+                        color: isActive ? '#fff' : '#475569',
+                        fontWeight: isActive ? 700 : 500,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <span>{cat}</span>
+                      <span style={{ fontSize: '0.74rem', background: isActive ? 'rgba(255,255,255,0.25)' : '#f1f5f9', padding: '1px 6px', borderRadius: '10px' }}>
+                        {catCount}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div style={{ width: '100%', maxWidth: '320px' }}>
+                <input
+                  type="text"
+                  placeholder="Search by shade name, default name, ID..."
+                  value={colorManagerSearch}
+                  onChange={e => setColorManagerSearch(e.target.value)}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.9rem' }}
+                />
+              </div>
+            </div>
+
+            {/* Shades Table Card */}
+            <div style={{ background: 'white', borderRadius: '16px', boxShadow: '0 5px 20px rgba(0,0,0,0.05)', border: '1px solid #eee', overflow: 'hidden' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+                  <thead>
+                    <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', fontSize: '0.82rem', textTransform: 'uppercase', letterSpacing: '0.6px', color: '#64748b' }}>
+                      <th style={{ padding: '14px 20px', width: '90px' }}>Swatch</th>
+                      <th style={{ padding: '14px 20px' }}>Original Default Name & ID</th>
+                      <th style={{ padding: '14px 20px' }}>Category</th>
+                      <th style={{ padding: '14px 20px', width: '320px' }}>Custom Display Name</th>
+                      <th style={{ padding: '14px 20px', textAlign: 'center', width: '110px' }}>Status</th>
+                      <th style={{ padding: '14px 20px', textAlign: 'right', width: '160px' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredColorManagerColors.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} style={{ padding: '40px 20px', textAlign: 'center', color: '#888' }}>
+                          No shades match your search query & category filter.
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredColorManagerColors.map((colorItem) => {
+                        const defaultObj = SPECTRUM_COLORS.find(d => d.id === colorItem.id);
+                        const defaultName = defaultObj?.name || colorItem.name;
+                        const currentInputVal = editingColorNames[colorItem.id] !== undefined ? editingColorNames[colorItem.id] : (customColorNames[colorItem.id] || defaultName);
+                        const isCustomized = Boolean(customColorNames[colorItem.id] && customColorNames[colorItem.id] !== defaultName);
+                        const isPendingUnsaved = (editingColorNames[colorItem.id] !== undefined) && (editingColorNames[colorItem.id] !== (customColorNames[colorItem.id] || defaultName));
+
+                        return (
+                          <tr key={colorItem.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.15s ease' }}>
+                            {/* Swatch */}
+                            <td style={{ padding: '12px 20px' }}>
+                              <div style={{ position: 'relative', width: '42px', height: '42px', borderRadius: '50%', overflow: 'hidden', border: isCustomized ? '2px solid var(--color-primary)' : '1px solid #ddd', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }}>
+                                <img
+                                  src={colorItem.image}
+                                  alt={colorItem.name}
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                />
+                              </div>
+                            </td>
+
+                            {/* Original Name & ID */}
+                            <td style={{ padding: '12px 20px' }}>
+                              <div style={{ fontWeight: 600, fontSize: '0.95rem', color: '#1e293b' }}>
+                                {defaultName}
+                              </div>
+                              <div style={{ fontSize: '0.74rem', color: '#94a3b8', fontFamily: 'monospace', marginTop: '2px' }}>
+                                #{colorItem.id}
+                              </div>
+                            </td>
+
+                            {/* Category */}
+                            <td style={{ padding: '12px 20px' }}>
+                              <span style={{ fontSize: '0.78rem', background: '#f1f5f9', color: '#475569', padding: '3px 10px', borderRadius: '12px', fontWeight: 600 }}>
+                                {colorItem.category}
+                              </span>
+                            </td>
+
+                            {/* Custom Display Name Input */}
+                            <td style={{ padding: '12px 20px' }}>
+                              <div style={{ position: 'relative' }}>
+                                <input
+                                  type="text"
+                                  value={currentInputVal}
+                                  onChange={e => handleColorNameChange(colorItem.id, e.target.value)}
+                                  placeholder={`Default: ${defaultName}`}
+                                  style={{
+                                    width: '100%',
+                                    padding: '9px 14px',
+                                    borderRadius: '8px',
+                                    border: isPendingUnsaved ? '1.5px solid var(--color-primary)' : (isCustomized ? '1.5px solid #d97706' : '1px solid #cbd5e1'),
+                                    background: isPendingUnsaved ? '#fffdf7' : '#ffffff',
+                                    fontSize: '0.92rem',
+                                    fontWeight: isCustomized || isPendingUnsaved ? 600 : 400
+                                  }}
+                                />
+                                {isPendingUnsaved && (
+                                  <span style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.72rem', color: 'var(--color-primary)', fontWeight: 700 }}>
+                                    Unsaved
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Status */}
+                            <td style={{ padding: '12px 20px', textAlign: 'center' }}>
+                              {isCustomized ? (
+                                <span style={{ fontSize: '0.76rem', background: 'rgba(217, 119, 6, 0.12)', color: '#b45309', padding: '3px 10px', borderRadius: '12px', fontWeight: 700 }}>
+                                  Customized
+                                </span>
+                              ) : (
+                                <span style={{ fontSize: '0.76rem', background: '#f1f5f9', color: '#64748b', padding: '3px 10px', borderRadius: '12px', fontWeight: 600 }}>
+                                  Default
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Actions */}
+                            <td style={{ padding: '12px 20px', textAlign: 'right' }}>
+                              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleSaveSingleColor(colorItem.id)}
+                                  disabled={savingColors}
+                                  style={{
+                                    padding: '6px 12px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.8rem',
+                                    fontWeight: 600,
+                                    border: 'none',
+                                    background: 'var(--color-primary)',
+                                    color: '#ffffff',
+                                    cursor: 'pointer'
+                                  }}
+                                >
+                                  Save
+                                </button>
+                                {isCustomized && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleResetSingleColor(colorItem.id)}
+                                    disabled={savingColors}
+                                    style={{
+                                      padding: '6px 10px',
+                                      borderRadius: '6px',
+                                      fontSize: '0.8rem',
+                                      fontWeight: 600,
+                                      border: '1px solid #cbd5e1',
+                                      background: '#fff',
+                                      color: '#64748b',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    Reset
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* TESTIMONIALS MANAGEMENT TAB */}

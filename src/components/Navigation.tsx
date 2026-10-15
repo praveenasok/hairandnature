@@ -290,8 +290,8 @@ export default function Navigation() {
                               <stop offset="100%" stopColor="#f1e0ca" />
                             </radialGradient>
                             <linearGradient id="roseAccent" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#e45258" />
-                              <stop offset="100%" stopColor="#ad252b" />
+                              <stop offset="0%" stopColor="var(--color-primary, #8F232B)" />
+                              <stop offset="100%" stopColor="var(--color-primary-dark, #641219)" />
                             </linearGradient>
                             {/* Clockwise Upper Arc for Top Text */}
                             <path id="medallionUpperArc" d="M 21,60 A 39,39 0 0,1 99,60" fill="none" />

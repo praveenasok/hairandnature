@@ -25,33 +25,33 @@ export default function GlobalEnquiryFloatingButton() {
         whileTap={{ scale: 0.94 }}
         style={{
           background: totalCount > 0 
-            ? 'linear-gradient(135deg, #b83238 0%, #d8454d 60%, #c5943a 100%)' 
+            ? 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 60%, var(--color-accent-gold) 100%)' 
             : 'linear-gradient(135deg, #1f1b1a 0%, #2b2523 100%)',
           color: '#ffffff',
           border: totalCount > 0 
             ? '1.5px solid rgba(255,255,255,0.35)' 
             : '1px solid rgba(197, 148, 58, 0.45)',
           borderRadius: '50px',
-          padding: '12px 20px',
+          padding: '11px 18px',
           boxShadow: totalCount > 0 
-            ? '0 10px 28px rgba(184, 50, 56, 0.38), 0 0 0 1px rgba(255,255,255,0.2)' 
+            ? '0 10px 28px var(--color-primary-glow, rgba(0,0,0,0.35)), 0 0 0 1px rgba(255,255,255,0.2)' 
             : '0 8px 24px rgba(0,0,0,0.22)',
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
+          gap: '9px',
           cursor: 'pointer',
-          fontSize: '0.88rem',
+          fontSize: '0.84rem',
           fontWeight: 700,
           letterSpacing: '0.3px',
           backdropFilter: 'blur(8px)',
-          transition: 'box-shadow 0.3s ease'
+          transition: 'box-shadow 0.3s ease, transform 0.2s ease'
         }}
       >
         <span style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
           {totalCount > 0 ? (
-            <ShoppingBag size={18} />
+            <ShoppingBag size={17} />
           ) : (
-            <Sparkles size={17} color="#dfb76c" />
+            <Sparkles size={16} color="var(--color-accent-gold, #dfb76c)" />
           )}
 
           {totalCount > 0 && (
@@ -60,7 +60,7 @@ export default function GlobalEnquiryFloatingButton() {
               top: '-8px',
               right: '-9px',
               background: '#ffffff',
-              color: '#b83238',
+              color: 'var(--color-primary, #111)',
               borderRadius: '50%',
               width: '18px',
               height: '18px',

@@ -9,17 +9,31 @@
       "22 Inches",
       "24 Inches",
       "26 Inches",
-      "28 Inches",
-      "30 Inches"
+      "28 Inches"
     ],
     "availableWeights": [
       "100 Grams"
     ],
     "availableStyles": [
       "Natural Straight",
-      "Natural Wave",
-      "Body Wave",
-      "Deep Wave"
+      "Natural Wave"
+    ],
+    "availableColors": [
+      "Natural Black",
+      "Natural Brown",
+      "Medium Brown",
+      "Bronze",
+      "Chestnut Brown",
+      "Brown",
+      "Walnut Brown",
+      "Chocolate Brown",
+      "Caramel",
+      "Sand",
+      "Golden Blonde",
+      "Ash Bronde",
+      "Platinum Blonde",
+      "Beach Blonde",
+      "Natural Blonde"
     ]
   },
   "K Tips": {
@@ -36,14 +50,29 @@
       "30 Inches"
     ],
     "availableWeights": [
-      "50 Grams",
       "100 Grams"
     ],
     "availableStyles": [
       "Natural Straight",
-      "Natural Wave",
-      "Body Wave",
-      "Deep Wave"
+      "Natural Wave"
+    ],
+    "availableColors": [
+      "Natural Black",
+      "Natural Brown",
+      "Medium Brown",
+      "Bronze",
+      "Chestnut Brown",
+      "Brown",
+      "Walnut Brown",
+      "Chocolate Brown",
+      "Caramel",
+      "Ash Brown",
+      "Golden Blonde",
+      "Sand",
+      "Ash Bronde",
+      "Beach Blonde",
+      "Natural Blonde",
+      "Platinum Blonde"
     ]
   },
   "Genius Wefts": {
@@ -56,18 +85,32 @@
       "22 Inches",
       "24 Inches",
       "26 Inches",
-      "30 Inches",
       "28 Inches"
     ],
     "availableWeights": [
-      "50 Grams",
-      "100 Grams"
+      "50 Grams"
     ],
     "availableStyles": [
       "Natural Straight",
-      "Natural Wave",
-      "Body Wave",
-      "Deep Wave"
+      "Natural Wave"
+    ],
+    "availableColors": [
+      "Natural Black",
+      "Natural Brown",
+      "Medium Brown",
+      "Bronze",
+      "Chestnut Brown",
+      "Brown",
+      "Walnut Brown",
+      "Chocolate Brown",
+      "Caramel",
+      "Ash Brown",
+      "Golden Blonde",
+      "Sand",
+      "Ash Bronde",
+      "Beach Blonde",
+      "Natural Blonde",
+      "Platinum Blonde"
     ]
   },
   "Butterfly Wefts": {
@@ -84,13 +127,27 @@
       "30 Inches"
     ],
     "availableWeights": [
-      "100 Grams",
-      "50 Grams"
+      "100 Grams"
     ],
     "availableStyles": [
       "Natural Straight",
-      "Natural Wave",
-      "Body Wave"
+      "Natural Wave"
+    ],
+    "availableColors": [
+      "Natural Black",
+      "Natural Brown",
+      "Medium Brown",
+      "Chocolate Brown",
+      "Walnut Brown",
+      "Brown",
+      "Chestnut Brown",
+      "Bronze",
+      "Caramel",
+      "Golden Blonde",
+      "Beach Blonde",
+      "Natural Blonde",
+      "Ash Bronde",
+      "Platinum Blonde"
     ]
   },
   "ClipOn Extensions": {
@@ -103,8 +160,7 @@
       "22 Inches",
       "24 Inches",
       "26 Inches",
-      "28 Inches",
-      "30 Inches"
+      "28 Inches"
     ],
     "availableWeights": [
       "100 Grams",
@@ -113,9 +169,25 @@
     ],
     "availableStyles": [
       "Natural Straight",
-      "Natural Wave",
-      "Body Wave",
-      "Deep Wave"
+      "Natural Wave"
+    ],
+    "availableColors": [
+      "Natural Black",
+      "Natural Brown",
+      "Medium Brown",
+      "Bronze",
+      "Chestnut Brown",
+      "Brown",
+      "Walnut Brown",
+      "Chocolate Brown",
+      "Caramel",
+      "Ash Brown",
+      "Golden Blonde",
+      "Sand",
+      "Ash Bronde",
+      "Beach Blonde",
+      "Natural Blonde",
+      "Platinum Blonde"
     ]
   }
 }

@@ -1,14 +1,308 @@
-:root {
-  --color-primary: #e45258;
-  --color-primary-dark: #c0392b;
-  --color-background: #ebe1d8;
-  --color-text: #1a1a1a;
-  --color-text-light: #555555;
+:root,
+[data-theme="bordeaux"] {
+  --color-primary: #8F232B;
+  --color-primary-dark: #641219;
+  --color-primary-light: #B83A44;
+  --color-primary-subtle: rgba(143, 35, 43, 0.08);
+  --color-primary-glow: rgba(143, 35, 43, 0.32);
+  --color-accent-gold: #C5943A;
+  --color-accent-gold-dark: #966D21;
+  --color-accent-gold-light: #DFB76C;
+  --color-background: #FAF8F5;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F3EFEA;
+  --color-text: #1C1917;
+  --color-text-light: #57534E;
+  --color-border: rgba(143, 35, 43, 0.12);
   --color-white: #ffffff;
   --color-black: #000000;
-  --font-serif: var(--font-quicksand), serif;
-  --font-sans: var(--font-quicksand), sans-serif;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
+
+[data-theme="obsidian"] {
+  --color-primary: #18181B;
+  --color-primary-dark: #09090B;
+  --color-primary-light: #27272A;
+  --color-primary-subtle: rgba(24, 24, 27, 0.07);
+  --color-primary-glow: rgba(212, 175, 55, 0.35);
+  --color-accent-gold: #D4AF37;
+  --color-accent-gold-dark: #A9871E;
+  --color-accent-gold-light: #ECC86B;
+  --color-background: #FBFBFC;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F4F4F5;
+  --color-text: #09090B;
+  --color-text-light: #71717A;
+  --color-border: rgba(24, 24, 27, 0.14);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+[data-theme="espresso"] {
+  --color-primary: #2E231C;
+  --color-primary-dark: #1C1510;
+  --color-primary-light: #48382E;
+  --color-primary-subtle: rgba(46, 35, 28, 0.08);
+  --color-primary-glow: rgba(184, 135, 70, 0.32);
+  --color-accent-gold: #B88746;
+  --color-accent-gold-dark: #8F6327;
+  --color-accent-gold-light: #DDB074;
+  --color-background: #F8F6F1;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EFEBE3;
+  --color-text: #26211D;
+  --color-text-light: #6B6158;
+  --color-border: rgba(46, 35, 28, 0.14);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+[data-theme="midnight"] {
+  --color-primary: #132238;
+  --color-primary-dark: #0B1424;
+  --color-primary-light: #203657;
+  --color-primary-subtle: rgba(19, 34, 56, 0.08);
+  --color-primary-glow: rgba(201, 151, 56, 0.32);
+  --color-accent-gold: #C99738;
+  --color-accent-gold-dark: #9A6F1D;
+  --color-accent-gold-light: #E2B867;
+  --color-background: #F7F9FB;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EDF2F7;
+  --color-text: #0F172A;
+  --color-text-light: #475569;
+  --color-border: rgba(19, 34, 56, 0.14);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 5. Imperial Emerald & Antique Gold */
+[data-theme="emerald"] {
+  --color-primary: #14382B;
+  --color-primary-dark: #0C231A;
+  --color-primary-light: #1E503E;
+  --color-primary-subtle: rgba(20, 56, 43, 0.08);
+  --color-primary-glow: rgba(200, 157, 66, 0.32);
+  --color-accent-gold: #C89D42;
+  --color-accent-gold-dark: #997322;
+  --color-accent-gold-light: #E2BC68;
+  --color-background: #F6F9F7;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EDF3F0;
+  --color-text: #11231B;
+  --color-text-light: #50665B;
+  --color-border: rgba(20, 56, 43, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 6. Cashmere Rose & Warm Champagne */
+[data-theme="rose-gold"] {
+  --color-primary: #8A3A4E;
+  --color-primary-dark: #632535;
+  --color-primary-light: #B05067;
+  --color-primary-subtle: rgba(138, 58, 78, 0.08);
+  --color-primary-glow: rgba(204, 164, 109, 0.32);
+  --color-accent-gold: #CCA46D;
+  --color-accent-gold-dark: #9C753F;
+  --color-accent-gold-light: #E6C28E;
+  --color-background: #FAF7F8;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F4EDF0;
+  --color-text: #28161C;
+  --color-text-light: #6E565F;
+  --color-border: rgba(138, 58, 78, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 7. Royal Amethyst & Byzantine Gold */
+[data-theme="amethyst"] {
+  --color-primary: #4A1E42;
+  --color-primary-dark: #31102B;
+  --color-primary-light: #682E5D;
+  --color-primary-subtle: rgba(74, 30, 66, 0.08);
+  --color-primary-glow: rgba(212, 163, 71, 0.32);
+  --color-accent-gold: #D4A347;
+  --color-accent-gold-dark: #A17424;
+  --color-accent-gold-light: #EBC06B;
+  --color-background: #FAF7FA;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F2EBF2;
+  --color-text: #1E0C1B;
+  --color-text-light: #63495F;
+  --color-border: rgba(74, 30, 66, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 8. Tuscan Terracotta & Amber Ochre */
+[data-theme="terracotta"] {
+  --color-primary: #9E4327;
+  --color-primary-dark: #732E18;
+  --color-primary-light: #C25B3B;
+  --color-primary-subtle: rgba(158, 67, 39, 0.08);
+  --color-primary-glow: rgba(201, 134, 45, 0.32);
+  --color-accent-gold: #C9862D;
+  --color-accent-gold-dark: #996016;
+  --color-accent-gold-light: #E6A857;
+  --color-background: #FBF8F5;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F4EEE8;
+  --color-text: #26150F;
+  --color-text-light: #695046;
+  --color-border: rgba(158, 67, 39, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 9. Botanical Sage & Soft Gilt */
+[data-theme="sage"] {
+  --color-primary: #2D4739;
+  --color-primary-dark: #1B2E24;
+  --color-primary-light: #436652;
+  --color-primary-subtle: rgba(45, 71, 57, 0.08);
+  --color-primary-glow: rgba(190, 150, 72, 0.32);
+  --color-accent-gold: #BE9648;
+  --color-accent-gold-dark: #8E6D29;
+  --color-accent-gold-light: #DCB76E;
+  --color-background: #F7F9F7;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EEF3EE;
+  --color-text: #18261E;
+  --color-text-light: #52665B;
+  --color-border: rgba(45, 71, 57, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 10. Royal Cobalt & Gilded Sun */
+[data-theme="cobalt"] {
+  --color-primary: #0E2F68;
+  --color-primary-dark: #071B3E;
+  --color-primary-light: #184693;
+  --color-primary-subtle: rgba(14, 47, 104, 0.08);
+  --color-primary-glow: rgba(212, 168, 56, 0.32);
+  --color-accent-gold: #D4A838;
+  --color-accent-gold-dark: #A17A1B;
+  --color-accent-gold-light: #E8C25E;
+  --color-background: #F6F8FC;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EBF0F8;
+  --color-text: #0A1B36;
+  --color-text-light: #485973;
+  --color-border: rgba(14, 47, 104, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 11. Minimalist Slate & White Gold */
+[data-theme="monochrome"] {
+  --color-primary: #334155;
+  --color-primary-dark: #1E293B;
+  --color-primary-light: #475569;
+  --color-primary-subtle: rgba(51, 65, 85, 0.08);
+  --color-primary-glow: rgba(181, 153, 99, 0.32);
+  --color-accent-gold: #B59963;
+  --color-accent-gold-dark: #88703E;
+  --color-accent-gold-light: #D8BE8A;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F1F5F9;
+  --color-text: #0F172A;
+  --color-text-light: #64748B;
+  --color-border: rgba(51, 65, 85, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 12. Burnished Copper & Raw Sienna */
+[data-theme="copper"] {
+  --color-primary: #8C3B1E;
+  --color-primary-dark: #632610;
+  --color-primary-light: #B0502E;
+  --color-primary-subtle: rgba(140, 59, 30, 0.08);
+  --color-primary-glow: rgba(199, 136, 52, 0.32);
+  --color-accent-gold: #C78834;
+  --color-accent-gold-dark: #96601B;
+  --color-accent-gold-light: #E5AC5E;
+  --color-background: #FBF8F5;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F5ECE4;
+  --color-text: #28140B;
+  --color-text-light: #6B5145;
+  --color-border: rgba(140, 59, 30, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 13. Velvet Charcoal & Molten Brass */
+[data-theme="charcoal"] {
+  --color-primary: #24272C;
+  --color-primary-dark: #141619;
+  --color-primary-light: #373C44;
+  --color-primary-subtle: rgba(36, 39, 44, 0.08);
+  --color-primary-glow: rgba(207, 155, 60, 0.32);
+  --color-accent-gold: #CF9B3C;
+  --color-accent-gold-dark: #9C7020;
+  --color-accent-gold-light: #E8BA62;
+  --color-background: #F8F8F9;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #EDEDF0;
+  --color-text: #121316;
+  --color-text-light: #5E6470;
+  --color-border: rgba(36, 39, 44, 0.13);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 14. Golden Champagne & Warm Truffle */
+[data-theme="champagne"] {
+  --color-primary: #6E4D25;
+  --color-primary-dark: #483115;
+  --color-primary-light: #946A36;
+  --color-primary-subtle: rgba(110, 77, 37, 0.08);
+  --color-primary-glow: rgba(204, 162, 70, 0.32);
+  --color-accent-gold: #CCA246;
+  --color-accent-gold-dark: #9B7527;
+  --color-accent-gold-light: #E5C271;
+  --color-background: #FAF8F3;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F2EDE3;
+  --color-text: #24190C;
+  --color-text-light: #695743;
+  --color-border: rgba(110, 77, 37, 0.12);
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --font-serif: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-quicksand), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 
 * {
   box-sizing: border-box;
@@ -76,57 +370,96 @@ button {
   align-items: flex-start;
 }
 
-.btn,
-.btn-gold {
+.btn {
   background-color: var(--color-primary);
   color: white;
-  padding: 14px 28px;
-  font-size: 1rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+  padding: 13px 26px;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
   font-family: var(--font-sans);
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 30px;
+  border-radius: 12px;
   text-align: center;
   cursor: pointer;
   border: none;
   text-decoration: none;
 }
 
-.btn:hover,
-.btn-gold:hover {
+.btn:hover {
   background-color: var(--color-primary-dark);
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(184, 46, 56, 0.25);
 }
 
-.btn-dark {
-  background-color: #333333;
-  color: white;
-  padding: 14px 28px;
-  font-size: 1rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
+.btn-gold {
+  background: linear-gradient(135deg, #1f1c19 0%, #12100f 100%);
+  color: #ffffff;
+  padding: 13px 26px;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
   font-family: var(--font-sans);
-  font-weight: 500;
-  transition: all 0.3s ease;
+  font-weight: 600;
+  transition: all 0.25s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 30px;
+  border-radius: 12px;
   text-align: center;
   cursor: pointer;
-  border: none;
+  border: 1px solid rgba(197, 148, 58, 0.45);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #2b2723 0%, #1a1715 100%);
+  border-color: rgba(212, 175, 55, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(197, 148, 58, 0.25);
+}
+
+.btn-dark {
+  background-color: #222222;
+  color: white;
+  padding: 13px 26px;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-dark:hover {
-  background-color: #1a1a1a;
+  background-color: #111111;
   transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.wholesale-cta-btn {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.wholesale-cta-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
+.wholesale-cta-btn:active {
+  transform: translateY(0);
 }
 
 .btn-outline {
@@ -191,7 +524,7 @@ button {
 }
 
 .site-header .nav-link {
-  color: #1a1a1a;
+  color: var(--color-text);
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 1px;
@@ -200,22 +533,22 @@ button {
 }
 
 .site-header.scrolled .nav-link {
-  color: #1a1a1a;
+  color: var(--color-text);
 }
 
 .site-header .nav-link:hover {
-  color: #e45258;
+  color: var(--color-primary);
 }
 
 .site-header .brand-name {
-  color: #e45258;
+  color: var(--color-primary);
   font-family: var(--font-serif);
   font-size: 1.8rem;
   line-height: 1.1;
 }
 
 .site-header.scrolled .brand-name {
-  color: #e45258;
+  color: var(--color-primary);
 }
 
 /* Mobile Nav Overlay & Buttons */
@@ -283,7 +616,7 @@ button {
     align-items: center;
     gap: 6px;
     cursor: pointer;
-    box-shadow: 0 3px 10px rgba(228, 82, 88, 0.3);
+    box-shadow: 0 3px 10px var(--color-primary-glow, rgba(0, 0, 0, 0.2));
     flex-shrink: 0;
     transition: all 0.2s ease;
   }

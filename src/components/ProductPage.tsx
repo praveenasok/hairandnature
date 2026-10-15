@@ -8,6 +8,7 @@ import { useEnquiry } from '@/context/EnquiryContext';
 import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor } from '@/data/colors';
 import { HAIR_STYLES, STYLE_NAMES, HairStyle } from '@/data/styles';
 import { getProductThumbnail } from '@/data/productImages';
+import { Plus, ShoppingBag, Check } from 'lucide-react';
 
 const LENGTHS = ['16 Inches', '18 Inches', '20 Inches', '22 Inches', '24 Inches', '26 Inches', '28 Inches', '30 Inches'];
 const WEIGHTS = ['50 Grams', '100 Grams', '150 Grams', '200 Grams'];
@@ -101,25 +102,30 @@ interface ProductPageProps {
 }
 
 export default function ProductPage({ title, desc, img, images = [], specs = [] }: ProductPageProps) {
-  const { formatPrice, currency } = useCurrency();
+  const { formatPrice, convertPrice, currency, symbols } = useCurrency();
   const { addItem, totalCount, setIsOpen: openGlobalEnquiry } = useEnquiry();
   const [quantity, setQuantity] = useState<number>(1);
   const [length, setLength] = useState(LENGTHS[0]);
   const [weight, setWeight] = useState(WEIGHTS[1]);
+  const [allColors, setAllColors] = useState<HairColor[]>(SPECTRUM_COLORS);
   const [style, setStyle] = useState(STYLES[0]);
   const [color, setColor] = useState(SPECTRUM_COLORS[0].name);
-  const [colorCategory, setColorCategory] = useState<string>('All');
   const [description, setDescription] = useState(desc);
   const [metadata, setMetadata] = useState<any>(null);
 
-  const filteredColors = useMemo(() => {
-    if (colorCategory === 'All') return SPECTRUM_COLORS;
-    return SPECTRUM_COLORS.filter(c => c.category === colorCategory);
-  }, [colorCategory]);
+  const availableColors = useMemo(() => {
+    if (metadata && Array.isArray(metadata.availableColors) && metadata.availableColors.length > 0) {
+      const filtered = allColors.filter(c => metadata.availableColors.includes(c.name) || metadata.availableColors.includes(c.id));
+      if (filtered.length > 0) return filtered;
+    }
+    return allColors;
+  }, [metadata, allColors]);
+
+
 
   const selectedColorObj = useMemo(() => {
-    return SPECTRUM_COLORS.find(c => c.name === color) || SPECTRUM_COLORS[0];
-  }, [color]);
+    return availableColors.find(c => c.name === color) || availableColors[0] || allColors[0];
+  }, [color, availableColors, allColors]);
 
   const selectedStyleObj = useMemo(() => {
     return HAIR_STYLES.find(s => s.name === style) || HAIR_STYLES[0];
@@ -141,33 +147,103 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
     return [img];
   }, [images, title, img, metadata]);
 
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [prevSlide, setPrevSlide] = useState<number | null>(null);
-
-  const changeSlide = (next: number) => {
-    setPrevSlide(currentSlide);
-    setCurrentSlide(next);
-    setTimeout(() => {
-      setPrevSlide(null);
-    }, 600);
-  };
+  // Unified Gallery Views (Product Slides + Active Texture + Active Shade)
+  const [activeView, setActiveView] = useState<{ type: 'product'; index: number } | { type: 'style' } | { type: 'color' }>({ type: 'product', index: 0 });
   const [isPaused, setIsPaused] = useState(false);
 
-  useEffect(() => {
-    if (slideImages.length <= 1 || isPaused) return;
-    const timer = setInterval(() => {
-      changeSlide((currentSlide + 1) % slideImages.length);
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [slideImages.length, isPaused, currentSlide]);
+  const allGalleryItems = useMemo(() => {
+    const items: Array<{
+      id: string;
+      src: string;
+      alt: string;
+      tag: string;
+      title: string;
+      subtitle: string;
+      type: 'product' | 'style' | 'color';
+      index?: number;
+    }> = slideImages.map((src, idx) => ({
+      id: `product-${idx}`,
+      src,
+      alt: `${title} view ${idx + 1}`,
+      tag: 'Product View',
+      title: title,
+      subtitle: idx === 0 ? 'Model Showcase' : 'Product Detail',
+      type: 'product',
+      index: idx
+    }));
+
+    if (selectedStyleObj) {
+      items.push({
+        id: `style-${selectedStyleObj.id}`,
+        src: selectedStyleObj.image,
+        alt: `${selectedStyleObj.name} hair texture`,
+        tag: 'Texture View',
+        title: selectedStyleObj.name,
+        subtitle: `${selectedStyleObj.pattern} • ${selectedStyleObj.curlType}`,
+        type: 'style'
+      });
+    }
+
+    if (selectedColorObj) {
+      items.push({
+        id: `color-${selectedColorObj.id}`,
+        src: selectedColorObj.image,
+        alt: `${selectedColorObj.name} hair shade`,
+        tag: 'Shade View',
+        title: selectedColorObj.name,
+        subtitle: `${selectedColorObj.category} • 100% Remy`,
+        type: 'color'
+      });
+    }
+
+    return items;
+  }, [slideImages, title, selectedStyleObj, selectedColorObj]);
+
+  const currentItemIndex = useMemo(() => {
+    if (activeView.type === 'style') {
+      const idx = allGalleryItems.findIndex(item => item.type === 'style');
+      return idx !== -1 ? idx : 0;
+    }
+    if (activeView.type === 'color') {
+      const idx = allGalleryItems.findIndex(item => item.type === 'color');
+      return idx !== -1 ? idx : 0;
+    }
+    const idx = allGalleryItems.findIndex(item => item.type === 'product' && item.index === activeView.index);
+    return idx !== -1 ? idx : 0;
+  }, [activeView, allGalleryItems]);
+
+  const currentDisplay = allGalleryItems[currentItemIndex] || allGalleryItems[0];
 
   const handlePrevSlide = () => {
-    changeSlide((currentSlide - 1 + slideImages.length) % slideImages.length);
+    const nextIdx = (currentItemIndex - 1 + allGalleryItems.length) % allGalleryItems.length;
+    const item = allGalleryItems[nextIdx];
+    if (item.type === 'product') {
+      setActiveView({ type: 'product', index: item.index || 0 });
+    } else {
+      setActiveView({ type: item.type });
+    }
   };
 
   const handleNextSlide = () => {
-    changeSlide((currentSlide + 1) % slideImages.length);
+    const nextIdx = (currentItemIndex + 1) % allGalleryItems.length;
+    const item = allGalleryItems[nextIdx];
+    if (item.type === 'product') {
+      setActiveView({ type: 'product', index: item.index || 0 });
+    } else {
+      setActiveView({ type: item.type });
+    }
   };
+
+  useEffect(() => {
+    if (activeView.type !== 'product' || slideImages.length <= 1 || isPaused) return;
+    const timer = setInterval(() => {
+      setActiveView(prev => {
+        if (prev.type !== 'product') return prev;
+        return { type: 'product', index: (prev.index + 1) % slideImages.length };
+      });
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slideImages.length, isPaused, activeView]);
   
   useEffect(() => {
     fetch('/api/prices')
@@ -192,6 +268,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
         }
       })
       .catch(err => console.error("Could not load descriptions", err));
+
+    fetch('/api/colors')
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.colors) && data.colors.length > 0) {
+          setAllColors(data.colors);
+        }
+      })
+      .catch(err => console.error("Could not load colors", err));
 
     fetch('/api/product-metadata')
       .then(res => res.json())
@@ -231,31 +316,86 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
       if (metadata.availableStyles && metadata.availableStyles.length > 0 && !metadata.availableStyles.includes(style)) {
         setStyle(metadata.availableStyles[0]);
       }
+      if (metadata.availableColors && metadata.availableColors.length > 0 && !metadata.availableColors.includes(color)) {
+        setColor(metadata.availableColors[0]);
+      }
     }
-  }, [metadata, length, weight, style]);
+  }, [metadata, length, weight, style, color]);
 
-  const currentColorObj = SPECTRUM_COLORS.find(c => c.name === color);
+
+  useEffect(() => {
+    if (availableColors.length > 0 && !availableColors.some(c => c.name === color)) {
+      setColor(availableColors[0].name);
+    }
+  }, [availableColors, color]);
+
+  const currentColorObj = availableColors.find(c => c.name === color) || allColors.find(c => c.name === color) || SPECTRUM_COLORS[0];
   const currentColorCategory = currentColorObj ? currentColorObj.category : 'Unknown';
 
-  const keyWithWeight = `${title}|${length}|${style}|${currentColorCategory}|${weight}`;
-  const keyLegacy = `${title}|${length}|${style}|${currentColorCategory}`;
+  const mults: Record<string, number> = {
+    '50 Grams': 0.55,
+    '100 Grams': 1.0,
+    '150 Grams': 1.48,
+    '200 Grams': 1.95
+  };
 
-  let currentPrice = prices[keyWithWeight];
-  if (currentPrice === undefined && prices[keyLegacy] !== undefined) {
-    const base = prices[keyLegacy];
-    const mults: Record<string, number> = {
-      '50 Grams': 0.55,
-      '100 Grams': 1.0,
-      '150 Grams': 1.48,
-      '200 Grams': 1.95
-    };
-    currentPrice = Math.round(base * (mults[weight] || 1.0));
+  // Robust Pricing Lookup Hierarchy:
+  // 1. Exact Color Name + Selected Weight (e.g. "Tape Extensions|16 Inches|Natural Straight|Frost|100 Grams")
+  // 2. Color Category + Selected Weight (e.g. "Tape Extensions|16 Inches|Natural Straight|Blondes & Ash|100 Grams")
+  // 3. Exact Color Name + 100g base price (with weight multiplier)
+  // 4. Color Category + 100g base price (with weight multiplier)
+  // 5. Legacy 4-part key with Color Name (with weight multiplier)
+  // 6. Legacy 4-part key with Color Category (with weight multiplier)
+  // 7. Fallback to any style defined for this product, length, and color/category
+  let currentPrice: number | undefined = undefined;
+
+  const keyColorWeight = `${title}|${length}|${style}|${color}|${weight}`;
+  const keyCatWeight = `${title}|${length}|${style}|${currentColorCategory}|${weight}`;
+  const keyColor100g = `${title}|${length}|${style}|${color}|100 Grams`;
+  const keyCat100g = `${title}|${length}|${style}|${currentColorCategory}|100 Grams`;
+  const keyColorLegacy = `${title}|${length}|${style}|${color}`;
+  const keyCatLegacy = `${title}|${length}|${style}|${currentColorCategory}`;
+
+  if (prices[keyColorWeight] !== undefined) {
+    currentPrice = prices[keyColorWeight];
+  } else if (prices[keyCatWeight] !== undefined) {
+    currentPrice = prices[keyCatWeight];
+  } else if (prices[keyColor100g] !== undefined) {
+    currentPrice = Math.round(prices[keyColor100g] * (mults[weight] || 1.0));
+  } else if (prices[keyCat100g] !== undefined) {
+    currentPrice = Math.round(prices[keyCat100g] * (mults[weight] || 1.0));
+  } else if (prices[keyColorLegacy] !== undefined) {
+    currentPrice = Math.round(prices[keyColorLegacy] * (mults[weight] || 1.0));
+  } else if (prices[keyCatLegacy] !== undefined) {
+    currentPrice = Math.round(prices[keyCatLegacy] * (mults[weight] || 1.0));
+  } else {
+    // Style fallback: check if another style has a price defined for this length, color/category, and weight
+    for (const altStyle of STYLE_NAMES) {
+      if (altStyle === style) continue;
+      const altColorWeight = `${title}|${length}|${altStyle}|${color}|${weight}`;
+      const altCatWeight = `${title}|${length}|${altStyle}|${currentColorCategory}|${weight}`;
+      const altColor100g = `${title}|${length}|${altStyle}|${color}|100 Grams`;
+      const altCat100g = `${title}|${length}|${altStyle}|${currentColorCategory}|100 Grams`;
+      
+      if (prices[altColorWeight] !== undefined) {
+        currentPrice = prices[altColorWeight];
+        break;
+      } else if (prices[altCatWeight] !== undefined) {
+        currentPrice = prices[altCatWeight];
+        break;
+      } else if (prices[altColor100g] !== undefined) {
+        currentPrice = Math.round(prices[altColor100g] * (mults[weight] || 1.0));
+        break;
+      } else if (prices[altCat100g] !== undefined) {
+        currentPrice = Math.round(prices[altCat100g] * (mults[weight] || 1.0));
+        break;
+      }
+    }
   }
 
   const formattedPriceWithUnit = currentPrice !== undefined ? formatPrice(currentPrice, unit) : '';
-  const priceText = currentPrice !== undefined ? ` - ${formattedPriceWithUnit}` : '';
-  const whatsappMessage = `Hi, I am interested in ordering the ${title}. \nLength: ${length}\nWeight: ${weight}\nStyle: ${style}\nColor: ${color}${currentPrice ? `\nPrice: ${formattedPriceWithUnit} (${currency})` : ''}`;
-  const whatsappUrl = `https://wa.me/919871171978?text=${encodeURIComponent(whatsappMessage)}`;
+
+  const [isJustAdded, setIsJustAdded] = useState(false);
 
   const handleAddToGlobalEnquiry = () => {
     // Select authentic physical product photo instead of model image
@@ -272,6 +412,8 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
       quantity,
       basePriceUsd: currentPrice
     });
+    setIsJustAdded(true);
+    setTimeout(() => setIsJustAdded(false), 2200);
     openGlobalEnquiry(true);
   };
 
@@ -287,7 +429,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             <span style={{ color: '#bbb' }}>/</span>
             <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{title}</span>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(228, 82, 88, 0.08)', color: 'var(--color-primary)', padding: '5px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', color: 'var(--color-primary)', padding: '5px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
             <span>✨</span> 100% Virgin Temple Remy Hair • Direct Factory Floor
           </div>
         </div>
@@ -302,64 +444,115 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             transition={{ duration: 0.6 }}
             className="product-gallery-sticky"
           >
-            
-            {/* Main Interactive Product Image Frame */}
-            <div style={{ 
-              position: 'relative', 
-              width: '100%', 
-              aspectRatio: '4 / 4.8', 
-              borderRadius: '20px', 
-              overflow: 'hidden', 
-              boxShadow: '0 20px 45px rgba(0,0,0,0.08)', 
-              marginBottom: '16px', 
-              background: '#f8f6f4',
-              border: '1px solid rgba(0,0,0,0.04)'
-            }}>
-              {slideImages.map((src, index) => (
-                <img 
-                  key={src + index}
-                  src={src} 
-                  alt={`${title} detail view ${index + 1}`}
+                     {/* Main Interactive Product Image Frame */}
+            <div 
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+              style={{ 
+                position: 'relative', 
+                width: '100%', 
+                aspectRatio: '4 / 4.8', 
+                borderRadius: '20px', 
+                overflow: 'hidden', 
+                boxShadow: '0 20px 45px rgba(0,0,0,0.08)', 
+                marginBottom: '16px', 
+                background: '#f8f6f4',
+                border: '1px solid rgba(0,0,0,0.04)'
+              }}
+            >
+              <AnimatePresence mode="wait">
+                <motion.img 
+                  key={currentDisplay.id + currentDisplay.src}
+                  src={currentDisplay.src} 
+                  alt={currentDisplay.alt}
+                  initial={{ opacity: 0, scale: 1.02 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
                   style={{ 
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    zIndex: currentSlide === index ? 1 : 0,
                     width: '100%', 
                     height: '100%', 
                     objectFit: 'cover',
-                    objectPosition: PRODUCT_IMAGE_CONFIG[src]?.position || 'center center',
-                    zIndex: currentSlide === index ? 1 : 0,
-                    pointerEvents: currentSlide === index ? 'auto' : 'none',
-                    opacity: currentSlide === index || prevSlide === index ? 1 : 0,
-                    transition: 'opacity 0.6s ease-in-out'
+                    objectPosition: PRODUCT_IMAGE_CONFIG[currentDisplay.src]?.position || 'center center',
+                    transform: PRODUCT_IMAGE_CONFIG[currentDisplay.src]?.transform || undefined
                   }} 
                 />
-              ))}
+              </AnimatePresence>
 
-              {/* Floating Quality Tag */}
+              {/* Floating Quality / Mode Tag */}
               <div style={{
                 position: 'absolute',
                 top: '16px',
                 left: '16px',
-                background: 'rgba(255, 255, 255, 0.9)',
-                backdropFilter: 'blur(8px)',
+                background: 'rgba(255, 255, 255, 0.94)',
+                backdropFilter: 'blur(10px)',
                 padding: '6px 14px',
                 borderRadius: '30px',
                 fontSize: '0.78rem',
                 fontWeight: 700,
-                color: '#222',
+                color: '#1a1a1a',
                 boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px'
+                gap: '8px',
+                zIndex: 2,
+                border: '1px solid rgba(255,255,255,0.7)',
+                maxWidth: 'calc(100% - 110px)'
               }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--color-primary)' }}></span>
-                Factory Direct • Export Grade
+                <span style={{ 
+                  width: '8px', 
+                  height: '8px', 
+                  borderRadius: '50%', 
+                  flexShrink: 0,
+                  background: currentDisplay.type === 'color' ? '#d97706' : (currentDisplay.type === 'style' ? '#7c3aed' : 'var(--color-primary)') 
+                }} />
+                <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {currentDisplay.type === 'color' && `Shade: ${currentDisplay.title}`}
+                  {currentDisplay.type === 'style' && `Texture: ${currentDisplay.title}`}
+                  {currentDisplay.type === 'product' && 'Factory Direct • Export Grade'}
+                </span>
+                {currentDisplay.type !== 'product' && (
+                  <span style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    ({currentDisplay.subtitle})
+                  </span>
+                )}
               </div>
 
+              {/* Quick Return to Product Photos Button */}
+              {currentDisplay.type !== 'product' && (
+                <button
+                  type="button"
+                  onClick={() => setActiveView({ type: 'product', index: 0 })}
+                  style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    left: '16px',
+                    background: 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(0,0,0,0.08)',
+                    borderRadius: '20px',
+                    padding: '6px 12px',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    color: 'var(--color-primary)',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.12)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    zIndex: 2,
+                    transition: 'all 0.15s ease'
+                  }}
+                >
+                  <span>↩</span> View Product Photos
+                </button>
+              )}
+
               {/* Slide Counter Indicator */}
-              {slideImages.length > 1 && (
+              {allGalleryItems.length > 1 && (
                 <div style={{
                   position: 'absolute',
                   top: '16px',
@@ -370,14 +563,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   padding: '4px 10px',
                   borderRadius: '20px',
                   fontSize: '0.75rem',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  zIndex: 2
                 }}>
-                  {currentSlide + 1} / {slideImages.length}
+                  {currentItemIndex + 1} / {allGalleryItems.length}
                 </div>
               )}
 
               {/* Gallery Overlay Prev / Next Buttons */}
-              {slideImages.length > 1 && (
+              {allGalleryItems.length > 1 && (
                 <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 2 }}>
                   <button 
                     onClick={handlePrevSlide}
@@ -386,14 +580,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                       width: '40px', 
                       height: '40px', 
                       borderRadius: '50%', 
-                      background: 'rgba(255,255,255,0.9)', 
+                      background: 'rgba(255,255,255,0.92)', 
                       color: '#222', 
                       backdropFilter: 'blur(8px)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
                       cursor: 'pointer', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
+                      border: 'none',
                       transition: 'all 0.2s ease'
                     }}
                   >
@@ -406,14 +601,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                       width: '40px', 
                       height: '40px', 
                       borderRadius: '50%', 
-                      background: 'rgba(255,255,255,0.9)', 
+                      background: 'rgba(255,255,255,0.92)', 
                       color: '#222', 
                       backdropFilter: 'blur(8px)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
                       cursor: 'pointer', 
                       display: 'flex', 
                       alignItems: 'center', 
                       justifyContent: 'center',
+                      border: 'none',
                       transition: 'all 0.2s ease'
                     }}
                   >
@@ -424,29 +620,64 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             </div>
 
             {/* Gallery Thumbnails Strip */}
-            {slideImages.length > 1 && (
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${slideImages.length}, 1fr)`, gap: '10px', marginBottom: '22px' }}>
-                {slideImages.map((sImg, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => changeSlide(idx)}
-                    style={{
-                      height: '74px',
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      border: idx === currentSlide ? '2px solid var(--color-primary)' : '1px solid rgba(0,0,0,0.08)',
-                      padding: 0,
-                      cursor: 'pointer',
-                      background: '#fff',
-                      opacity: idx === currentSlide ? 1 : 0.65,
-                      transform: idx === currentSlide ? 'scale(1.02)' : 'none',
-                      transition: 'all 0.2s ease',
-                      boxShadow: idx === currentSlide ? '0 4px 12px rgba(228, 82, 88, 0.18)' : 'none'
-                    }}
-                  >
-                    <img src={sImg} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </button>
-                ))}
+            {allGalleryItems.length > 1 && (
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: `repeat(${allGalleryItems.length}, 1fr)`, 
+                gap: '8px', 
+                marginBottom: '22px' 
+              }}>
+                {allGalleryItems.map((item, idx) => {
+                  const isActive = idx === currentItemIndex;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        if (item.type === 'product') {
+                          setActiveView({ type: 'product', index: item.index || 0 });
+                        } else {
+                          setActiveView({ type: item.type });
+                        }
+                      }}
+                      title={item.title}
+                      style={{
+                        position: 'relative',
+                        height: '74px',
+                        borderRadius: '12px',
+                        overflow: 'hidden',
+                        border: isActive ? '2px solid var(--color-primary)' : '1px solid rgba(0,0,0,0.08)',
+                        padding: 0,
+                        cursor: 'pointer',
+                        background: '#fff',
+                        opacity: isActive ? 1 : 0.65,
+                        transform: isActive ? 'scale(1.03)' : 'none',
+                        transition: 'all 0.2s ease',
+                        boxShadow: isActive ? '0 4px 12px var(--color-primary-glow, rgba(143, 35, 43, 0.22))' : 'none'
+                      }}
+                    >
+                      <img src={item.src} alt={item.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      
+                      {item.type !== 'product' && (
+                        <div style={{
+                          position: 'absolute',
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          background: item.type === 'color' ? 'rgba(217, 119, 6, 0.9)' : 'rgba(124, 58, 237, 0.9)',
+                          color: '#fff',
+                          fontSize: '8.5px',
+                          fontWeight: 800,
+                          textAlign: 'center',
+                          padding: '2px 0',
+                          letterSpacing: '0.4px',
+                          textTransform: 'uppercase'
+                        }}>
+                          {item.type === 'color' ? 'Shade' : 'Texture'}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
 
@@ -512,8 +743,16 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </h1>
               {currentPrice !== undefined && (
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.1rem)', fontWeight: 800, color: 'var(--color-primary)', lineHeight: 1 }}>
-                    {formattedPriceWithUnit}
+                  <div style={{ display: 'inline-flex', alignItems: 'baseline', color: 'var(--color-primary)', lineHeight: 1 }}>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 700, marginRight: '2px' }}>
+                      {symbols ? (symbols[currency] || '$') : '$'}
+                    </span>
+                    <span style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.1rem)', fontWeight: 800, fontVariantNumeric: 'tabular-nums', letterSpacing: '-0.5px' }}>
+                      {convertPrice(currentPrice)}
+                    </span>
+                    <span style={{ fontSize: '0.88rem', fontWeight: 500, marginLeft: '3px', opacity: 0.85 }}>
+                      / {unit}
+                    </span>
                   </div>
                   <span style={{ fontSize: '0.75rem', color: '#888', display: 'block', marginTop: '4px' }}>
                     Direct Wholesale Price ({currency})
@@ -532,7 +771,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             <div style={{ marginBottom: '22px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>1. Select Length</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
                   {length}
                 </span>
               </div>
@@ -547,7 +786,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         padding: '8px 14px', 
                         borderRadius: '8px', 
                         border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0', 
-                        background: isSelected ? 'rgba(228, 82, 88, 0.05)' : '#ffffff',
+                        background: isSelected ? 'var(--color-primary-subtle, rgba(143, 35, 43, 0.05))' : '#ffffff',
                         color: isSelected ? 'var(--color-primary)' : '#334155',
                         fontWeight: isSelected ? 700 : 500,
                         cursor: 'pointer',
@@ -566,7 +805,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>2. Select Weight / Density</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
                   {weight}
                 </span>
               </div>
@@ -581,7 +820,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         padding: '8px 14px', 
                         borderRadius: '8px', 
                         border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0', 
-                        background: isSelected ? 'rgba(228, 82, 88, 0.05)' : '#ffffff',
+                        background: isSelected ? 'var(--color-primary-subtle, rgba(143, 35, 43, 0.05))' : '#ffffff',
                         color: isSelected ? 'var(--color-primary)' : '#334155',
                         fontWeight: isSelected ? 700 : 500,
                         cursor: 'pointer',
@@ -600,7 +839,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             <div style={{ marginBottom: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>3. Select Style & Texture</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
                   {selectedStyleObj.name} ({selectedStyleObj.curlType})
                 </span>
               </div>
@@ -617,7 +856,10 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   return (
                     <button
                       key={st.id}
-                      onClick={() => setStyle(st.name)}
+                      onClick={() => {
+                        setStyle(st.name);
+                        setActiveView({ type: 'style' });
+                      }}
                       type="button"
                       style={{
                         display: 'flex',
@@ -627,10 +869,10 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         padding: '8px 6px',
                         borderRadius: '10px',
                         border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
-                        background: isSelected ? 'rgba(228, 82, 88, 0.04)' : '#ffffff',
+                        background: isSelected ? 'var(--color-primary-subtle, rgba(143, 35, 43, 0.04))' : '#ffffff',
                         cursor: 'pointer',
                         transition: 'all 0.15s ease',
-                        boxShadow: isSelected ? '0 3px 10px rgba(228, 82, 88, 0.12)' : 'none',
+                        boxShadow: isSelected ? '0 3px 10px var(--color-primary-glow, rgba(143, 35, 43, 0.12))' : 'none',
                         position: 'relative'
                       }}
                     >
@@ -685,115 +927,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   );
                 })}
               </div>
-
-              {/* Texture Detail Note */}
-              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '8px 12px', fontSize: '0.8rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 700 }}>•</span>
-                <span><strong>{selectedStyleObj.name}:</strong> {selectedStyleObj.description}</span>
-              </div>
             </div>
 
             {/* 4. Color Options */}
             <div style={{ marginBottom: '26px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>4. Select Premium Shade</span>
-                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'rgba(228, 82, 88, 0.08)', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
+                <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
                   {selectedColorObj.name}
                 </span>
-              </div>
-
-              {/* Active Color Preview Bar with HD Loupe */}
-              <div style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '14px', 
-                background: 'linear-gradient(135deg, #ffffff 0%, #faf7f5 100%)', 
-                border: '1.5px solid rgba(228, 82, 88, 0.22)', 
-                borderRadius: '14px', 
-                padding: '10px 14px', 
-                marginBottom: '14px',
-                boxShadow: '0 4px 18px rgba(228, 82, 88, 0.06)'
-              }}>
-                <div style={{ 
-                  position: 'relative',
-                  width: '56px', 
-                  height: '56px', 
-                  borderRadius: '12px', 
-                  overflow: 'hidden', 
-                  flexShrink: 0, 
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5)', 
-                  border: '2px solid var(--color-primary)',
-                  background: '#f5f5f5' 
-                }}>
-                  <img 
-                    src={selectedColorObj.image} 
-                    alt={selectedColorObj.name} 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover',
-                      transform: 'scale(1.25)',
-                      transition: 'transform 0.3s ease'
-                    }} 
-                  />
-                  <div style={{ 
-                    position: 'absolute', 
-                    bottom: '2px', 
-                    right: '2px', 
-                    background: 'rgba(0,0,0,0.65)', 
-                    color: '#fff', 
-                    fontSize: '9px', 
-                    fontWeight: 800, 
-                    padding: '1px 4px', 
-                    borderRadius: '4px',
-                    backdropFilter: 'blur(2px)'
-                  }}>
-                    HD
-                  </div>
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                    <span style={{ fontWeight: 800, fontSize: '1rem', color: '#111' }}>{selectedColorObj.name}</span>
-                    <span style={{ fontSize: '0.72rem', background: 'rgba(228, 82, 88, 0.12)', color: 'var(--color-primary)', padding: '2px 8px', borderRadius: '10px', fontWeight: 700 }}>
-                      {selectedColorObj.category}
-                    </span>
-                    <span style={{ fontSize: '0.68rem', background: '#f0ece7', color: '#6d5a49', padding: '2px 6px', borderRadius: '6px', fontWeight: 600 }}>
-                      Active Shade
-                    </span>
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#666', marginTop: '3px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>✨ 100% Remy Human Hair</span>
-                    <span>•</span>
-                    <span style={{ color: '#2b8a3e', fontWeight: 600 }}>In Stock (Factory Direct)</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category Filter Tabs */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '10px' }}>
-                {COLOR_CATEGORIES.map(cat => {
-                  const count = cat === 'All' ? SPECTRUM_COLORS.length : SPECTRUM_COLORS.filter(c => c.category === cat).length;
-                  const isActive = colorCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setColorCategory(cat)}
-                      style={{
-                        padding: '4px 10px',
-                        borderRadius: '20px',
-                        border: isActive ? '1px solid var(--color-primary)' : '1px solid #e2e8f0',
-                        background: isActive ? 'rgba(228, 82, 88, 0.08)' : '#fff',
-                        color: isActive ? 'var(--color-primary)' : '#64748b',
-                        fontSize: '0.75rem',
-                        fontWeight: isActive ? 700 : 500,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease'
-                      }}
-                    >
-                      {cat} ({count})
-                    </button>
-                  );
-                })}
               </div>
 
               {/* Color Swatches Grid with In-Place Zoom on Selected Swatch */}
@@ -808,12 +950,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 borderRadius: '12px',
                 background: '#fafafa'
               }}>
-                {filteredColors.map(c => {
+                {availableColors.map(c => {
                   const isSelected = c.name === color;
                   return (
                     <button
                       key={c.id}
-                      onClick={() => setColor(c.name)}
+                      onClick={() => {
+                        setColor(c.name);
+                        setActiveView({ type: 'color' });
+                      }}
                       title={c.name}
                       aria-label={c.name}
                       style={{
@@ -831,7 +976,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         transform: isSelected ? 'scale(1.24)' : 'scale(1)',
                         transformOrigin: 'center center',
                         boxShadow: isSelected 
-                          ? '0 12px 26px -2px rgba(228, 82, 88, 0.42), 0 0 0 2px var(--color-primary)' 
+                          ? '0 12px 26px -2px var(--color-primary-glow, rgba(143, 35, 43, 0.42)), 0 0 0 2px var(--color-primary)' 
                           : '0 1px 3px rgba(0,0,0,0.04)',
                         transition: 'transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease'
                       }}
@@ -1025,230 +1170,103 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   <span style={{ fontSize: '0.86rem', color: '#666', fontWeight: 600 }}>Estimated Rate:</span>
                   {quantity > 1 && (
                     <span style={{ display: 'block', fontSize: '0.74rem', color: '#888' }}>
-                      ({quantity} x {formattedPriceWithUnit})
+                      ({quantity} x {symbols ? (symbols[currency] || '$') : '$'}{convertPrice(currentPrice || 0)} / {unit})
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: '1.45rem', fontWeight: 800, color: '#b83238' }}>
-                  {currentPrice !== undefined ? formatPrice(currentPrice * quantity) : 'Wholesale Quote'}
-                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                  <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-primary)' }}>
+                    {symbols ? (symbols[currency] || '$') : '$'}
+                  </span>
+                  <span style={{ fontSize: '1.55rem', fontWeight: 800, color: 'var(--color-primary)', fontVariantNumeric: 'tabular-nums' }}>
+                    {currentPrice !== undefined ? convertPrice(currentPrice * quantity) : 'Quote'}
+                  </span>
+                  <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 500, marginLeft: '3px' }}>
+                    ({currency})
+                  </span>
+                </div>
               </div>
 
               {/* Primary Enquiry Action */}
               <button 
                 type="button"
                 onClick={handleAddToGlobalEnquiry}
-                className="btn-gold" 
+                className="wholesale-cta-btn" 
                 style={{ 
                   width: '100%', 
-                  padding: '16px 20px', 
-                  fontSize: '1rem', 
-                  fontWeight: 700,
+                  padding: '16px 22px', 
+                  fontSize: '0.98rem', 
+                  fontWeight: 600,
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
                   gap: '10px',
-                  borderRadius: '12px',
-                  boxShadow: '0 6px 20px rgba(228, 82, 88, 0.35)',
-                  border: 'none',
-                  cursor: 'pointer'
+                  borderRadius: '14px',
+                  background: isJustAdded 
+                    ? 'linear-gradient(135deg, #15803d 0%, #166534 100%)'
+                    : 'linear-gradient(135deg, #1c1917 0%, #110f0e 100%)',
+                  color: '#ffffff',
+                  border: isJustAdded 
+                    ? '1.5px solid rgba(74, 222, 128, 0.6)'
+                    : '1.5px solid rgba(197, 148, 58, 0.45)',
+                  boxShadow: isJustAdded
+                    ? '0 8px 24px rgba(22, 101, 52, 0.35)'
+                    : '0 8px 26px rgba(18, 16, 14, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  textTransform: 'none',
+                  letterSpacing: '0.2px',
+                  position: 'relative'
                 }}
               >
-                <span>➕ Add to Wholesale Enquiry</span>
-                {totalCount > 0 && (
-                  <span style={{ background: '#ffffff', color: 'var(--color-primary)', borderRadius: '12px', padding: '2px 8px', fontSize: '0.75rem', fontWeight: 800 }}>
-                    {totalCount}
-                  </span>
+                <div style={{
+                  width: '26px',
+                  height: '26px',
+                  borderRadius: '50%',
+                  background: isJustAdded ? 'rgba(74, 222, 128, 0.2)' : 'rgba(197, 148, 58, 0.2)',
+                  border: isJustAdded ? '1px solid rgba(74, 222, 128, 0.5)' : '1px solid rgba(197, 148, 58, 0.45)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
+                }}>
+                  {isJustAdded ? (
+                    <Check size={15} strokeWidth={2.6} color="#4ade80" />
+                  ) : (
+                    <Plus size={15} strokeWidth={2.6} color="#e5c07b" />
+                  )}
+                </div>
+
+                <span style={{ fontSize: '0.98rem', fontWeight: 600, color: '#ffffff', letterSpacing: '0.2px' }}>
+                  {isJustAdded ? 'Added to Wholesale Enquiry!' : 'Add to Wholesale Enquiry'}
+                </span>
+
+                {totalCount > 0 && !isJustAdded && (
+                  <div style={{
+                    marginLeft: 'auto',
+                    background: 'rgba(212, 175, 55, 0.18)',
+                    border: '1px solid rgba(212, 175, 55, 0.45)',
+                    color: '#f5e6c8',
+                    borderRadius: '20px',
+                    padding: '3px 10px',
+                    fontSize: '0.76rem',
+                    fontWeight: 700,
+                    letterSpacing: '0.3px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px'
+                  }}>
+                    <ShoppingBag size={12} strokeWidth={2.4} color="#e5c07b" />
+                    <span>{totalCount} in portfolio</span>
+                  </div>
                 )}
               </button>
 
-              {/* Secondary single-item quick WhatsApp link */}
-              <div style={{ textAlign: 'center', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(197, 148, 58, 0.18)' }}>
-                <a 
-                  href={whatsappUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  style={{ fontSize: '0.8rem', color: '#7a6654', textDecoration: 'underline', fontWeight: 500, transition: 'color 0.2s' }}
-                >
-                  ⚡ Direct WhatsApp quote for this single configuration only
-                </a>
-              </div>
 
-              {/* Worldwide Express Shipping Options Panel */}
-              <div style={{ 
-                marginTop: '18px', 
-                padding: '16px 18px', 
-                background: 'linear-gradient(180deg, #fffbf6 0%, #fbf5ee 100%)', 
-                borderRadius: '16px', 
-                border: '1px solid rgba(220, 185, 145, 0.4)',
-                boxShadow: '0 4px 18px rgba(0, 0, 0, 0.02)'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '1.05rem' }}>✈️</span>
-                    <div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#2b231d', letterSpacing: '0.4px', textTransform: 'uppercase' }}>
-                        Worldwide Express Shipping
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: '#7e6d60' }}>
-                        Door-to-door courier delivery with live tracking
-                      </div>
-                    </div>
-                  </div>
-                  <span style={{ 
-                    fontSize: '0.66rem', 
-                    fontWeight: 700, 
-                    color: '#8a622c', 
-                    background: 'rgba(218, 165, 32, 0.12)', 
-                    padding: '3px 8px', 
-                    borderRadius: '20px',
-                    whiteSpace: 'nowrap'
-                  }}>
-                    Global Priority
-                  </span>
-                </div>
-
-                {/* 4 Carriers Grid */}
-                <div style={{ 
-                  display: 'grid', 
-                  gridTemplateColumns: 'repeat(2, 1fr)', 
-                  gap: '10px' 
-                }}>
-                  {/* FedEx */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid rgba(220, 185, 145, 0.45)',
-                    borderRadius: '12px',
-                    padding: '10px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    minHeight: '66px',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src="/images/carriers/fedex.svg" 
-                        alt="FedEx Express" 
-                        style={{ height: '18px', width: 'auto', maxWidth: '72px', objectFit: 'contain' }} 
-                      />
-                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#4d148c', background: 'rgba(77, 20, 140, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
-                        3–5 Days
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
-                      FedEx Express
-                    </div>
-                  </div>
-
-                  {/* DHL */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid rgba(220, 185, 145, 0.45)',
-                    borderRadius: '12px',
-                    padding: '10px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    minHeight: '66px',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src="/images/carriers/dhl.svg" 
-                        alt="DHL Express" 
-                        style={{ height: '16px', width: 'auto', maxWidth: '72px', objectFit: 'contain' }} 
-                      />
-                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#d40511', background: 'rgba(212, 5, 17, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
-                        3–5 Days
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
-                      DHL Worldwide
-                    </div>
-                  </div>
-
-                  {/* UPS */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid rgba(220, 185, 145, 0.45)',
-                    borderRadius: '12px',
-                    padding: '10px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    minHeight: '66px',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src="/images/carriers/ups.svg" 
-                        alt="UPS Worldwide" 
-                        style={{ height: '22px', width: 'auto', maxWidth: '35px', objectFit: 'contain' }} 
-                      />
-                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#68451f', background: 'rgba(104, 69, 31, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
-                        3–6 Days
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
-                      UPS Saver
-                    </div>
-                  </div>
-
-                  {/* Aramex */}
-                  <div style={{
-                    background: '#ffffff',
-                    border: '1px solid rgba(220, 185, 145, 0.45)',
-                    borderRadius: '12px',
-                    padding: '10px 12px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    minHeight: '66px',
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.02)'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '24px' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img 
-                        src="/images/carriers/aramex.svg" 
-                        alt="Aramex Priority" 
-                        style={{ height: '14px', width: 'auto', maxWidth: '75px', objectFit: 'contain' }} 
-                      />
-                      <span style={{ fontSize: '0.64rem', fontWeight: 700, color: '#e31837', background: 'rgba(227, 24, 55, 0.08)', padding: '2px 6px', borderRadius: '6px' }}>
-                        4–7 Days
-                      </span>
-                    </div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 600, color: '#3a312a', marginTop: '6px' }}>
-                      Aramex Priority
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Assurance Info */}
-                <div style={{ 
-                  marginTop: '12px', 
-                  paddingTop: '10px', 
-                  borderTop: '1px dashed rgba(220, 185, 145, 0.45)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'space-between',
-                  flexWrap: 'wrap',
-                  gap: '6px',
-                  fontSize: '0.71rem', 
-                  color: '#7e6d60' 
-                }}>
-                  <span>📦 Dispatches in 24–48h directly from Chennai factory</span>
-                  <span style={{ fontWeight: 600, color: '#2b231d' }}>✓ Full Customs Documentation Included</span>
-                </div>
-              </div>
             </div>
 
           </motion.div>
         </div>
-
 
       </div>
     </div>

@@ -823,7 +823,7 @@ export default function GlobalEnquiryDrawer() {
                     </strong>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '0.72rem', background: 'rgba(228,82,88,0.1)', color: 'var(--color-primary)', padding: '3px 10px', borderRadius: '20px', fontWeight: 700 }}>
+                    <span style={{ fontSize: '0.72rem', background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.1))', color: 'var(--color-primary)', padding: '3px 10px', borderRadius: '20px', fontWeight: 700 }}>
                       Factory Direct
                     </span>
                   </div>
