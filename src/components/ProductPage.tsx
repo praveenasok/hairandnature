@@ -179,7 +179,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
         alt: `${selectedStyleObj.name} hair texture`,
         tag: 'Texture View',
         title: selectedStyleObj.name,
-        subtitle: `${selectedStyleObj.pattern} • ${selectedStyleObj.curlType}`,
+        subtitle: selectedStyleObj.pattern,
         type: 'style'
       });
     }
@@ -859,7 +859,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#222' }}>3. Select Style & Texture</span>
                 <span style={{ color: 'var(--color-primary)', fontWeight: 600, background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', padding: '2px 10px', borderRadius: '12px', fontSize: '0.82rem' }}>
-                  {selectedStyleObj.name} ({selectedStyleObj.curlType})
+                  {selectedStyleObj.name}
                 </span>
               </div>
 
