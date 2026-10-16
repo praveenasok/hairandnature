@@ -225,7 +225,7 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
     if (totalEst > 0) {
       msg += `💰 *Estimated Portfolio Total:* ${formatPrice(items.reduce((acc, it) => acc + (it.basePriceUsd || 0) * it.quantity, 0))} (${currency})\n`;
     }
-    msg += `💎 *Quality Standard:* 100% Pure Virgin Temple Remy Hair (Cuticle Aligned)\n`;
+    msg += `💎 *Quality Standard:* 100% Ethical. 100% Natural. 100% You. (100% Pure Virgin Temple Remy Hair)\n`;
     msg += `✈️ *Shipping:* Express International via DHL / FedEx Priority\n\n`;
     msg += `Please verify current factory inventory, tiered wholesale discounts, and express dispatch lead time. Thank you!`;
 
@@ -237,6 +237,7 @@ export function EnquiryProvider({ children }: { children: React.ReactNode }) {
     const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     let msg = `✨ *hair&nature® General Wholesale Enquiry* ✨\n`;
+    msg += `_100% Ethical. 100% Natural. 100% You._\n`;
     msg += `━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     msg += `📅 *Date:* ${dateStr}\n`;
     msg += `🏭 *Dispatch Origin:* Direct Factory Export Hub (New Delhi, India)\n`;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { SPECTRUM_COLORS, COLOR_CATEGORIES, HairColor, getSpectrumColors } from "@/data/colors";
 import { HAIR_STYLES, STYLE_NAMES } from "@/data/styles";
 import { Testimonial } from "@/app/api/testimonials/route";
@@ -96,6 +96,25 @@ export default function AdminPage() {
   // Search and Sort state
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState<{ key: SortKey, direction: SortDirection } | null>(null);
+
+  // Download price list state
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [downloadSuccessMsg, setDownloadSuccessMsg] = useState("");
+  const downloadMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(e.target as Node)) {
+        setShowDownloadMenu(false);
+      }
+    };
+    if (showDownloadMenu) {
+      document.addEventListener('mousedown', handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, [showDownloadMenu]);
 
   useEffect(() => {
     Promise.all([
@@ -958,6 +977,138 @@ export default function AdminPage() {
     return <span style={{ color: 'var(--color-primary)', marginLeft: '5px' }}>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>;
   };
 
+  // Download price list functions
+  const downloadPricesAsCsv = (
+    subset: 'all' | 'filtered' | 'selected' | 'product',
+    customFilename?: string
+  ) => {
+    let rowsToExport: Array<{
+      product: string;
+      length: string;
+      weight: string;
+      style: string;
+      category: string;
+      unit: string;
+      price: number;
+    }> = [];
+
+    if (subset === 'selected') {
+      rowsToExport = processedPrices.filter(p => selectedRows.includes(p.key));
+    } else if (subset === 'filtered') {
+      rowsToExport = processedPrices;
+    } else if (subset === 'product') {
+      rowsToExport = processedPrices.filter(p => p.product === product);
+    } else {
+      // 'all'
+      rowsToExport = Object.entries(prices).map(([key, price]) => {
+        const parts = key.split('|');
+        const prodName = parts[0] || '';
+        const length = parts[1] || '';
+        const style = parts[2] || '';
+        const category = parts[3] || '';
+        const weight = parts[4] || '100 Grams';
+        const unit = units[prodName] || 'unit';
+        return { key, product: prodName, length, weight, style, category, price, unit };
+      });
+    }
+
+    if (rowsToExport.length === 0) {
+      alert('No price entries found to export.');
+      return;
+    }
+
+    const escapeCsv = (val: string | number | undefined | null): string => {
+      if (val === undefined || val === null) return '""';
+      const str = String(val).trim();
+      return `"${str.replace(/"/g, '""')}"`;
+    };
+
+    const headers = [
+      'Product',
+      'Length',
+      'Weight',
+      'Style / Texture',
+      'Color Shade',
+      'Color Category',
+      'Unit of Sale',
+      'Price (USD)',
+      'Display Price'
+    ];
+
+    const csvRows = [headers.join(',')];
+
+    for (const row of rowsToExport) {
+      const colorObj = allColors.find(c => c.name === row.category || c.id === row.category);
+      const colorCategory = colorObj?.category || '';
+      const displayPrice = `$${Math.round(row.price)} / ${row.unit}`;
+
+      csvRows.push([
+        escapeCsv(row.product),
+        escapeCsv(row.length),
+        escapeCsv(row.weight),
+        escapeCsv(row.style),
+        escapeCsv(row.category),
+        escapeCsv(colorCategory),
+        escapeCsv(row.unit),
+        escapeCsv(Math.round(row.price)),
+        escapeCsv(displayPrice)
+      ].join(','));
+    }
+
+    const csvContent = '\uFEFF' + csvRows.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const defaultFilename = subset === 'product'
+      ? `price-list-${product.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${dateStr}.csv`
+      : subset === 'selected'
+      ? `price-list-selected-${rowsToExport.length}-${dateStr}.csv`
+      : subset === 'filtered'
+      ? `price-list-filtered-${dateStr}.csv`
+      : `hair-and-nature-price-list-${dateStr}.csv`;
+
+    link.href = url;
+    link.setAttribute('download', customFilename || defaultFilename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setDownloadSuccessMsg(`✓ Downloaded ${rowsToExport.length} price combinations!`);
+    setTimeout(() => setDownloadSuccessMsg(''), 4000);
+  };
+
+  const downloadPricesAsJson = () => {
+    if (Object.keys(prices).length === 0) {
+      alert('No price entries found to export.');
+      return;
+    }
+
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      totalEntries: Object.keys(prices).length,
+      units,
+      descriptions,
+      prices
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    link.href = url;
+    link.setAttribute('download', `hair-and-nature-prices-backup-${dateStr}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setDownloadSuccessMsg(`✓ Downloaded JSON backup with ${Object.keys(prices).length} prices!`);
+    setTimeout(() => setDownloadSuccessMsg(''), 4000);
+  };
+
   if (loading) return <div style={{ padding: '100px', textAlign: 'center' }}>Loading Admin Panel...</div>;
 
   return (
@@ -968,11 +1119,48 @@ export default function AdminPage() {
             <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.5rem)', color: 'var(--color-primary)', fontWeight: 600, margin: 0 }}>
               Store Management Panel
             </h1>
-            <span style={{ fontSize: '0.9rem', color: '#666' }}>Configure products, dynamic prices, and home page salon testimonials</span>
+            <span style={{ fontSize: '0.9rem', color: '#666' }}>100% Ethical. 100% Natural. 100% You. • Configure products, dynamic prices, and home page salon testimonials</span>
           </div>
-          <a href="/" target="_blank" style={{ fontSize: '0.88rem', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none', background: '#fff', border: '1px solid #ddd', padding: '8px 16px', borderRadius: '8px' }}>
-            ↗ View Live Store
-          </a>
+          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button
+              type="button"
+              onClick={() => downloadPricesAsCsv('all')}
+              disabled={Object.keys(prices).length === 0}
+              style={{
+                fontSize: '0.88rem',
+                color: '#ffffff',
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #1f1c19 0%, #12100f 100%)',
+                border: '1px solid rgba(197, 148, 58, 0.45)',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                cursor: Object.keys(prices).length === 0 ? 'not-allowed' : 'pointer',
+                opacity: Object.keys(prices).length === 0 ? 0.6 : 1,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                transition: 'all 0.2s ease'
+              }}
+              title="Download all defined price lists as CSV spreadsheet"
+            >
+              <span>📥</span>
+              <span>Download Price List</span>
+              <span style={{
+                fontSize: '0.72rem',
+                background: 'rgba(197, 148, 58, 0.25)',
+                color: '#DFB76C',
+                padding: '1px 6px',
+                borderRadius: '10px',
+                fontWeight: 700
+              }}>
+                {Object.keys(prices).length}
+              </span>
+            </button>
+            <a href="/" target="_blank" style={{ fontSize: '0.88rem', color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none', background: '#fff', border: '1px solid #ddd', padding: '8px 16px', borderRadius: '8px' }}>
+              ↗ View Live Store
+            </a>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -1748,7 +1936,7 @@ export default function AdminPage() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' }}>
             <div>
               <h2 style={{ fontSize: '1.4rem', margin: 0, fontWeight: 600 }}>3. Current Defined Prices</h2>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '3px', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.88rem', color: '#666' }}>
                   Showing {processedPrices.length} {searchQuery.trim() ? `matching (${Object.keys(prices).length} total)` : 'active combinations'}
                 </span>
@@ -1764,10 +1952,23 @@ export default function AdminPage() {
                     Fuzzy Search
                   </span>
                 )}
+                {downloadSuccessMsg && (
+                  <span style={{
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    color: '#166534',
+                    background: '#dcfce7',
+                    border: '1px solid #86efac',
+                    padding: '2px 8px',
+                    borderRadius: '10px'
+                  }}>
+                    {downloadSuccessMsg}
+                  </span>
+                )}
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', width: '100%', maxWidth: '640px', justifyContent: 'flex-start' }}>
-              <div style={{ position: 'relative', flex: '1 1 240px', minWidth: 'min(100%, 240px)' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+              <div style={{ position: 'relative', width: '220px' }}>
                 <input 
                   type="text" 
                   placeholder="Fuzzy search (e.g. 'tape 18 blonde', 'ktip', 'straight')..." 
@@ -1811,6 +2012,298 @@ export default function AdminPage() {
                   </button>
                 )}
               </div>
+
+              {/* Download Price List Split Button & Dropdown */}
+              <div style={{ position: 'relative' }} ref={downloadMenuRef}>
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'stretch',
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  border: '1px solid rgba(197, 148, 58, 0.45)',
+                  overflow: 'hidden'
+                }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (selectedRows.length > 0) {
+                        downloadPricesAsCsv('selected');
+                      } else if (searchQuery.trim()) {
+                        downloadPricesAsCsv('filtered');
+                      } else {
+                        downloadPricesAsCsv('all');
+                      }
+                    }}
+                    disabled={Object.keys(prices).length === 0}
+                    style={{
+                      background: 'linear-gradient(135deg, #1f1c19 0%, #12100f 100%)',
+                      color: '#ffffff',
+                      border: 'none',
+                      padding: '10px 14px',
+                      fontWeight: 600,
+                      fontSize: '0.88rem',
+                      cursor: Object.keys(prices).length === 0 ? 'not-allowed' : 'pointer',
+                      opacity: Object.keys(prices).length === 0 ? 0.6 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'all 0.15s ease'
+                    }}
+                    title={
+                      selectedRows.length > 0
+                        ? `Download ${selectedRows.length} selected prices as CSV`
+                        : searchQuery.trim()
+                        ? `Download ${processedPrices.length} filtered prices as CSV`
+                        : `Download all ${Object.keys(prices).length} prices as CSV`
+                    }
+                  >
+                    <span style={{ fontSize: '0.95rem' }}>📥</span>
+                    <span>
+                      {selectedRows.length > 0
+                        ? `Download Selected (${selectedRows.length})`
+                        : 'Download Price List'}
+                    </span>
+                    <span style={{
+                      fontSize: '0.7rem',
+                      background: 'rgba(197, 148, 58, 0.25)',
+                      color: '#DFB76C',
+                      padding: '1px 6px',
+                      borderRadius: '10px',
+                      fontWeight: 700
+                    }}>
+                      CSV
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowDownloadMenu(prev => !prev)}
+                    disabled={Object.keys(prices).length === 0}
+                    style={{
+                      background: 'linear-gradient(135deg, #2b2723 0%, #1a1715 100%)',
+                      color: '#DFB76C',
+                      border: 'none',
+                      borderLeft: '1px solid rgba(197, 148, 58, 0.3)',
+                      padding: '10px 10px',
+                      cursor: Object.keys(prices).length === 0 ? 'not-allowed' : 'pointer',
+                      opacity: Object.keys(prices).length === 0 ? 0.6 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '0.72rem'
+                    }}
+                    title="Export options (All, Filtered, Selected, JSON)"
+                  >
+                    ▼
+                  </button>
+                </div>
+
+                {/* Dropdown Menu */}
+                {showDownloadMenu && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 6px)',
+                    right: 0,
+                    width: '310px',
+                    background: '#ffffff',
+                    borderRadius: '12px',
+                    boxShadow: '0 12px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.06)',
+                    border: '1px solid #e2e8f0',
+                    zIndex: 100,
+                    padding: '8px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '4px'
+                  }}>
+                    <div style={{
+                      padding: '6px 10px 6px 10px',
+                      borderBottom: '1px solid #f1f5f9',
+                      fontSize: '0.74rem',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      color: '#64748b'
+                    }}>
+                      Download & Export Options
+                    </div>
+
+                    {/* Option 1: All Prices CSV */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        downloadPricesAsCsv('all');
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{
+                        padding: '10px 12px',
+                        background: '#f8fafc',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                        transition: 'background 0.15s ease'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
+                      onMouseLeave={e => e.currentTarget.style.background = '#f8fafc'}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.86rem', color: '#0f172a' }}>
+                          📊 Full Price List (CSV)
+                        </span>
+                        <span style={{ fontSize: '0.72rem', background: '#e2e8f0', padding: '1px 6px', borderRadius: '10px', fontWeight: 600 }}>
+                          {Object.keys(prices).length}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                        All combinations for Excel, Google Sheets, & Numbers
+                      </span>
+                    </button>
+
+                    {/* Option 2: Active Product Only */}
+                    {product && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          downloadPricesAsCsv('product');
+                          setShowDownloadMenu(false);
+                        }}
+                        style={{
+                          padding: '10px 12px',
+                          background: '#fff',
+                          border: '1px solid #e2e8f0',
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                        onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.86rem', color: '#0f172a' }}>
+                            🏷️ "{product}" Only (CSV)
+                          </span>
+                          <span style={{ fontSize: '0.72rem', background: '#e2e8f0', padding: '1px 6px', borderRadius: '10px', fontWeight: 600 }}>
+                            {processedPrices.filter(p => p.product === product).length}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                          Filtered to active selected product
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Option 3: Filtered CSV */}
+                    {searchQuery.trim() && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          downloadPricesAsCsv('filtered');
+                          setShowDownloadMenu(false);
+                        }}
+                        style={{
+                          padding: '10px 12px',
+                          background: 'rgba(143, 35, 43, 0.04)',
+                          border: '1px solid rgba(143, 35, 43, 0.2)',
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(143, 35, 43, 0.08)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(143, 35, 43, 0.04)'}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.86rem', color: 'var(--color-primary)' }}>
+                            🔍 Search Matches (CSV)
+                          </span>
+                          <span style={{ fontSize: '0.72rem', background: 'var(--color-primary)', color: '#fff', padding: '1px 6px', borderRadius: '10px', fontWeight: 600 }}>
+                            {processedPrices.length}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                          Filtered by &ldquo;{searchQuery}&rdquo;
+                        </span>
+                      </button>
+                    )}
+
+                    {/* Option 4: Selected Rows CSV */}
+                    {selectedRows.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          downloadPricesAsCsv('selected');
+                          setShowDownloadMenu(false);
+                        }}
+                        style={{
+                          padding: '10px 12px',
+                          background: 'rgba(22, 101, 52, 0.05)',
+                          border: '1px solid rgba(22, 101, 52, 0.2)',
+                          borderRadius: '8px',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px'
+                        }}
+                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(22, 101, 52, 0.1)'}
+                        onMouseLeave={e => e.currentTarget.style.background = 'rgba(22, 101, 52, 0.05)'}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.86rem', color: '#166534' }}>
+                            ☑️ Selected Rows (CSV)
+                          </span>
+                          <span style={{ fontSize: '0.72rem', background: '#166534', color: '#fff', padding: '1px 6px', borderRadius: '10px', fontWeight: 600 }}>
+                            {selectedRows.length}
+                          </span>
+                        </div>
+                        <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                          Only currently checked items
+                        </span>
+                      </button>
+                    )}
+
+                    <div style={{ height: '1px', background: '#f1f5f9', margin: '3px 0' }} />
+
+                    {/* Option 5: JSON backup */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        downloadPricesAsJson();
+                        setShowDownloadMenu(false);
+                      }}
+                      style={{
+                        padding: '9px 12px',
+                        background: '#fff',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = '#f8fafc'}
+                      onMouseLeave={e => e.currentTarget.style.background = '#fff'}
+                    >
+                      <span style={{ fontWeight: 600, fontSize: '0.84rem', color: '#334155' }}>
+                        🗄️ Database Backup (JSON)
+                      </span>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
+                        .json
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {selectedRows.length > 0 && (
                 <button 
                   onClick={handleDeleteSelected}

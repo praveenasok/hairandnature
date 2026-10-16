@@ -80,9 +80,12 @@ export default function Navigation() {
     <>
       <header className={`site-header ${scrolled ? 'scrolled' : ''}`}>
         <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '15px', flexShrink: 1, minWidth: 0, textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
+          <Link href="/" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flexShrink: 1, minWidth: 0, textDecoration: 'none' }} onClick={() => setIsOpen(false)}>
             {/* Brand Logo */}
-            <h1 className="brand-name" style={{ margin: 0, fontWeight: 500, fontSize: 'clamp(1.25rem, 4.2vw, 1.8rem)', whiteSpace: 'nowrap' }}>hair&nature®</h1>
+            <h1 className="brand-name" style={{ margin: 0, fontWeight: 500, fontSize: 'clamp(1.2rem, 3.8vw, 1.75rem)', whiteSpace: 'nowrap', lineHeight: 1.15 }}>hair&nature®</h1>
+            <span style={{ fontSize: 'clamp(0.58rem, 1.6vw, 0.7rem)', letterSpacing: '0.4px', color: 'var(--color-accent-gold-dark, #966D21)', fontWeight: 700, whiteSpace: 'nowrap', opacity: 0.95 }}>
+              100% Ethical. 100% Natural. 100% You.
+            </span>
           </Link>
           
           {/* Desktop Nav */}
@@ -171,7 +174,10 @@ export default function Navigation() {
                         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', filter: 'brightness(0.6)', pointerEvents: 'none' }} 
                       />
                       <div style={{ position: 'relative', zIndex: 1, color: 'white' }}>
-                        <h4 style={{ margin: '0 0 8px 0', fontSize: '1.1rem', fontWeight: 600 }}>Premium Collection</h4>
+                        <span style={{ display: 'inline-block', fontSize: '0.72rem', letterSpacing: '0.8px', textTransform: 'uppercase', color: '#DFB76C', fontWeight: 700, marginBottom: '4px' }}>
+                          100% Ethical. 100% Natural. 100% You.
+                        </span>
+                        <h4 style={{ margin: '0 0 6px 0', fontSize: '1.1rem', fontWeight: 600 }}>Premium Collection</h4>
                         <p style={{ margin: 0, fontSize: '0.85rem', opacity: 0.9, lineHeight: 1.5 }}>Discover ethically sourced, 100% natural Indian Remy human hair.</p>
                       </div>
                     </Link>

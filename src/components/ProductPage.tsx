@@ -130,7 +130,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   const selectedStyleObj = useMemo(() => {
     return HAIR_STYLES.find(s => s.name === style) || HAIR_STYLES[0];
   }, [style]);
-  
+
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [unit, setUnit] = useState<string>('unit');
 
@@ -244,7 +244,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
     }, 5000);
     return () => clearInterval(timer);
   }, [slideImages.length, isPaused, activeView]);
-  
+
   useEffect(() => {
     fetch('/api/prices')
       .then(res => res.json())
@@ -376,7 +376,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
       const altCatWeight = `${title}|${length}|${altStyle}|${currentColorCategory}|${weight}`;
       const altColor100g = `${title}|${length}|${altStyle}|${color}|100 Grams`;
       const altCat100g = `${title}|${length}|${altStyle}|${currentColorCategory}|100 Grams`;
-      
+
       if (prices[altColorWeight] !== undefined) {
         currentPrice = prices[altColorWeight];
         break;
@@ -439,7 +439,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
   return (
     <div style={{ paddingTop: 'clamp(90px, 12vh, 130px)', paddingBottom: 'clamp(50px, 8vh, 80px)', background: 'var(--color-background)', minHeight: '100vh' }}>
       <div className="container">
-             {/* Clean Breadcrumb & Trust Banner */}
+        {/* Clean Breadcrumb & Trust Banner */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '28px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.9rem', color: '#666' }}>
             <a href="/" style={{ color: '#666', transition: 'color 0.2s' }}>Home</a>
@@ -448,56 +448,56 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             <span style={{ color: '#bbb' }}>/</span>
             <span style={{ color: 'var(--color-primary)', fontWeight: 600 }}>{title}</span>
           </div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', color: 'var(--color-primary)', padding: '5px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
-            <span>✨</span> 100% Virgin Temple Remy Hair • Direct Factory Floor
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'var(--color-primary-subtle, rgba(143, 35, 43, 0.08))', color: 'var(--color-primary)', padding: '5px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 700 }}>
+            <span>✨</span> 100% Ethical. 100% Natural. 100% You.
           </div>
         </div>
 
         {/* Main 2-Column Luxury Showcase Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 460px), 1fr))', gap: 'clamp(32px, 5vw, 64px)', alignItems: 'start' }}>
-          
+
           {/* Left Column: Sticky Luxury Product Gallery (desktop only) */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             className="product-gallery-sticky"
           >
-                     {/* Main Interactive Product Image Frame */}
-            <div 
+            {/* Main Interactive Product Image Frame */}
+            <div
               onMouseEnter={() => setIsPaused(true)}
               onMouseLeave={() => setIsPaused(false)}
-              style={{ 
-                position: 'relative', 
-                width: '100%', 
-                aspectRatio: '4 / 4.8', 
-                borderRadius: '20px', 
-                overflow: 'hidden', 
-                boxShadow: '0 20px 45px rgba(0,0,0,0.08)', 
-                marginBottom: '16px', 
+              style={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: '4 / 4.8',
+                borderRadius: '20px',
+                overflow: 'hidden',
+                boxShadow: '0 20px 45px rgba(0,0,0,0.08)',
+                marginBottom: '16px',
                 background: '#f8f6f4',
                 border: '1px solid rgba(0,0,0,0.04)'
               }}
             >
               <AnimatePresence mode="wait">
-                <motion.img 
+                <motion.img
                   key={currentDisplay.id + currentDisplay.src}
-                  src={currentDisplay.src} 
+                  src={currentDisplay.src}
                   alt={currentDisplay.alt}
                   initial={{ opacity: 0, scale: 1.02 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.35, ease: 'easeOut' }}
-                  style={{ 
+                  style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
-                    width: '100%', 
-                    height: '100%', 
+                    width: '100%',
+                    height: '100%',
                     objectFit: 'cover',
                     objectPosition: PRODUCT_IMAGE_CONFIG[currentDisplay.src]?.position || 'center center',
                     transform: PRODUCT_IMAGE_CONFIG[currentDisplay.src]?.transform || undefined
-                  }} 
+                  }}
                 />
               </AnimatePresence>
 
@@ -521,12 +521,12 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 border: '1px solid rgba(255,255,255,0.7)',
                 maxWidth: 'calc(100% - 110px)'
               }}>
-                <span style={{ 
-                  width: '8px', 
-                  height: '8px', 
-                  borderRadius: '50%', 
+                <span style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
                   flexShrink: 0,
-                  background: currentDisplay.type === 'color' ? '#d97706' : (currentDisplay.type === 'style' ? '#7c3aed' : 'var(--color-primary)') 
+                  background: currentDisplay.type === 'color' ? '#d97706' : (currentDisplay.type === 'style' ? '#7c3aed' : 'var(--color-primary)')
                 }} />
                 <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {currentDisplay.type === 'color' && `Shade: ${currentDisplay.title}`}
@@ -592,20 +592,20 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               {/* Gallery Overlay Prev / Next Buttons */}
               {allGalleryItems.length > 1 && (
                 <div style={{ position: 'absolute', bottom: '16px', right: '16px', display: 'flex', gap: '8px', zIndex: 2 }}>
-                  <button 
+                  <button
                     onClick={handlePrevSlide}
                     aria-label="Previous image"
-                    style={{ 
-                      width: '40px', 
-                      height: '40px', 
-                      borderRadius: '50%', 
-                      background: 'rgba(255,255,255,0.92)', 
-                      color: '#222', 
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.92)',
+                      color: '#222',
                       backdropFilter: 'blur(8px)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
-                      cursor: 'pointer', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       border: 'none',
                       transition: 'all 0.2s ease'
@@ -613,20 +613,20 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   >
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
                   </button>
-                  <button 
+                  <button
                     onClick={handleNextSlide}
                     aria-label="Next image"
-                    style={{ 
-                      width: '40px', 
-                      height: '40px', 
-                      borderRadius: '50%', 
-                      background: 'rgba(255,255,255,0.92)', 
-                      color: '#222', 
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      background: 'rgba(255,255,255,0.92)',
+                      color: '#222',
                       backdropFilter: 'blur(8px)',
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)', 
-                      cursor: 'pointer', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       border: 'none',
                       transition: 'all 0.2s ease'
@@ -640,11 +640,11 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
 
             {/* Gallery Thumbnails Strip */}
             {allGalleryItems.length > 1 && (
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: `repeat(${allGalleryItems.length}, 1fr)`, 
-                gap: '8px', 
-                marginBottom: '22px' 
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${allGalleryItems.length}, 1fr)`,
+                gap: '8px',
+                marginBottom: '22px'
               }}>
                 {allGalleryItems.map((item, idx) => {
                   const isActive = idx === currentItemIndex;
@@ -675,7 +675,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                       }}
                     >
                       <img src={item.src} alt={item.alt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      
+
                       {item.type !== 'product' && (
                         <div style={{
                           position: 'absolute',
@@ -701,11 +701,11 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             )}
 
             {/* Luxury Trust & Craftsmanship Highlights */}
-            <div style={{ 
-              background: '#ffffff', 
-              borderRadius: '16px', 
-              padding: '16px 20px', 
-              border: '1px solid rgba(0,0,0,0.06)', 
+            <div style={{
+              background: '#ffffff',
+              borderRadius: '16px',
+              padding: '16px 20px',
+              border: '1px solid rgba(0,0,0,0.06)',
               boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
               display: 'grid',
               gridTemplateColumns: 'repeat(3, 1fr)',
@@ -730,18 +730,18 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             </div>
 
           </motion.div>
-          
+
           {/* Right Column: Luxury Product Details & Configurator Card */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
-            style={{ 
-              background: '#ffffff', 
-              borderRadius: '24px', 
-              padding: 'clamp(24px, 4vw, 36px)', 
-              border: '1px solid rgba(0,0,0,0.06)', 
-              boxShadow: '0 12px 35px rgba(0,0,0,0.03)' 
+            style={{
+              background: '#ffffff',
+              borderRadius: '24px',
+              padding: 'clamp(24px, 4vw, 36px)',
+              border: '1px solid rgba(0,0,0,0.06)',
+              boxShadow: '0 12px 35px rgba(0,0,0,0.03)'
             }}
           >
             {/* Pre-header Tag */}
@@ -756,10 +756,15 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             </div>
 
             {/* Title & Live Pricing Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '14px' }}>
-              <h1 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', color: '#1a1a1a', fontWeight: 700, lineHeight: 1.15, margin: 0, flex: 1, minWidth: '220px' }}>
-                {title}
-              </h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '14px', marginBottom: '8px' }}>
+              <div>
+                <h1 style={{ fontSize: 'clamp(1.8rem, 3.5vw, 2.4rem)', color: '#1a1a1a', fontWeight: 700, lineHeight: 1.15, margin: '0 0 6px 0' }}>
+                  {title}
+                </h1>
+                <div style={{ fontSize: '0.84rem', fontWeight: 700, color: 'var(--color-accent-gold-dark, #966D21)', letterSpacing: '0.5px' }}>
+                  100% Ethical. 100% Natural. 100% You.
+                </div>
+              </div>
               {currentPrice !== undefined && (
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ display: 'inline-flex', alignItems: 'baseline', color: 'var(--color-primary)', lineHeight: 1 }}>
@@ -783,7 +788,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             <p style={{ fontSize: '0.98rem', lineHeight: 1.65, marginBottom: '22px', color: '#555' }}>
               {description}
             </p>
-            
+
             <div style={{ height: '1px', background: '#f0edea', margin: '20px 0' }} />
 
             {/* 1. Length Options */}
@@ -798,13 +803,13 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 {availableLengths.map((len: string) => {
                   const isSelected = len === length;
                   return (
-                    <button 
-                      key={len} 
+                    <button
+                      key={len}
                       onClick={() => setLength(len)}
-                      style={{ 
-                        padding: '8px 14px', 
-                        borderRadius: '8px', 
-                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0', 
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
                         background: isSelected ? 'var(--color-primary-subtle, rgba(143, 35, 43, 0.05))' : '#ffffff',
                         color: isSelected ? 'var(--color-primary)' : '#334155',
                         fontWeight: isSelected ? 700 : 500,
@@ -832,13 +837,13 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                 {availableWeights.map((w: string) => {
                   const isSelected = w === weight;
                   return (
-                    <button 
-                      key={w} 
+                    <button
+                      key={w}
                       onClick={() => setWeight(w)}
-                      style={{ 
-                        padding: '8px 14px', 
-                        borderRadius: '8px', 
-                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0', 
+                      style={{
+                        padding: '8px 14px',
+                        borderRadius: '8px',
+                        border: isSelected ? '2px solid var(--color-primary)' : '1px solid #e2e8f0',
                         background: isSelected ? 'var(--color-primary-subtle, rgba(143, 35, 43, 0.05))' : '#ffffff',
                         color: isSelected ? 'var(--color-primary)' : '#334155',
                         fontWeight: isSelected ? 700 : 500,
@@ -864,9 +869,9 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
 
               {/* Style Cards Compact Grid */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(3, 1fr)', 
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(3, 1fr)',
                 gap: '8px',
                 marginBottom: '10px'
               }}>
@@ -904,14 +909,14 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         marginBottom: '6px',
                         position: 'relative'
                       }}>
-                        <img 
-                          src={st.image} 
-                          alt={st.name} 
-                          style={{ 
-                            width: '100%', 
-                            height: '100%', 
+                        <img
+                          src={st.image}
+                          alt={st.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
                             objectFit: 'cover'
-                          }} 
+                          }}
                         />
                         {isSelected && (
                           <div style={{
@@ -934,9 +939,9 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         )}
                       </div>
 
-                      <span style={{ 
-                        fontWeight: isSelected ? 700 : 600, 
-                        fontSize: '0.8rem', 
+                      <span style={{
+                        fontWeight: isSelected ? 700 : 600,
+                        fontSize: '0.8rem',
                         color: isSelected ? 'var(--color-primary)' : '#1e293b',
                         lineHeight: 1.2
                       }}>
@@ -958,12 +963,12 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
 
               {/* Color Swatches Grid with In-Place Zoom on Selected Swatch */}
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))', 
-                gap: '10px', 
-                maxHeight: '280px', 
-                overflowY: 'auto', 
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(78px, 1fr))',
+                gap: '10px',
+                maxHeight: '280px',
+                overflowY: 'auto',
                 padding: '14px 12px',
                 border: '1px solid #e5e5e5',
                 borderRadius: '12px',
@@ -996,8 +1001,8 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                         zIndex: isSelected ? 20 : 1,
                         transform: isSelected ? 'scale(1.15)' : 'scale(1)',
                         transformOrigin: 'center center',
-                        boxShadow: isSelected 
-                          ? '0 10px 22px -2px var(--color-primary-glow, rgba(143, 35, 43, 0.4)), 0 0 0 2px var(--color-primary)' 
+                        boxShadow: isSelected
+                          ? '0 10px 22px -2px var(--color-primary-glow, rgba(143, 35, 43, 0.4)), 0 0 0 2px var(--color-primary)'
                           : '0 1px 3px rgba(0,0,0,0.04)',
                         transition: 'transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, border-color 0.2s ease'
                       }}
@@ -1026,34 +1031,34 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                       )}
 
                       {/* Swatch Hair Image with In-Place Zoom */}
-                      <div style={{ 
-                        width: '38px', 
-                        height: '38px', 
-                        borderRadius: '50%', 
-                        overflow: 'hidden', 
-                        border: isSelected ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.08)', 
+                      <div style={{
+                        width: '38px',
+                        height: '38px',
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        border: isSelected ? '2px solid #ffffff' : '1px solid rgba(0,0,0,0.08)',
                         background: '#eee',
                         boxShadow: isSelected ? '0 0 0 1.5px var(--color-primary)' : 'none',
                         transition: 'all 0.2s ease',
                         flexShrink: 0
                       }}>
-                        <img 
-                          src={c.image} 
-                          alt={c.name} 
-                          style={{ 
-                            width: '100%', 
-                            height: '100%', 
+                        <img
+                          src={c.image}
+                          alt={c.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
                             objectFit: 'cover',
                             transform: isSelected ? 'scale(1.35)' : 'scale(1)',
                             transition: 'transform 0.28s ease'
-                          }} 
+                          }}
                         />
                       </div>
 
                       {/* Swatch Label: Full Name Display without Truncation */}
-                      <span style={{ 
-                        fontSize: isSelected ? '0.71rem' : '0.67rem', 
-                        fontWeight: isSelected ? 800 : 500, 
+                      <span style={{
+                        fontSize: isSelected ? '0.71rem' : '0.67rem',
+                        fontWeight: isSelected ? 800 : 500,
                         color: isSelected ? 'var(--color-primary)' : '#334155',
                         textAlign: 'center',
                         lineHeight: 1.15,
@@ -1095,22 +1100,22 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
             )}
 
             {/* Luxury Order Summary & Wholesale Enquiry Action Card */}
-            <div style={{ 
-              background: 'linear-gradient(135deg, #fffdfa 0%, #fbf5ed 60%, #f6ebdc 100%)', 
-              border: '1.5px solid rgba(197, 148, 58, 0.35)', 
-              borderRadius: '20px', 
-              padding: 'clamp(20px, 3.5vw, 26px)', 
+            <div style={{
+              background: 'linear-gradient(135deg, #fffdfa 0%, #fbf5ed 60%, #f6ebdc 100%)',
+              border: '1.5px solid rgba(197, 148, 58, 0.35)',
+              borderRadius: '20px',
+              padding: 'clamp(20px, 3.5vw, 26px)',
               boxShadow: '0 10px 32px rgba(197, 148, 58, 0.09), inset 0 1px 0 rgba(255,255,255,0.95)',
               position: 'relative',
               overflow: 'hidden'
             }}>
               {/* Header Badge */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <span style={{ 
-                  fontSize: '0.74rem', 
-                  textTransform: 'uppercase', 
-                  letterSpacing: '1.2px', 
-                  color: '#8c7662', 
+                <span style={{
+                  fontSize: '0.74rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1.2px',
+                  color: '#8c7662',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -1119,12 +1124,12 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#c5943a' }}></span>
                   Wholesale Summary
                 </span>
-                <span style={{ 
-                  fontSize: '0.74rem', 
-                  background: '#dcfce7', 
-                  color: '#15803d', 
-                  padding: '2px 8px', 
-                  borderRadius: '12px', 
+                <span style={{
+                  fontSize: '0.74rem',
+                  background: '#dcfce7',
+                  color: '#15803d',
+                  padding: '2px 8px',
+                  borderRadius: '12px',
                   fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
@@ -1136,11 +1141,11 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
 
               {/* Active Selection Ribbon */}
-              <div style={{ 
-                background: '#ffffff', 
-                border: '1px solid #ebdcd0', 
-                borderRadius: '12px', 
-                padding: '12px 14px', 
+              <div style={{
+                background: '#ffffff',
+                border: '1px solid #ebdcd0',
+                borderRadius: '12px',
+                padding: '12px 14px',
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -1170,7 +1175,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(197, 148, 58, 0.2)' }}>
                 <span style={{ fontSize: '0.86rem', color: '#555', fontWeight: 600 }}>Order Quantity ({unit}s):</span>
                 <div style={{ display: 'inline-flex', alignItems: 'center', background: '#ffffff', borderRadius: '8px', border: '1px solid #d9d0c7', overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     style={{ border: 'none', background: 'transparent', color: '#444', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
@@ -1180,7 +1185,7 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
                   <span style={{ padding: '0 12px', fontSize: '0.92rem', fontWeight: 800, color: '#1a1a1a' }}>
                     {quantity}
                   </span>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setQuantity(quantity + 1)}
                     style={{ border: 'none', background: 'transparent', color: '#444', padding: '6px 12px', cursor: 'pointer', fontSize: '1rem', fontWeight: 700 }}
@@ -1214,25 +1219,25 @@ export default function ProductPage({ title, desc, img, images = [], specs = [] 
               </div>
 
               {/* Primary Enquiry Action */}
-              <button 
+              <button
                 type="button"
                 onClick={handleAddToGlobalEnquiry}
-                className="wholesale-cta-btn" 
-                style={{ 
-                  width: '100%', 
-                  padding: '16px 22px', 
-                  fontSize: '0.98rem', 
+                className="wholesale-cta-btn"
+                style={{
+                  width: '100%',
+                  padding: '16px 22px',
+                  fontSize: '0.98rem',
                   fontWeight: 600,
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   gap: '10px',
                   borderRadius: '14px',
-                  background: isJustAdded 
+                  background: isJustAdded
                     ? 'linear-gradient(135deg, #15803d 0%, #166534 100%)'
                     : 'linear-gradient(135deg, #1c1917 0%, #110f0e 100%)',
                   color: '#ffffff',
-                  border: isJustAdded 
+                  border: isJustAdded
                     ? '1.5px solid rgba(74, 222, 128, 0.6)'
                     : '1.5px solid rgba(197, 148, 58, 0.45)',
                   boxShadow: isJustAdded

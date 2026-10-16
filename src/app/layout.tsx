@@ -20,8 +20,8 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "hair&nature® - Natural Human Hair Extension Manufacturer & Exporter",
-  description: "Ethically sourced, high-quality, chemical-free extensions known for strength, luster, and durability. Experience premium hair extensions.",
+  title: "hair&nature® - 100% Ethical. 100% Natural. 100% You.",
+  description: "100% Ethical. 100% Natural. 100% You. Top natural human hair extensions manufacturer & exporter. Ethically sourced, chemical-free, 100% natural Remy hair extensions.",
   icons: {
     icon: [
       { url: '/icon.png', type: 'image/png' },
@@ -48,7 +48,10 @@ export default function RootLayout({
           <footer id="contact-section" style={{ backgroundColor: '#111', color: 'white', padding: 'clamp(50px, 8vh, 80px) 0 30px' }}>
             <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 250px), 1fr))', gap: 'clamp(25px, 4vw, 40px)', marginBottom: '30px' }}>
               <div>
-                <h3 style={{ marginBottom: '16px', fontSize: 'clamp(1.6rem, 4vw, 2rem)', color: 'var(--color-primary)' }}>hair&nature®</h3>
+                <h3 style={{ marginBottom: '8px', fontSize: 'clamp(1.6rem, 4vw, 2rem)', color: 'var(--color-primary)' }}>hair&nature®</h3>
+                <p style={{ fontWeight: 700, color: 'var(--color-accent-gold, #C5943A)', fontSize: '0.92rem', marginBottom: '12px', letterSpacing: '0.4px' }}>
+                  100% Ethical. 100% Natural. 100% You.
+                </p>
                 <p style={{ opacity: 0.7, lineHeight: 1.8, fontSize: '0.95rem' }}>Top natural human hair extensions manufacturer & exporter. We offer ethically sourced, chemical-free, 100% natural Remy hair extensions.</p>
               </div>
               <div>

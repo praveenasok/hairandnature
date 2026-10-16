@@ -79,7 +79,7 @@ export default function Home() {
       align: "flex-end", 
       textAlign: "right" as const,
       title: "Natural Indian Human Hair Extension Manufacturer & Exporter",
-      subtitle: "Ethically sourced, high-quality, chemical-free extensions known for strength, luster, and durability.",
+      subtitle: "100% Ethical. 100% Natural. 100% You. Ethically sourced, chemical-free extensions known for strength, luster, and durability.",
       link: null,
       buttonText: null,
       titleNowrap: false,
@@ -1710,7 +1710,10 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '16px' }}>Our Heritage & Commitment</h2>
+              <h2 className="section-title" style={{ textAlign: 'left', marginBottom: '8px' }}>Our Heritage & Commitment</h2>
+              <div style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--color-primary)', letterSpacing: '0.4px', marginBottom: '16px' }}>
+                100% Ethical. 100% Natural. 100% You.
+              </div>
               <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.1rem)', lineHeight: 1.8, color: 'var(--color-text-light)', marginBottom: '16px' }}>
                 At hair&nature®, we pride ourselves on delivering the finest, ethically sourced Remy human hair directly from the temples of India to you.
               </p>

@@ -10,8 +10,11 @@ export default function Shop() {
   return (
     <div className="animate-fade-in" style={{ paddingTop: 'clamp(90px, 12vh, 120px)', paddingBottom: 'clamp(40px, 8vh, 80px)', backgroundColor: 'var(--color-white)', minHeight: '80vh' }}>
       <div className="container">
-        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--color-primary)', marginBottom: '10px', fontWeight: 600 }}>Shop Collection</h1>
-        <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.2rem)', opacity: 0.8, marginBottom: 'clamp(24px, 4vw, 40px)', lineHeight: 1.6 }}>Discover the perfect DIY hair extensions to match your style.</p>
+        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 3rem)', color: 'var(--color-primary)', marginBottom: '6px', fontWeight: 600 }}>Shop Collection</h1>
+        <p style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--color-accent-gold-dark, #966D21)', letterSpacing: '0.5px', marginBottom: '8px' }}>
+          100% Ethical. 100% Natural. 100% You.
+        </p>
+        <p style={{ fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', opacity: 0.8, marginBottom: 'clamp(24px, 4vw, 40px)', lineHeight: 1.6 }}>Discover the perfect hair extensions to match your style.</p>
         
         <div className="grid">
           {products.map((product) => (

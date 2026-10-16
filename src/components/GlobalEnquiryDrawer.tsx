@@ -229,8 +229,13 @@ export default function GlobalEnquiryDrawer() {
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                  <span style={{ fontSize: '0.74rem', color: '#966d21', fontWeight: 700, letterSpacing: '0.3px' }}>
+                    100% Ethical. 100% Natural. 100% You.
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
                   <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span>
-                  <span style={{ fontSize: '0.78rem', color: '#666', fontWeight: 500 }}>
+                  <span style={{ fontSize: '0.74rem', color: '#666', fontWeight: 500 }}>
                     Direct Factory Floor • New Delhi Export Desk
                   </span>
                 </div>
